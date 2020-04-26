@@ -1,0 +1,9 @@
+@import "settings.vars.scss";
+@import "mixins.scss";
+@import "prism.scss";
+
+body {
+  @include mainfont;
+  color: $main_black;
+  background: white;
+}

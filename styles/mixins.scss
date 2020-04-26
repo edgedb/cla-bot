@@ -1,0 +1,58 @@
+@import "settings.vars.scss";
+
+@mixin cell {
+  min-width: 300px;
+  max-width: 700px;
+  width: 70%;
+  margin: 10px 0;
+  padding: 3px 10px;
+
+  border-left: 1px solid transparent;
+
+  &:hover {
+    border-left: 1px solid #ccc;
+  }
+}
+
+@mixin mainfont {
+  font-family: -apple-system, BlinkMacSystemFont, arial, sans-serif;
+}
+
+@mixin monospace {
+  font-family: Menlo, Consolas, monospace;
+}
+
+@mixin background-image($fn) {
+  width: image-width($fn);
+  height: image-height($fn);
+  background-image: url($fn);
+  background-repeat: no-repeat;
+}
+
+@function iphonex_right_constraint($min) {
+  @return unquote("max(") $min unquote(",env(safe-area-inset-right))");
+}
+
+@function iphonex_left_constraint($min) {
+  @return unquote("max(") $min unquote(",env(safe-area-inset-left))");
+}
+
+@mixin iphonex_sides_constraint($type, $min) {
+  /* See https://webkit.org/blog/7929/designing-websites-for-iphone-x/
+     for details. */
+  #{$type}-left: iphonex_left_constraint($min);
+  #{$type}-right: iphonex_right_constraint($min);
+}
+
+@mixin iphonex_var_constraint($var, $min) {
+  /* See https://webkit.org/blog/7929/designing-websites-for-iphone-x/
+     for details. */
+  #{$var}: unquote("max(") iphonex_left_constraint($min) unquote(",")
+    iphonex_right_constraint($min) unquote(")");
+}
+
+@mixin iphonex_constraints() {
+  @supports (padding: unquote("max(0px)")) {
+    @content;
+  }
+}
