@@ -1,9 +1,11 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 
-import validate from "../../service/handlers/cla/validate";
+import { checkCLA } from "../../service/handlers/check-cla";
 
-// This file defines a webhook handler for GitHub pull requests.
-//
+// Handler for GitHub pull requests.
+// It verifies that the user who is creating a PR
+// signed the CLA. The service publishes in any case a status in the PR,
+// using credentials of a GitHub app.
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const {
@@ -14,7 +16,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(404).end("Not found");
   }
 
-  // NB: Next.js only handles lowercase headers
+  // Next.js enforces lowercase header names
   let event = req.headers['x-github-event']
 
   if (!event) {
@@ -23,7 +25,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
   switch (event) {
     case 'pull_request':
-      // TODO: read the user from body.pull_request.user.id
       const { body } = req;
       const pullRequestUserId = body?.pull_request?.user?.id;
 
@@ -31,9 +32,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         return res.status(400).end("Expected a request body with pull request user id");
       }
 
-      await validate(pullRequestUserId)
-
-      res.status(200).json(body)
+      await checkCLA(pullRequestUserId)
+      res.status(200).end("OK")
       break
     default:
       return res.status(400).end(`The event ${event} is not handled.`);
