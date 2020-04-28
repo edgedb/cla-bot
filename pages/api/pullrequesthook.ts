@@ -24,14 +24,31 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   switch (event) {
-    case 'pull_request':
+    case "ping":
+      // sent when configuring a webhook
+      res.status(200).end("Hi there!");
+      break
+    case "pull_request":
       const { body } = req;
+
+      const action = body.action;
+      if (
+        action != "opened" &&
+        action != "reopened"
+      ) {
+        // do nothing;
+        // we check CLA only when
+        // a PR is opened or reopened
+        res.status(200).end(`Doing nothing: the pull_request action is ${action}`);
+        break
+      }
+
       const gitHubUserId = body?.pull_request?.user?.id;
       const pullRequestHeadSha = body?.pull_request?.head?.sha;
       const targetRepositoryId = body?.repository?.id;
-      const targetRepositoryOwnerId = body?.repository?.owner.id;
-      const targetRepositoryOwnerName = body?.repository?.owner.login;
-      const targetRepositoryFullName = body?.repository?.fullName;
+      const targetRepositoryOwnerId = body?.repository?.owner?.id;
+      const targetRepositoryOwnerName = body?.repository?.owner?.login;
+      const targetRepositoryFullName = body?.repository?.full_name;
       const targetRepositoryName = body?.repository?.name;
 
       if (
@@ -49,7 +66,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           repository.id;
           repository.owner.id;
           repository.owner.login;
-          repository.fullName;
+          repository.full_name;
           repository.name;
         `);
       }
