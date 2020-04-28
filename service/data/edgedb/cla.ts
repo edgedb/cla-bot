@@ -1,7 +1,9 @@
-import { CLA } from "../../domain/cla"
-import { ClaRepository } from "../../domain/repositories";
+import { TYPES } from "../../constants/types"
+import { injectable } from "inversify"
+import { CLA, ClaRepository } from "../../domain/cla"
 
 
+@injectable()
 class EdgeDBClaRepository implements ClaRepository {
 
   async getClaByGitHubUserId(githubUserId: Number): Promise<CLA | null> {

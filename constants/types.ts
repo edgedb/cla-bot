@@ -1,5 +1,6 @@
 const TYPES = {
-  ClaRepository: Symbol.for("ClaRepository")
+  ClaRepository: Symbol.for("ClaRepository"),
+  StatusChecksService: Symbol.for("StatusChecksService"),
 };
 
 export { TYPES };

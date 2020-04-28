@@ -3,9 +3,8 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { checkCLA } from "../../service/handlers/check-cla";
 
 // Handler for GitHub pull requests.
-// It verifies that the user who is creating a PR
-// signed the CLA. The service publishes in any case a status in the PR,
-// using credentials of a GitHub app.
+// It verifies that the user who is creating a PR signed the CLA,
+// and posts a status check to the PR.
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const {

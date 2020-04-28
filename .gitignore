@@ -4,3 +4,6 @@
 /.vscode
 /yarn-error.log
 
+# ignore pem files, to avoid accidentally commit a private RSA key to the repo:
+# private RSA keys are handled to create JWTs to interact with GitHub api
+/**/*.pem

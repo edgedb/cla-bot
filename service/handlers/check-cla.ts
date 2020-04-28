@@ -1,24 +1,41 @@
-// import { container } from "../../inversify.config"
-// import { TYPES } from "../../constants/types"
-// import { ClaRepository } from "../../service/domain/repositories"
-import { EdgeDBClaRepository } from "../../service/data/edgedb/cla"
+import { container } from "../../inversify.config"
+import { TYPES } from "../../constants/types"
+import { ClaRepository } from "../../service/domain/cla"
+import { CheckState, StatusCheckInput, StatusChecksService } from "../../service/domain/checks"
 
+const CLA_CHECK_CONTEXT = "CLA Signing";
+
+// TODO: create a TARGET_URL to the same environment of this API, to a method that
+// displays the license
+const TARGET_URL = "https://example.com/build/status";
+
+// TODO: support configurable messages
 
 async function checkCLA(gitHubUserId: Number): Promise<void> {
-  // check if the requester signed the CLA
-  const claRepository = new EdgeDBClaRepository();
-  // TODO: how to fix the following error?
-  // Support for the experimental syntax 'decorators-legacy' isn't currently enabled
-  //
-  // container.get<ClaRepository>(TYPES.ClaRepository);
+  const claRepository = container.get<ClaRepository>(TYPES.ClaRepository);
+  const statusCheckService = container.get<StatusChecksService>(TYPES.StatusChecksService);
 
   const cla = await claRepository.getClaByGitHubUserId(gitHubUserId);
 
+  let status: StatusCheckInput;
+
   if (cla == null) {
-    // TODO: post a failure status, requiring to sign the CLA
+    status = new StatusCheckInput(
+      CheckState.failure,
+      TARGET_URL,
+      "Please sign our Contributor License Agreement.",
+      CLA_CHECK_CONTEXT
+    );
   } else {
-    // TODO: post a success status
+    status = new StatusCheckInput(
+      CheckState.success,
+      TARGET_URL,
+      "The Contributor License Agreement is signed :heavy_check_mark:.",
+      CLA_CHECK_CONTEXT
+    );
   }
+
+  await statusCheckService.createStatus(status);
 }
 
 export { checkCLA };
