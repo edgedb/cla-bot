@@ -1,10 +1,25 @@
 
-export class CLA {
+
+export interface ClaCheckRepository {
+  id: number,
+  owner: string,
+  ownerId: number,
+  name: string,
+  fullName: string
+}
+
+export interface ClaCheckInput {
+  gitHubUserId: number
+  repository: ClaCheckRepository
+  pullRequestHeadSha: string
+}
+
+export class Cla {
   id: string;
-  gitHubUserId: Number;
+  gitHubUserId: number;
   timestamp: Date
 
-  constructor(id: string, gitHubUserId: Number, timestamp: Date) {
+  constructor(id: string, gitHubUserId: number, timestamp: Date) {
     this.id = id;
     this.gitHubUserId = gitHubUserId
     this.timestamp = timestamp
@@ -13,7 +28,7 @@ export class CLA {
 
 export interface ClaRepository {
 
-  getClaByGitHubUserId(githubUserId: Number): Promise<CLA | null>;
+  getClaByGitHubUserId(githubUserId: Number): Promise<Cla | null>;
 
-  saveCla(data: CLA): Promise<void>;
+  saveCla(data: Cla): Promise<void>;
 }

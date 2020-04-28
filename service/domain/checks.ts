@@ -1,5 +1,4 @@
 
-// TODO: support
 export enum CheckState {
   success = "success",
   failure = "failure",
@@ -27,6 +26,11 @@ export class StatusCheckInput {
 
 export interface StatusChecksService {
 
-  createStatus(data: StatusCheckInput): Promise<void>;
+  createStatus(
+    targetAccountId: number,
+    targetRepoFullName: string,
+    pullRequestHeadSha: string,
+    data: StatusCheckInput
+  ): Promise<void>;
 
 }

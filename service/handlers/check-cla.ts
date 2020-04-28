@@ -1,21 +1,26 @@
 import { container } from "../../inversify.config"
 import { TYPES } from "../../constants/types"
-import { ClaRepository } from "../../service/domain/cla"
+import { ClaCheckInput, ClaRepository } from "../../service/domain/cla"
 import { CheckState, StatusCheckInput, StatusChecksService } from "../../service/domain/checks"
 
-const CLA_CHECK_CONTEXT = "CLA Signing";
+const CLA_CHECK_CONTEXT = "CLA Signing"
 
 // TODO: create a TARGET_URL to the same environment of this API, to a method that
 // displays the license
-const TARGET_URL = "https://example.com/build/status";
+const TARGET_URL = "https://example.com/build/status"
 
 // TODO: support configurable messages
+const SUCCESS_MESSAGE = "The Contributor License Agreement is signed :heavy_check_mark:.
+const FAILURE_MESSAGE = "Please sign our Contributor License Agreement."
 
-async function checkCLA(gitHubUserId: Number): Promise<void> {
+
+async function checkCla(
+  data: ClaCheckInput
+): Promise<void> {
   const claRepository = container.get<ClaRepository>(TYPES.ClaRepository);
   const statusCheckService = container.get<StatusChecksService>(TYPES.StatusChecksService);
 
-  const cla = await claRepository.getClaByGitHubUserId(gitHubUserId);
+  const cla = await claRepository.getClaByGitHubUserId(data.gitHubUserId);
 
   let status: StatusCheckInput;
 
@@ -23,19 +28,24 @@ async function checkCLA(gitHubUserId: Number): Promise<void> {
     status = new StatusCheckInput(
       CheckState.failure,
       TARGET_URL,
-      "Please sign our Contributor License Agreement.",
+      FAILURE_MESSAGE,
       CLA_CHECK_CONTEXT
     );
   } else {
     status = new StatusCheckInput(
       CheckState.success,
       TARGET_URL,
-      "The Contributor License Agreement is signed :heavy_check_mark:.",
+      SUCCESS_MESSAGE,
       CLA_CHECK_CONTEXT
     );
   }
 
-  await statusCheckService.createStatus(status);
+  await statusCheckService.createStatus(
+    data.repository.ownerId,
+    data.repository.fullName,
+    data.pullRequestHeadSha,
+    status
+  );
 }
 
-export { checkCLA };
+export { checkCla };

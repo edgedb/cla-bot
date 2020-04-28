@@ -1,22 +1,15 @@
 import fs from "fs";
-import fetch from 'cross-fetch';
+import fetch from "cross-fetch";
 import jwt from "jsonwebtoken";
 import { expectSuccessfulResponse } from "../../errors"
 
 
-// Example access token for installation, issued by GitHub:
-//
-// {
-//   "token": "v1.4c864a3bacec0f36664203b7077ad0f37299642b",
-//   "expires_at": "2020-04-28T14:43:05Z",
-//   "permissions": {
-//     "checks": "write",
-//     "metadata": "read",
-//     "pull_requests": "write",
-//     "statuses": "write"
-//   },
-//   "repository_selection": "selected"
-// }
+export class InstallationNotFoundError extends Error {
+  constructor(targetAccountId: number) {
+    super(`An installation for target account ${targetAccountId} was not found. Is
+    the GitHub application authorized to interact with the desired GitHub account?`);
+  }
+}
 
 
 interface GitHubInstallationAccessTokenResult {
@@ -24,6 +17,12 @@ interface GitHubInstallationAccessTokenResult {
   expires_at: Date
   permissions: { [key: string]: string }
   repository_selection: string
+}
+
+// GitHub api returns much more information, but here we care only about the following:
+interface GitHubInstallationItem {
+  id: number,
+  target_id: number
 }
 
 
@@ -89,24 +88,69 @@ export class GitHubAccessHandler {
     // NB: do not change expiration time, because GitHub doesn't allow
     // access tokens lasting more than 10 minutes.
     // For primary access tokens, the issuer is the GitHub application itself.
-    const token = jwt.sign({
+    return jwt.sign({
       "iat": time,
       "exp": time + (10 * 60),
       "iss": `${this._githubApplicationId}`,
     }, this._privateKey, { algorithm: "RS256" });
-
-    console.info(token);
-
-    return token;
   }
 
-  async getAccessTokenForInstallation(installationId: Number): Promise<string> {
-    // The URL to obtain an access token for an installation looks like this:
-    // https://api.github.com/app/installations/{installation_id}/access_tokens
-    // an installation, in GitHub terminology, refers to a GitHub app being authorized
-    // over a certain repository (or possibly even an organization?).
+  async getAccessTokenForAccount(
+    targetAccountId: number,
+    primaryAccessToken?: string
+  ): Promise<string> {
+    // To get an access token for a GitHub app to interact with a repository,
+    // it is necessary to obtain first the "installation id", which represents
+    // the authorization of the GitHub app over the target account, and then
+    // obtain an access token for the installation.
+    // It is possible that a GitHub app has access rights over a different repository,
+    // but here for simplicity we don't verify if the app is authorized on the
+    // repository where the PR is being done (a call to this API:
+    // https://api.github.com/installation/repositories
+    // would enable to follow "look before you leap"
 
-    const primaryAccessToken = this.createPrimaryAccessToken();
+    if (!primaryAccessToken)
+      primaryAccessToken = this.createPrimaryAccessToken();
+
+    const response = await fetch(
+      "https://api.github.com/app/installations",
+      {
+        method: "GET",
+        headers: {
+          "Accept": "application/vnd.github.machine-man-preview+json",
+          "Authorization": `Bearer ${primaryAccessToken}`
+        }
+      }
+    );
+
+    await expectSuccessfulResponse(response);
+
+    const data: GitHubInstallationItem[] = await response.json();
+    var installationId: number | null = null;
+
+    data.forEach(installation => {
+      if (installation.target_id == targetAccountId) {
+        installationId = installation.id;
+      }
+    });
+
+    if (installationId == null)
+      throw new InstallationNotFoundError(targetAccountId);
+
+    return await this.getAccessTokenForInstallation(installationId);
+  }
+
+  async getAccessTokenForInstallation(
+    installationId: number,
+    primaryAccessToken?: string
+  ): Promise<string> {
+    // An installation, in GitHub terminology, refers to a GitHub app being authorized
+    // over a certain organization.
+    // To interact with repositories inside an organization, we
+    // need an access token issued for the installation.
+
+    if (!primaryAccessToken)
+      primaryAccessToken = this.createPrimaryAccessToken();
 
     const response = await fetch(
       `https://api.github.com/app/installations/${installationId}/access_tokens`,
@@ -121,11 +165,9 @@ export class GitHubAccessHandler {
 
     await expectSuccessfulResponse(response);
 
-    const data: GitHubInstallationAccessTokenResult = await response.json();
     // TODO: access tokens can be cached in memory until they expire!
     // TODO: implement a dedicated class that supports caching of access tokens
-
-    console.info(JSON.stringify(data));
+    const data: GitHubInstallationAccessTokenResult = await response.json();
 
     // https://api.github.com/app/installations
     return data.token;
