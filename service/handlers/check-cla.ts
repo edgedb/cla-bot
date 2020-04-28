@@ -10,7 +10,7 @@ const CLA_CHECK_CONTEXT = "CLA Signing"
 const TARGET_URL = "https://example.com/build/status"
 
 // TODO: support configurable messages
-const SUCCESS_MESSAGE = "The Contributor License Agreement is signed :heavy_check_mark:"
+const SUCCESS_MESSAGE = "The Contributor License Agreement is signed."
 const FAILURE_MESSAGE = "Please sign our Contributor License Agreement."
 
 
