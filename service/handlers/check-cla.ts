@@ -33,6 +33,10 @@ async function checkCla(
       FAILURE_MESSAGE,
       CLA_CHECK_CONTEXT
     );
+
+    // TODO: add also a comment to the PR,
+    // to increase visibility (as in current solution?)
+
   } else {
     status = new StatusCheckInput(
       CheckState.success,

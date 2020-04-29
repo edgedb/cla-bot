@@ -4,7 +4,7 @@ import { ClaCheckInput } from "../../service/domain/cla"
 import { checkCla } from "../../service/handlers/check-cla";
 
 // Handler for GitHub pull requests.
-// It verifies that the user who is creating a PR signed the Cla,
+// It verifies that the user who is creating a PR signed the CLA,
 // and posts a status check to the PR.
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
@@ -85,6 +85,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
       await checkCla(input)
       res.status(200).end("OK")
+
+      console.log(`Handled hook for PR on ${targetRepositoryFullName}`);
       break
     default:
       return res.status(400).end(`The event ${event} is not handled.`);

@@ -20,7 +20,6 @@ class GitHubStatusChecksAPI implements StatusChecksService {
     pullRequestHeadSha: string,
     data: StatusCheckInput
   ): Promise<void> {
-
     const accessToken = await this._access_token_handler.getAccessTokenForAccount(targetAccountId);
 
     const response = await fetch(

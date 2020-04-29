@@ -30,8 +30,8 @@ export class GitHubAccessHandler {
   // This class handles client credentials flow to obtain access tokens to interact
   // with our own organization
 
-  private _privateKey: any;
-  private _githubApplicationId: Number;
+  private _privateKey: Buffer;
+  private _githubApplicationId: number;
 
   constructor() {
     this._privateKey = this.getPrivateKey();
@@ -50,7 +50,7 @@ export class GitHubAccessHandler {
     return privateRsaKeyPath;
   }
 
-  private getGitHubApplicationId(): Number {
+  private getGitHubApplicationId(): number {
     const githubApplicationIdRaw = process.env.GITHUB_APPLICATION_ID;
 
     if (!githubApplicationIdRaw) {
@@ -78,19 +78,15 @@ export class GitHubAccessHandler {
 
   createPrimaryAccessToken(): string {
     // TODO: access tokens can be cached in memory until they expire
-    // THIS is low priority since creating a new access token here is cheap
+    // this is low priority since creating a new access token here is cheap
 
     // NB: new Date().getTime() in JavaScript returns a value in milliseconds
-    // it must be converted to seconds here. For example, in Python time.time() is
-    // sufficient in this context.
+    // it must be converted to seconds for "exp"
     const time = Math.round(new Date().getTime() / 1000);
 
-    // NB: do not change expiration time, because GitHub doesn't allow
-    // access tokens lasting more than 10 minutes.
-    // For primary access tokens, the issuer is the GitHub application itself.
     return jwt.sign({
       "iat": time,
-      "exp": time + (10 * 60),
+      "exp": time + (9 * 60),
       "iss": `${this._githubApplicationId}`,
     }, this._privateKey, { algorithm: "RS256" });
   }
