@@ -1,24 +1,29 @@
 import jwt from "jsonwebtoken";
 import { aretry } from "../common/resiliency";
 import { Cla, ClaCheckInput, ClaRepository } from "../../service/domain/cla";
-import { container } from "../../inversify.config";
+import { inject, injectable } from "inversify";
 import { SafeError } from "../common/web";
 import { ServiceSettings } from "../settings";
 import { TYPES } from "../../constants/types";
 import { UserInfo, UsersService } from "../../service/domain/users";
-import { v4 as uuidv4 } from "uuid";
+import { v4 as uuid } from "uuid";
 
 
+@injectable()
 class SignClaHandler
 {
   private _settings: ServiceSettings
   private _claRepository: ClaRepository
   private _usersService: UsersService
 
-  constructor() {
-    this._settings = new ServiceSettings();
-    this._usersService = container.get<UsersService>(TYPES.UsersService);
-    this._claRepository = container.get<ClaRepository>(TYPES.ClaRepository);
+  constructor(
+    @inject(TYPES.ServiceSettings) serviceSettings: ServiceSettings,
+    @inject(TYPES.ClaRepository) claRepository: ClaRepository,
+    @inject(TYPES.UsersService) usersCheckService: UsersService,
+  ) {
+    this._settings = serviceSettings;
+    this._usersService = usersCheckService;
+    this._claRepository = claRepository;
   }
 
   parseState(rawState: string): ClaCheckInput
@@ -34,7 +39,7 @@ class SignClaHandler
   @aretry()
   async createCla(user: UserInfo): Promise<void> {
     await this._claRepository.saveCla(new Cla(
-      uuidv4(),
+      uuid(),
       user.id,
       new Date()
     ));
@@ -44,7 +49,7 @@ class SignClaHandler
     const state = this.parseState(rawState);
     const userInfo = await this._usersService.getUserInfoFromAccessToken(accessToken);
 
-    // NB: ensure that user who signed up is the same who created the PR
+    // NB: ensure that the user who signed up is the same who created the PR
     if (state.gitHubUserId != userInfo.id) {
       throw new SafeError(
         "The GitHub user who posted the PR, is not the same person who just " +
@@ -54,6 +59,8 @@ class SignClaHandler
     }
 
     await this.createCla(userInfo);
+
+    // TODO: the user now signed the CLA, mark the PR status as good
   }
 }
 

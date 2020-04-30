@@ -17,6 +17,7 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "typeRoots": [
       "./node_modules/@types"
     ],
@@ -29,6 +30,6 @@
   "include": [
     "next-env.d.ts",
     "**/*.ts",
-    "**/*.tsx"
+    "**/*.tsx", "server.js"
   ]
 }

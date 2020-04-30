@@ -1,10 +1,10 @@
 import jwt from "jsonwebtoken";
+import { aretry } from "../common/resiliency";
 import { CheckState, StatusCheckInput, StatusChecksService } from "../../service/domain/checks";
 import { ClaCheckInput, ClaRepository } from "../../service/domain/cla";
-import { container } from "../../inversify.config";
 import { getEnvSettingOrThrow } from "../../service/common/settings";
+import { inject, injectable } from "inversify";
 import { TYPES } from "../../constants/types";
-import { aretry } from "../common/resiliency"
 
 const CLA_CHECK_CONTEXT = "CLA Signing"
 
@@ -26,14 +26,18 @@ function getTargetUrl(data: ClaCheckInput): string {
 }
 
 
+@injectable()
 class ClaCheckHandler {
 
   private _claRepository: ClaRepository
   private _statusCheckService: StatusChecksService
 
-  constructor() {
-    this._claRepository = container.get<ClaRepository>(TYPES.ClaRepository);
-    this._statusCheckService = container.get<StatusChecksService>(TYPES.StatusChecksService);
+  constructor(
+    @inject(TYPES.ClaRepository) claRepository: ClaRepository,
+    @inject(TYPES.StatusChecksService) statusCheckService: StatusChecksService,
+  ) {
+    this._claRepository = claRepository;
+    this._statusCheckService = statusCheckService;
   }
 
   @aretry()

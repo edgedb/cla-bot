@@ -1,10 +1,11 @@
 import githubAuth from "./configuration";
+import { container } from "../../../../inversify.config"; // TODO: avoid this
 import { NextApiRequest, NextApiResponse } from "next";
 import { SafeError } from "../../../../service/common/web";
 import { SignClaHandler } from "../../../../service/handlers/sign-cla";
 
 
-const signHandler = new SignClaHandler();
+const signHandler = container.get<SignClaHandler>(SignClaHandler);
 
 
 function readOAuthError(req: NextApiRequest): string | null {

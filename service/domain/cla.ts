@@ -28,7 +28,7 @@ export class Cla {
 
 export interface ClaRepository {
 
-  getClaByGitHubUserId(githubUserId: Number): Promise<Cla | null>;
+  getClaByGitHubUserId(githubUserId: number): Promise<Cla | null>;
 
   saveCla(data: Cla): Promise<void>;
 }

@@ -1,6 +1,6 @@
-import { NextApiRequest, NextApiResponse } from 'next'
+import { NextApiRequest, NextApiResponse } from "next";
 
-type AliveContract = {
+interface AliveContract {
   alive: boolean,
   timestamp: Date
 }
