@@ -10,8 +10,6 @@ const CLA_CHECK_CONTEXT = "CLA Signing"
 
 const SECRET = getEnvSettingOrThrow("SECRET")
 const SERVER_BASE_URL = getEnvSettingOrThrow("SERVER_URL")
-
-// TODO: support configurable messages
 const SUCCESS_MESSAGE = "The Contributor License Agreement is signed."
 const FAILURE_MESSAGE = "Please sign our Contributor License Agreement."
 
@@ -24,13 +22,7 @@ function getTargetUrl(data: ClaCheckInput): string {
   // is the one who authorizes our app and does sign-in to sign the agreement.
 
   // We create a JWT token, to ensure that the user cannot modify the parameter
-  const token = jwt.sign({
-    gitHubUserId: data.gitHubUserId,
-    pullRequestHeadSha: data.pullRequestHeadSha,
-    repository: data.repository
-  }, SECRET);
-
-  return `${SERVER_BASE_URL}/contributor-license-agreement?state=${token}`
+  return `${SERVER_BASE_URL}/contributor-license-agreement?state=${jwt.sign(data, SECRET)}`
 }
 
 
@@ -80,6 +72,5 @@ class ClaCheckHandler {
     );
   }
 }
-
 
 export { ClaCheckHandler };

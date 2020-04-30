@@ -537,3 +537,47 @@
   }
 ]
 ```
+
+## Example response of call to obtain user information from access token
+
+The access token is obtained after user's interactive sign-in, from Authorization Code Grant flow.
+
+```
+curl -H "Authorization: token 71c51786930fbfeabc1812944052a1d6d3ba9182" https://api.github.com/user
+```
+
+```
+{
+  "login": "RobertoPrevato",
+  "id": 2576032,
+  "node_id": "MDQ6VXNlcjI1NzYwMzI=",
+  "avatar_url": "https://avatars2.githubusercontent.com/u/2576032?v=4",
+  "gravatar_id": "",
+  "url": "https://api.github.com/users/RobertoPrevato",
+  "html_url": "https://github.com/RobertoPrevato",
+  "followers_url": "https://api.github.com/users/RobertoPrevato/followers",
+  "following_url": "https://api.github.com/users/RobertoPrevato/following{/other_user}",
+  "gists_url": "https://api.github.com/users/RobertoPrevato/gists{/gist_id}",
+  "starred_url": "https://api.github.com/users/RobertoPrevato/starred{/owner}{/repo}",
+  "subscriptions_url": "https://api.github.com/users/RobertoPrevato/subscriptions",
+  "organizations_url": "https://api.github.com/users/RobertoPrevato/orgs",
+  "repos_url": "https://api.github.com/users/RobertoPrevato/repos",
+  "events_url": "https://api.github.com/users/RobertoPrevato/events{/privacy}",
+  "received_events_url": "https://api.github.com/users/RobertoPrevato/received_events",
+  "type": "User",
+  "site_admin": false,
+  "name": "Roberto Prevato",
+  "company": "EdgeDB",
+  "blog": "https://robertoprevato.github.io",
+  "location": "Warsaw, Poland",
+  "email": "roberto.prevato@gmail.com",
+  "hireable": null,
+  "bio": "Web Developer, DevOps",
+  "public_repos": 84,
+  "public_gists": 4,
+  "followers": 61,
+  "following": 25,
+  "created_at": "2012-10-16T21:30:54Z",
+  "updated_at": "2020-04-29T17:03:31Z"
+}
+```

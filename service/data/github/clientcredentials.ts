@@ -1,6 +1,7 @@
 import fetch from "cross-fetch";
 import fs from "fs";
 import jwt from "jsonwebtoken";
+import { aretry } from "../../common/resiliency";
 import { expectSuccessfulResponse } from "../../common/web";
 
 
@@ -91,6 +92,7 @@ export class GitHubAccessHandler {
     }, this._privateKey, { algorithm: "RS256" });
   }
 
+  @aretry()
   async getAccessTokenForAccount(
     targetAccountId: number,
     primaryAccessToken?: string
@@ -136,6 +138,7 @@ export class GitHubAccessHandler {
     return await this.getAccessTokenForInstallation(installationId);
   }
 
+  @aretry()
   async getAccessTokenForInstallation(
     installationId: number,
     primaryAccessToken?: string

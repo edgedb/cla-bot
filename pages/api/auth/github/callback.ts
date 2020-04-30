@@ -1,5 +1,10 @@
 import githubAuth from "./configuration";
 import { NextApiRequest, NextApiResponse } from "next";
+import { SafeError } from "../../../../service/common/web";
+import { SignClaHandler } from "../../../../service/handlers/sign-cla";
+
+
+const signHandler = new SignClaHandler();
 
 
 function readOAuthError(req: NextApiRequest): string | null {
@@ -29,8 +34,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const rawState = req.query.state;
 
   if (!rawState) {
-    // Here we expect a state parameter, being a
-    // JWT whose payload contains context information
     return res.status(400).end(
       "Missing state context: expected information about original PR and the user " +
       "who created it."
@@ -46,16 +49,15 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const token = await githubAuth.code.getToken(requestUrl);
     const accessToken = token.accessToken;
 
-    // TODO: get user information using the access token
-    // curl -H "Authorization: token 71c51786930fbfeabc1812944052a1d6d3ba9182" https://api.github.com/user
-    // validate that the user who just signed in, is the same who created the PR.
+    await signHandler.signCla(rawState.toString(), accessToken);
 
-    // User authentication is something that belongs to the front-end,
-    // so we get user ID here, and pass it to the business logic.
-
-    console.info(token);
     res.status(200).end("OK");
   } catch (error) {
+
+    if (error instanceof SafeError) {
+      res.status(error.statusCode).end(error.message);
+      return;
+    }
 
     console.error(error);
     res.status(500).end("Internal server error");
