@@ -1,17 +1,35 @@
-import { container } from "../../inversify.config"
-import { TYPES } from "../../constants/types"
-import { ClaCheckInput, ClaRepository } from "../../service/domain/cla"
-import { CheckState, StatusCheckInput, StatusChecksService } from "../../service/domain/checks"
+import jwt from "jsonwebtoken";
+import { CheckState, StatusCheckInput, StatusChecksService } from "../../service/domain/checks";
+import { ClaCheckInput, ClaRepository } from "../../service/domain/cla";
+import { container } from "../../inversify.config";
+import { getEnvSettingOrThrow } from "../../service/common/settings";
+import { TYPES } from "../../constants/types";
 
 const CLA_CHECK_CONTEXT = "CLA Signing"
 
-// TODO: create a TARGET_URL to the same environment of this API, to a method that
-// displays the license
-const TARGET_URL = "https://example.com/build/status"
+const SECRET = getEnvSettingOrThrow("SECRET")
+const SERVER_BASE_URL = getEnvSettingOrThrow("SERVER_URL")
 
 // TODO: support configurable messages
 const SUCCESS_MESSAGE = "The Contributor License Agreement is signed."
 const FAILURE_MESSAGE = "Please sign our Contributor License Agreement."
+
+
+function getTargetUrl(data: ClaCheckInput): string {
+  // The target URL for the check must not only point to this instance of the web application
+  // to the page that displays the license agreement,
+  // it must also include a `state` query string parameter that will be handled through
+  // OAuth. The state is necessary to ensure that the same person who opened the PR
+  // is the one who authorizes our app and does sign-in to sign the agreement.
+
+  // We create a JWT token, to ensure that the user cannot modify the parameter
+  const token = jwt.sign({
+    gitHubUserId: data.gitHubUserId,
+    pullRequestHeadSha: data.pullRequestHeadSha
+  }, SECRET);
+
+  return `${SERVER_BASE_URL}/contributor-license-agreement?state=${token}`
+}
 
 
 async function checkCla(
@@ -21,15 +39,13 @@ async function checkCla(
   const statusCheckService = container.get<StatusChecksService>(TYPES.StatusChecksService);
 
   const cla = await claRepository.getClaByGitHubUserId(data.gitHubUserId);
-
+  const targetUrl = getTargetUrl(data);
   let status: StatusCheckInput;
 
-  // TODO: complete this part
-  //  && false
   if (cla == null) {
     status = new StatusCheckInput(
       CheckState.failure,
-      TARGET_URL,
+      targetUrl,
       FAILURE_MESSAGE,
       CLA_CHECK_CONTEXT
     );
@@ -40,7 +56,7 @@ async function checkCla(
   } else {
     status = new StatusCheckInput(
       CheckState.success,
-      TARGET_URL,
+      targetUrl,
       SUCCESS_MESSAGE,
       CLA_CHECK_CONTEXT
     );

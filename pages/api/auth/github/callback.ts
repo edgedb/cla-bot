@@ -25,6 +25,20 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(400).end(error);
   }
 
+  const rawState = req.query.state;
+
+  if (!rawState) {
+    // in this context, we expect a state containing a
+    // base64 encoded JSON structure with PR id and user id
+    return res.status(400).end(
+      "Missing state context: expected information about original PR and the user who created it."
+    );
+  }
+
+  // in this context, we expect
+  console.info(req.query)
+  console.info(req.headers)
+
   try {
     const requestUrl = req.url
 
