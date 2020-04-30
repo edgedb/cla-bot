@@ -1,3 +1,7 @@
+## Useful links
+
+* [Identifying and authorizing users for GitHub Apps](https://developer.github.com/apps/building-github-apps/identifying-and-authorizing-users-for-github-apps/)
+
 ## Example pull request webhook payload:
 
 ```json

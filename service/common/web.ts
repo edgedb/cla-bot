@@ -12,6 +12,7 @@ export class FailedHttpRequestError extends WebRequestError {
   }
 }
 
+
 export class MissingResponseBodyError extends WebRequestError {
   constructor() {
     super("Expected an HTTP response with a body, got nothing.");

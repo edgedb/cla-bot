@@ -1,6 +1,9 @@
-import Head from 'next/head'
+import Head from "next/head";
 
 export default function Home() {
+  // TODO: get request PR id;
+  // we need this in the scope (or state?)
+
   return (
     <div className="container">
       <Head>
@@ -86,7 +89,7 @@ export default function Home() {
         </div>
 
         <div>
-          <button className="btn btn-info btn-lg">Sign in with GitHub to agree</button>
+          <a href="/api/auth/github">Sign in with GitHub to agree</a>
         </div>
       </main>
       <footer>

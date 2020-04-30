@@ -1,5 +1,5 @@
-import { injectable } from "inversify"
-import { Cla, ClaRepository } from "../../domain/cla"
+import { Cla, ClaRepository } from "../../domain/cla";
+import { injectable } from "inversify";
 
 
 @injectable()

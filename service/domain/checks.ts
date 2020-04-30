@@ -4,6 +4,7 @@ export enum CheckState {
   failure = "failure",
 }
 
+
 export class StatusCheckInput {
   state: CheckState
   targetUrl: string

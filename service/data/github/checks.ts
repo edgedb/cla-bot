@@ -1,8 +1,8 @@
 import fetch from "cross-fetch";
-import { injectable } from "inversify"
-import { CheckState, StatusCheckInput, StatusChecksService } from "../../domain/checks"
-import { GitHubAccessHandler } from "./clientcredentials"
-import { expectSuccessfulResponse } from "../../errors"
+import { CheckState, StatusCheckInput, StatusChecksService } from "../../domain/checks";
+import { expectSuccessfulResponse } from "../../common/web";
+import { GitHubAccessHandler } from "./clientcredentials";
+import { injectable } from "inversify";
 
 
 @injectable()

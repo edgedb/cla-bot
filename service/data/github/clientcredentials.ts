@@ -1,7 +1,7 @@
-import fs from "fs";
 import fetch from "cross-fetch";
+import fs from "fs";
 import jwt from "jsonwebtoken";
-import { expectSuccessfulResponse } from "../../errors"
+import { expectSuccessfulResponse } from "../../common/web";
 
 
 export class InstallationNotFoundError extends Error {
