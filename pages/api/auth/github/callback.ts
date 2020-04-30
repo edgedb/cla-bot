@@ -15,7 +15,8 @@ function readOAuthError(req: NextApiRequest): string | null {
 
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-  // this function handles an incoming HTTP request following an attempt to sign in
+  // This function handles an incoming HTTP request following an attempt to sign in,
+  // or a redirect fired by GitHub in case of a configuration error
   const error = readOAuthError(req);
 
   if (error) {
@@ -28,16 +29,13 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const rawState = req.query.state;
 
   if (!rawState) {
-    // in this context, we expect a state containing a
-    // base64 encoded JSON structure with PR id and user id
+    // Here we expect a state parameter, being a
+    // JWT whose payload contains context information
     return res.status(400).end(
-      "Missing state context: expected information about original PR and the user who created it."
+      "Missing state context: expected information about original PR and the user " +
+      "who created it."
     );
   }
-
-  // in this context, we expect
-  console.info(req.query)
-  console.info(req.headers)
 
   try {
     const requestUrl = req.url

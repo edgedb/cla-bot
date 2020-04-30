@@ -4,6 +4,7 @@ import { ClaCheckInput, ClaRepository } from "../../service/domain/cla";
 import { container } from "../../inversify.config";
 import { getEnvSettingOrThrow } from "../../service/common/settings";
 import { TYPES } from "../../constants/types";
+import { aretry } from "../common/resiliency"
 
 const CLA_CHECK_CONTEXT = "CLA Signing"
 
@@ -25,49 +26,60 @@ function getTargetUrl(data: ClaCheckInput): string {
   // We create a JWT token, to ensure that the user cannot modify the parameter
   const token = jwt.sign({
     gitHubUserId: data.gitHubUserId,
-    pullRequestHeadSha: data.pullRequestHeadSha
+    pullRequestHeadSha: data.pullRequestHeadSha,
+    repository: data.repository
   }, SECRET);
 
   return `${SERVER_BASE_URL}/contributor-license-agreement?state=${token}`
 }
 
 
-async function checkCla(
-  data: ClaCheckInput
-): Promise<void> {
-  const claRepository = container.get<ClaRepository>(TYPES.ClaRepository);
-  const statusCheckService = container.get<StatusChecksService>(TYPES.StatusChecksService);
+class ClaCheckHandler {
 
-  const cla = await claRepository.getClaByGitHubUserId(data.gitHubUserId);
-  const targetUrl = getTargetUrl(data);
-  let status: StatusCheckInput;
+  private _claRepository: ClaRepository
+  private _statusCheckService: StatusChecksService
 
-  if (cla == null) {
-    status = new StatusCheckInput(
-      CheckState.failure,
-      targetUrl,
-      FAILURE_MESSAGE,
-      CLA_CHECK_CONTEXT
-    );
-
-    // TODO: add also a comment to the PR,
-    // to increase visibility (as in current solution?)
-
-  } else {
-    status = new StatusCheckInput(
-      CheckState.success,
-      targetUrl,
-      SUCCESS_MESSAGE,
-      CLA_CHECK_CONTEXT
-    );
+  constructor() {
+    this._claRepository = container.get<ClaRepository>(TYPES.ClaRepository);
+    this._statusCheckService = container.get<StatusChecksService>(TYPES.StatusChecksService);
   }
 
-  await statusCheckService.createStatus(
-    data.repository.ownerId,
-    data.repository.fullName,
-    data.pullRequestHeadSha,
-    status
-  );
+  @aretry()
+  async checkCla(
+    data: ClaCheckInput
+  ): Promise<void> {
+    const cla = await this._claRepository.getClaByGitHubUserId(data.gitHubUserId);
+    const targetUrl = getTargetUrl(data);
+    let status: StatusCheckInput;
+
+    if (cla == null) {
+      status = new StatusCheckInput(
+        CheckState.failure,
+        targetUrl,
+        FAILURE_MESSAGE,
+        CLA_CHECK_CONTEXT
+      );
+
+      // TODO: add also a comment to the PR,
+      // to increase visibility (as in current solution?)
+
+    } else {
+      status = new StatusCheckInput(
+        CheckState.success,
+        targetUrl,
+        SUCCESS_MESSAGE,
+        CLA_CHECK_CONTEXT
+      );
+    }
+
+    await this._statusCheckService.createStatus(
+      data.repository.ownerId,
+      data.repository.fullName,
+      data.pullRequestHeadSha,
+      status
+    );
+  }
 }
 
-export { checkCla };
+
+export { ClaCheckHandler };
