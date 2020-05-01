@@ -4,11 +4,10 @@ import { injectable } from "inversify";
 
 @injectable()
 export class ServiceSettings {
+  // common service settings, not specific to an external service
 
   private _url: string;
   private _secret: string;
-  // private _githubOAuthApplicationId: string;
-  // private _githubOAuthApplicationSecret: string;
 
   public get url(): string {
     return this._url;

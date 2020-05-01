@@ -49,6 +49,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
       const gitHubUserId = body?.pull_request?.user?.id;
       const pullRequestHeadSha = body?.pull_request?.head?.sha;
+      const pullRequestUrl = body?.pull_request?.url;
       const targetRepositoryId = body?.repository?.id;
       const targetRepositoryOwnerId = body?.repository?.owner?.id;
       const targetRepositoryOwnerName = body?.repository?.owner?.login;
@@ -58,6 +59,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       if (
         !gitHubUserId ||
         !pullRequestHeadSha ||
+        !pullRequestUrl ||
         !targetRepositoryId ||
         !targetRepositoryOwnerId ||
         !targetRepositoryOwnerName ||
@@ -66,6 +68,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       ) {
         return res.status(400).end(`Expected a pull request webhook payload with:
           pull_request.user.id;
+          pull_request.url;
           pull_request.head.sha;
           repository.id;
           repository.owner.id;
@@ -77,7 +80,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
       const input: ClaCheckInput = {
         gitHubUserId,
-        pullRequestHeadSha,
+        pullRequest: {
+          url: pullRequestUrl,
+          headSha: pullRequestHeadSha
+        },
         repository: {
           id: targetRepositoryId,
           owner: targetRepositoryOwnerName,

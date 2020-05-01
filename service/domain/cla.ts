@@ -8,10 +8,15 @@ export interface ClaCheckRepository {
   fullName: string
 }
 
+export interface ClaCheckPullRequest {
+  headSha: string
+  url: string
+}
+
 export interface ClaCheckInput {
   gitHubUserId: number
   repository: ClaCheckRepository
-  pullRequestHeadSha: string
+  pullRequest: ClaCheckPullRequest
 }
 
 export class Cla {

@@ -4,7 +4,7 @@ export class WebRequestError extends Error {}
 
 
 export class SafeError extends Error {
-  // Represents an error that can be safely shared with the client
+  // Represents an error whose details can be safely shared with the client
 
   private _statusCode: number
 

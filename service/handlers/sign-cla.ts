@@ -1,6 +1,8 @@
 import jwt from "jsonwebtoken";
 import { aretry } from "../common/resiliency";
+import { CheckState, StatusCheckInput, StatusChecksService } from "../../service/domain/checks";
 import { Cla, ClaCheckInput, ClaRepository } from "../../service/domain/cla";
+import { CLA_CHECK_CONTEXT, SUCCESS_MESSAGE } from "./check-cla";
 import { inject, injectable } from "inversify";
 import { SafeError } from "../common/web";
 import { ServiceSettings } from "../settings";
@@ -9,22 +11,18 @@ import { UserInfo, UsersService } from "../../service/domain/users";
 import { v4 as uuid } from "uuid";
 
 
+export interface SignedClaOutput {
+  redirectUrl: string
+}
+
+
 @injectable()
 class SignClaHandler
 {
   @inject(TYPES.ServiceSettings) private _settings: ServiceSettings
   @inject(TYPES.ClaRepository) private _claRepository: ClaRepository
   @inject(TYPES.UsersService) private _usersService: UsersService
-
-//  constructor(
-//    @inject(TYPES.ServiceSettings) serviceSettings: ServiceSettings,
-//    @inject(TYPES.ClaRepository) claRepository: ClaRepository,
-//    @inject(TYPES.UsersService) usersCheckService: UsersService,
-//  ) {
-//    this._settings = serviceSettings;
-//    this._usersService = usersCheckService;
-//    this._claRepository = claRepository;
-//  }
+  @inject(TYPES.StatusChecksService) private _statusCheckService: StatusChecksService
 
   parseState(rawState: string): ClaCheckInput
   {
@@ -45,12 +43,12 @@ class SignClaHandler
     ));
   }
 
-  async signCla(rawState: string, accessToken: string) {
-    const state = this.parseState(rawState);
+  async signCla(rawState: string, accessToken: string): Promise<SignedClaOutput> {
+    const data = this.parseState(rawState);
     const userInfo = await this._usersService.getUserInfoFromAccessToken(accessToken);
 
     // NB: ensure that the user who signed up is the same who created the PR
-    if (state.gitHubUserId != userInfo.id) {
+    if (data.gitHubUserId != userInfo.id) {
       throw new SafeError(
         "The GitHub user who posted the PR, is not the same person who just " +
         "signed-in. Thank you for authorizing our application, but the CLA must be " +
@@ -60,7 +58,22 @@ class SignClaHandler
 
     await this.createCla(userInfo);
 
-    // TODO: the user now signed the CLA, mark the PR status as good
+    // The user now signed the CLA, mark the check status as passed
+    await this._statusCheckService.createStatus(
+      data.repository.ownerId,
+      data.repository.fullName,
+      data.pullRequest.headSha,
+      new StatusCheckInput(
+        CheckState.success,
+        `${this._settings.url}/signed-contributor-license-agreement`,
+        SUCCESS_MESSAGE,
+        CLA_CHECK_CONTEXT
+      )
+    );
+
+    return {
+      redirectUrl: data.pullRequest.url
+    };
   }
 }
 

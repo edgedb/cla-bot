@@ -51,11 +51,11 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const token = await githubAuth.code.getToken(requestUrl);
     const accessToken = token.accessToken;
 
-    await signHandler.signCla(rawState.toString(), accessToken);
+    const result = await signHandler.signCla(rawState.toString(), accessToken);
 
-    // TODO: do we want to display a "Thank You" page here with a
-    // client side redirect to the PR, or redirect directly to the PR page?
-    res.status(200).end("OK");
+    // redirect to the PR page
+    res.setHeader("Location", result.redirectUrl);
+    res.status(302).end("OK");
   } catch (error) {
 
     if (error instanceof SafeError) {
