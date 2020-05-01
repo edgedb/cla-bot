@@ -24,10 +24,10 @@ container.bind<StatusChecksService>(TYPES.StatusChecksService)
 
 container.bind<UsersService>(TYPES.UsersService).to(GitHubUsersService);
 
-container.bind<ServiceSettings>(TYPES.ServiceSettings).toSelf().inSingletonScope();
+container.bind<ServiceSettings>(TYPES.ServiceSettings).to(ServiceSettings).inSingletonScope();
 
-container.bind<SignClaHandler>(TYPES.SignClaHandler).toSelf();
+container.bind<SignClaHandler>(TYPES.SignClaHandler).to(SignClaHandler);
 
-container.bind<ClaCheckHandler>(TYPES.ClaCheckHandler).toSelf();
+container.bind<ClaCheckHandler>(TYPES.ClaCheckHandler).to(ClaCheckHandler);
 
 export { container };

@@ -1,12 +1,14 @@
-import { NextApiRequest, NextApiResponse } from 'next'
-import { container } from "../../inversify.config"; // TODO: avoid this
-import { ClaCheckInput } from "../../service/domain/cla"
 import { ClaCheckHandler } from "../../service/handlers/check-cla";
+import { ClaCheckInput } from "../../service/domain/cla";
+import { container } from "../../inversify.config"; // TODO: avoid this
+import { NextApiRequest, NextApiResponse } from "next";
+import { TYPES } from "../../constants/types";
+
 
 // Handler for GitHub pull requests.
 // It verifies that the user who is creating a PR signed the CLA,
 // and posts a status check to the PR.
-const handler = container.get<ClaCheckHandler>(ClaCheckHandler);
+const handler = container.get<ClaCheckHandler>(TYPES.ClaCheckHandler);
 
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {

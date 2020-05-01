@@ -29,16 +29,16 @@ function getTargetUrl(data: ClaCheckInput): string {
 @injectable()
 class ClaCheckHandler {
 
-  private _claRepository: ClaRepository
-  private _statusCheckService: StatusChecksService
+  @inject(TYPES.ClaRepository) private _claRepository: ClaRepository
+  @inject(TYPES.StatusChecksService) private _statusCheckService: StatusChecksService
 
-  constructor(
-    @inject(TYPES.ClaRepository) claRepository: ClaRepository,
-    @inject(TYPES.StatusChecksService) statusCheckService: StatusChecksService,
-  ) {
-    this._claRepository = claRepository;
-    this._statusCheckService = statusCheckService;
-  }
+//  constructor(
+//    @inject(TYPES.ClaRepository) claRepository: ClaRepository,
+//    @inject(TYPES.StatusChecksService) statusCheckService: StatusChecksService,
+//  ) {
+//    this._claRepository = claRepository;
+//    this._statusCheckService = statusCheckService;
+//  }
 
   @aretry()
   async checkCla(

@@ -34,8 +34,3 @@ Business logic is lousy coupled with the data access layer, since it is only awa
 
 ## GitHub integration
 See the `notes` folder for examples and more information on the GitHub integration. Relevant functions in the code are commented to describe non obvious dynamics of the GitHub API. The folder includes a [Postman](https://www.postman.com) collection with some of the web requests used by this application.
-
-# TODO: continue here
-https://www.npmjs.com/package/client-oauth2
-
-https://www.npmjs.com/package/client-oauth2#authorization-code-grant

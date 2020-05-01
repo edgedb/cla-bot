@@ -12,19 +12,19 @@ import { v4 as uuid } from "uuid";
 @injectable()
 class SignClaHandler
 {
-  private _settings: ServiceSettings
-  private _claRepository: ClaRepository
-  private _usersService: UsersService
+  @inject(TYPES.ServiceSettings) private _settings: ServiceSettings
+  @inject(TYPES.ClaRepository) private _claRepository: ClaRepository
+  @inject(TYPES.UsersService) private _usersService: UsersService
 
-  constructor(
-    @inject(TYPES.ServiceSettings) serviceSettings: ServiceSettings,
-    @inject(TYPES.ClaRepository) claRepository: ClaRepository,
-    @inject(TYPES.UsersService) usersCheckService: UsersService,
-  ) {
-    this._settings = serviceSettings;
-    this._usersService = usersCheckService;
-    this._claRepository = claRepository;
-  }
+//  constructor(
+//    @inject(TYPES.ServiceSettings) serviceSettings: ServiceSettings,
+//    @inject(TYPES.ClaRepository) claRepository: ClaRepository,
+//    @inject(TYPES.UsersService) usersCheckService: UsersService,
+//  ) {
+//    this._settings = serviceSettings;
+//    this._usersService = usersCheckService;
+//    this._claRepository = claRepository;
+//  }
 
   parseState(rawState: string): ClaCheckInput
   {
@@ -32,7 +32,7 @@ class SignClaHandler
       return jwt.verify(rawState, this._settings.secret) as ClaCheckInput;
     } catch (error) {
       console.error(`State validation error: ${error}`);
-      throw new SafeError("Failed to validate the state.");
+      throw new SafeError("State validation error.");
     }
   }
 

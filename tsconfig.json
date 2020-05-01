@@ -4,8 +4,11 @@
     "lib": [
       "dom",
       "dom.iterable",
-      "esnext"
+      "esnext",
+      "es6"
     ],
+    "strictPropertyInitialization": false,
+    "types": ["reflect-metadata"],
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noImplicitThis": true,

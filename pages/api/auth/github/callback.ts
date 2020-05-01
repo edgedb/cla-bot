@@ -3,9 +3,10 @@ import { container } from "../../../../inversify.config"; // TODO: avoid this
 import { NextApiRequest, NextApiResponse } from "next";
 import { SafeError } from "../../../../service/common/web";
 import { SignClaHandler } from "../../../../service/handlers/sign-cla";
+import { TYPES } from "../../../../constants/types";
 
 
-const signHandler = container.get<SignClaHandler>(SignClaHandler);
+const signHandler = container.get<SignClaHandler>(TYPES.SignClaHandler);
 
 
 function readOAuthError(req: NextApiRequest): string | null {
@@ -52,6 +53,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
     await signHandler.signCla(rawState.toString(), accessToken);
 
+    // TODO: do we want to display a "Thank You" page here with a
+    // client side redirect to the PR, or redirect directly to the PR page?
     res.status(200).end("OK");
   } catch (error) {
 
