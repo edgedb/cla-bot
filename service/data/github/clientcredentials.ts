@@ -80,9 +80,6 @@ export class GitHubAccessHandler {
   createPrimaryAccessToken(): string {
     // TODO: access tokens can be cached in memory until they expire
     // this is low priority since creating a new access token here is cheap
-
-    // NB: new Date().getTime() in JavaScript returns a value in milliseconds
-    // it must be converted to seconds for "exp"
     const time = Math.round(new Date().getTime() / 1000);
 
     return jwt.sign({

@@ -19,7 +19,7 @@ class ClaCheckHandler {
   @inject(TYPES.ClaRepository) private _claRepository: ClaRepository
   @inject(TYPES.StatusChecksService) private _statusCheckService: StatusChecksService
 
-  getTargetUrl(data: ClaCheckInput): string {
+  getTargetUrlWithChallenge(data: ClaCheckInput): string {
     // The target URL for the check must not only point to this instance of the web application
     // to the page that displays the license agreement,
     // it must also include a `state` query string parameter that will be handled through
@@ -35,13 +35,12 @@ class ClaCheckHandler {
     data: ClaCheckInput
   ): Promise<void> {
     const cla = await this._claRepository.getClaByGitHubUserId(data.gitHubUserId);
-    const targetUrl = this.getTargetUrl(data);
     let status: StatusCheckInput;
 
     if (cla == null) {
       status = new StatusCheckInput(
         CheckState.failure,
-        targetUrl,
+        this.getTargetUrlWithChallenge(data),
         FAILURE_MESSAGE,
         CLA_CHECK_CONTEXT
       );
@@ -52,7 +51,7 @@ class ClaCheckHandler {
     } else {
       status = new StatusCheckInput(
         CheckState.success,
-        targetUrl,
+        `${this._settings.url}/signed-contributor-license-agreement?id=${cla.id}`,
         SUCCESS_MESSAGE,
         CLA_CHECK_CONTEXT
       );

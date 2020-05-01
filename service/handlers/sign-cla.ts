@@ -35,19 +35,22 @@ class SignClaHandler
   }
 
   @aretry()
-  async createCla(user: UserInfo): Promise<void> {
-    await this._claRepository.saveCla(new Cla(
+  async createCla(user: UserInfo): Promise<Cla> {
+    const cla = new Cla(
       uuid(),
       user.id,
       new Date()
-    ));
+    )
+
+    await this._claRepository.saveCla(cla)
+    return cla
   }
 
   async signCla(rawState: string, accessToken: string): Promise<SignedClaOutput> {
     const data = this.parseState(rawState);
     const userInfo = await this._usersService.getUserInfoFromAccessToken(accessToken);
 
-    // NB: ensure that the user who signed up is the same who created the PR
+    // ensure that the user who signed up is the same who created the PR
     if (data.gitHubUserId != userInfo.id) {
       throw new SafeError(
         "The GitHub user who posted the PR, is not the same person who just " +
@@ -56,7 +59,9 @@ class SignClaHandler
       );
     }
 
-    await this.createCla(userInfo);
+    // include the id of the CLA in the status target URL, so we could return
+    // information about the signed CLA
+    const cla = await this.createCla(userInfo);
 
     // The user now signed the CLA, mark the check status as passed
     await this._statusCheckService.createStatus(
@@ -65,7 +70,7 @@ class SignClaHandler
       data.pullRequest.headSha,
       new StatusCheckInput(
         CheckState.success,
-        `${this._settings.url}/signed-contributor-license-agreement`,
+        `${this._settings.url}/signed-contributor-license-agreement?id=${cla.id}`,
         SUCCESS_MESSAGE,
         CLA_CHECK_CONTEXT
       )

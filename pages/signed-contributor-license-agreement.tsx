@@ -10,7 +10,7 @@ export default function SignedLicenseAgreement() {
 
       <main>
         <h1 className="title">
-          The CLA was signed for this PR.
+          The author of this PR signed the CLA.
         </h1>
       </main>
 

@@ -49,7 +49,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
       const gitHubUserId = body?.pull_request?.user?.id;
       const pullRequestHeadSha = body?.pull_request?.head?.sha;
-      const pullRequestUrl = body?.pull_request?.url;
+      const pullRequestUrl = body?.pull_request?.html_url;
       const targetRepositoryId = body?.repository?.id;
       const targetRepositoryOwnerId = body?.repository?.owner?.id;
       const targetRepositoryOwnerName = body?.repository?.owner?.login;
