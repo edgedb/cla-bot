@@ -7,7 +7,7 @@
       "esnext",
       "es6"
     ],
-    "strictPropertyInitialization": true,
+    "strictPropertyInitialization": false,
     "types": ["reflect-metadata"],
     "strict": true,
     "forceConsistentCasingInFileNames": true,

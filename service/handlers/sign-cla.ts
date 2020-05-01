@@ -3,8 +3,7 @@ import { aretry } from "../common/resiliency";
 import { CheckState, StatusCheckInput, StatusChecksService } from "../../service/domain/checks";
 import { Cla, ClaCheckInput, ClaRepository } from "../../service/domain/cla";
 import { CLA_CHECK_CONTEXT, SUCCESS_MESSAGE } from "./check-cla";
-import { container } from "../../inversify.config";
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import { SafeError } from "../common/web";
 import { ServiceSettings } from "../settings";
 import { TYPES } from "../../constants/types";
@@ -20,25 +19,10 @@ export interface SignedClaOutput {
 @injectable()
 class SignClaHandler
 {
-  private _settings: ServiceSettings
-  private _claRepository: ClaRepository
-  private _usersService: UsersService
-  private _statusCheckService: StatusChecksService
-
-  constructor(
-    settings?: ServiceSettings,
-    claRepository?: ClaRepository,
-    statusCheckService?: StatusChecksService,
-    usersService?: UsersService
-  ) {
-    // unfortunately Babel doesn't seem to support parameters decorators
-    // the only downside here is that we increase verbosity
-    // (and inversify is already verbose by itself)
-    this._settings = settings || container.get<ServiceSettings>(TYPES.ServiceSettings);
-    this._claRepository = claRepository || container.get<ClaRepository>(TYPES.ClaRepository);
-    this._usersService = usersService || container.get<UsersService>(TYPES.UsersService);
-    this._statusCheckService = statusCheckService || container.get<StatusChecksService>(TYPES.StatusChecksService);
-  }
+  @inject(TYPES.ServiceSettings) private _settings: ServiceSettings
+  @inject(TYPES.ClaRepository) private _claRepository: ClaRepository
+  @inject(TYPES.UsersService) private _usersService: UsersService
+  @inject(TYPES.StatusChecksService) private _statusCheckService: StatusChecksService
 
   parseState(rawState: string): ClaCheckInput
   {

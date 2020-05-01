@@ -2,8 +2,7 @@ import jwt from "jsonwebtoken";
 import { aretry } from "../common/resiliency";
 import { CheckState, StatusCheckInput, StatusChecksService } from "../../service/domain/checks";
 import { ClaCheckInput, ClaRepository } from "../../service/domain/cla";
-import { container } from "../../inversify.config";
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import { ServiceSettings } from "../settings";
 import { TYPES } from "../../constants/types";
 
@@ -16,22 +15,9 @@ export const FAILURE_MESSAGE = "Please sign our Contributor License Agreement."
 @injectable()
 class ClaCheckHandler {
 
-  private _settings: ServiceSettings
-  private _claRepository: ClaRepository
-  private _statusCheckService: StatusChecksService
-
-  constructor(
-    settings?: ServiceSettings,
-    claRepository?: ClaRepository,
-    statusCheckService?: StatusChecksService
-  ) {
-    // unfortunately Babel doesn't seem to support parameters decorators
-    // the only downside here is that we increase verbosity
-    // (and inversify is already verbose by itself)
-    this._settings = settings || container.get<ServiceSettings>(TYPES.ServiceSettings);
-    this._claRepository = claRepository || container.get<ClaRepository>(TYPES.ClaRepository);
-    this._statusCheckService = statusCheckService || container.get<StatusChecksService>(TYPES.StatusChecksService);
-  }
+  @inject(TYPES.ServiceSettings) private _settings: ServiceSettings
+  @inject(TYPES.ClaRepository) private _claRepository: ClaRepository
+  @inject(TYPES.StatusChecksService) private _statusCheckService: StatusChecksService
 
   getTargetUrlWithChallenge(data: ClaCheckInput): string {
     // The target URL for the check must not only point to this instance of the web application
