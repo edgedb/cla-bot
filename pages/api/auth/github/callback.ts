@@ -1,5 +1,5 @@
 import githubAuth from "./configuration";
-import { container } from "../../../../inversify.config"; // TODO: avoid this
+import { container } from "../../../../inversify.config";
 import { NextApiRequest, NextApiResponse } from "next";
 import { SafeError } from "../../../../service/common/web";
 import { SignClaHandler } from "../../../../service/handlers/sign-cla";

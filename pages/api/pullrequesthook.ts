@@ -1,6 +1,6 @@
 import { ClaCheckHandler } from "../../service/handlers/check-cla";
 import { ClaCheckInput } from "../../service/domain/cla";
-import { container } from "../../inversify.config"; // TODO: avoid this
+import { container } from "../../inversify.config";
 import { NextApiRequest, NextApiResponse } from "next";
 import { TYPES } from "../../constants/types";
 
