@@ -15,15 +15,22 @@ export class InstallationNotFoundError extends Error {
 
 interface GitHubInstallationAccessTokenResult {
   token: string
-  expires_at: Date
+  expires_at: string
   permissions: { [key: string]: string }
   repository_selection: string
 }
+
 
 // GitHub api returns much more information, but here we care only about the following:
 interface GitHubInstallationItem {
   id: number,
   target_id: number
+}
+
+
+interface AccessToken {
+  value: string
+  expiresAt: number
 }
 
 
@@ -33,10 +40,12 @@ export class GitHubAccessHandler {
 
   private _privateKey: Buffer;
   private _githubApplicationId: number;
+  private _accountAccessTokensCache: { [accountId: number]: AccessToken}
 
   constructor() {
     this._privateKey = this.getPrivateKey();
     this._githubApplicationId = this.getGitHubApplicationId();
+    this._accountAccessTokensCache = {};
   }
 
   private getPrivateKeyPath(): string {
@@ -89,24 +98,32 @@ export class GitHubAccessHandler {
     }, this._privateKey, { algorithm: "RS256" });
   }
 
-  @async_retry()
-  async getAccessTokenForAccount(
+  setCachedAccessToken(targetAccountId: number, token: AccessToken): void {
+    this._accountAccessTokensCache[targetAccountId] = token;
+  }
+
+  getCachedAccessToken(targetAccountId: number): AccessToken | null
+  {
+    if (targetAccountId in this._accountAccessTokensCache) {
+      const cachedAccessToken = this._accountAccessTokensCache[targetAccountId];
+
+      // applies a margin of 60 seconds while checking for expiration
+      if ((new Date().getTime() + 60000) < cachedAccessToken.expiresAt) {
+        console.info(`Reusing a cached access token for account ${targetAccountId}`);
+        return cachedAccessToken;
+      }
+
+      // remove the expired access token
+      delete this._accountAccessTokensCache[targetAccountId];
+    }
+    return null;
+  }
+
+  private async getInstallationIdByAccountId(
     targetAccountId: number,
-    primaryAccessToken?: string
-  ): Promise<string> {
-    // To get an access token for a GitHub app to interact with a repository,
-    // it is necessary to obtain first the "installation id", which represents
-    // the authorization of the GitHub app over the target account, and then
-    // obtain an access token for the installation.
-    // It is possible that a GitHub app has access rights over a different repository,
-    // but here for simplicity we don't verify if the app is authorized on the
-    // repository where the PR is being done (a call to this API:
-    // https://api.github.com/installation/repositories
-    // would enable to follow "look before you leap")
-
-    if (!primaryAccessToken)
-      primaryAccessToken = this.createPrimaryAccessToken();
-
+    primaryAccessToken: string
+  ): Promise<number>
+  {
     const response = await fetch(
       "https://api.github.com/app/installations",
       {
@@ -132,18 +149,62 @@ export class GitHubAccessHandler {
     if (installationId == null)
       throw new InstallationNotFoundError(targetAccountId);
 
-    return await this.getAccessTokenForInstallation(installationId);
+    return installationId;
+  }
+
+  @async_retry()
+  async getAccessTokenForAccount(
+    targetAccountId: number,
+    primaryAccessToken?: string
+  ): Promise<string> {
+    // To get an access token for a GitHub app to interact with a repository,
+    // it is necessary to obtain first the "installation id", which represents
+    // the authorization of the GitHub app over the target account, and then
+    // obtain an access token for the installation.
+    // It is possible that a GitHub app has access rights over a different repository,
+    // but here for simplicity we don't verify if the app is authorized on the
+    // repository where the PR is being done (a call to this API:
+    // https://api.github.com/installation/repositories
+    // would enable to follow "look before you leap")
+
+    // installation access tokens issued by GitHub last one hour, so we cache them
+    // in memory and reuse them if possible
+    const cachedAccessToken = this.getCachedAccessToken(targetAccountId);
+
+    if (cachedAccessToken !== null) {
+      return cachedAccessToken.value;
+    }
+
+    if (!primaryAccessToken)
+      primaryAccessToken = this.createPrimaryAccessToken();
+
+    const installationId = await this.getInstallationIdByAccountId(
+      targetAccountId,
+      primaryAccessToken
+    )
+
+    const installationAccessTokenResult = await this.getAccessTokenForInstallation(
+      installationId
+    );
+
+    this.setCachedAccessToken(targetAccountId, {
+      value: installationAccessTokenResult.token,
+      expiresAt: new Date(installationAccessTokenResult.expires_at).getTime()
+    });
+
+    return installationAccessTokenResult.token;
   }
 
   @async_retry()
   async getAccessTokenForInstallation(
     installationId: number,
     primaryAccessToken?: string
-  ): Promise<string> {
+  ): Promise<GitHubInstallationAccessTokenResult> {
     // An installation, in GitHub terminology, refers to a GitHub app being authorized
     // over a certain organization.
     // To interact with repositories inside an organization, we
     // need an access token issued for the installation.
+    // https://api.github.com/app/installations
 
     if (!primaryAccessToken)
       primaryAccessToken = this.createPrimaryAccessToken();
@@ -161,11 +222,7 @@ export class GitHubAccessHandler {
 
     await expectSuccessfulResponse(response);
 
-    // TODO: access tokens can be cached in memory until they expire!
-    // TODO: implement a dedicated class that supports caching of access tokens
     const data: GitHubInstallationAccessTokenResult = await response.json();
-
-    // https://api.github.com/app/installations
-    return data.token;
+    return data;
   }
 }

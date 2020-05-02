@@ -3,6 +3,21 @@ function timeout(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+
+export class RetryError extends Error {
+
+  internalError: Error
+
+  constructor(internalError: Error, methodName: string) {
+    super(
+      `The method ${methodName} failed more than allowed retry times. ` +
+      `Inspect the internal error for more details.`
+    );
+    this.internalError = internalError;
+  }
+}
+
+
 export function async_retry(times: number = 3, delay: number = 100) {
   return (
     target: Object,
@@ -21,11 +36,15 @@ export function async_retry(times: number = 3, delay: number = 100) {
         try {
           return await originalMethod.apply(this, args);
         } catch (error) {
+
+          if (error instanceof RetryError) {
+            throw error;
+          }
+
           attempt += 1;
 
           if (attempt > times) {
-            console.log(`The method ${propertyKey} failed more than allowed retry times;`);
-            throw error;
+            throw new RetryError(error, propertyKey);
           }
 
           console.log(
