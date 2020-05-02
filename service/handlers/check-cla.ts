@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { aretry } from "../common/resiliency";
+import { async_retry } from "../common/resiliency";
 import { CheckState, StatusCheckInput, StatusChecksService } from "../../service/domain/checks";
 import { ClaCheckInput, ClaRepository } from "../../service/domain/cla";
 import { inject, injectable } from "inversify";
@@ -30,12 +30,18 @@ class ClaCheckHandler {
     return `${this._settings.url}/contributor-license-agreement?state=${jwt.sign(data, this._settings.secret)}`
   }
 
-  @aretry()
+  @async_retry()
   async checkCla(
     data: ClaCheckInput
   ): Promise<void> {
     const cla = await this._claRepository.getClaByGitHubUserId(data.gitHubUserId);
     let status: StatusCheckInput;
+
+    // TODO: instead of checking the user id,
+    // 1. list all commits of the PR (https://api.github.com/repos/RobertoPrevato/GitHubActionsLab/pulls/12/commits?page=9)
+    // 1B. check if the PR has more than 30 commits, fetch all pages
+    // 2. find all unique committers emails (commit.author.email)
+    // 3. create a status depending on that
 
     if (cla == null) {
       status = new StatusCheckInput(

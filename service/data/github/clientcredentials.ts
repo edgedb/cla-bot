@@ -1,7 +1,7 @@
 import fetch from "cross-fetch";
 import fs from "fs";
 import jwt from "jsonwebtoken";
-import { aretry } from "../../common/resiliency";
+import { async_retry } from "../../common/resiliency";
 import { expectSuccessfulResponse } from "../../common/web";
 
 
@@ -89,7 +89,7 @@ export class GitHubAccessHandler {
     }, this._privateKey, { algorithm: "RS256" });
   }
 
-  @aretry()
+  @async_retry()
   async getAccessTokenForAccount(
     targetAccountId: number,
     primaryAccessToken?: string
@@ -102,7 +102,7 @@ export class GitHubAccessHandler {
     // but here for simplicity we don't verify if the app is authorized on the
     // repository where the PR is being done (a call to this API:
     // https://api.github.com/installation/repositories
-    // would enable to follow "look before you leap"
+    // would enable to follow "look before you leap")
 
     if (!primaryAccessToken)
       primaryAccessToken = this.createPrimaryAccessToken();
@@ -135,7 +135,7 @@ export class GitHubAccessHandler {
     return await this.getAccessTokenForInstallation(installationId);
   }
 
-  @aretry()
+  @async_retry()
   async getAccessTokenForInstallation(
     installationId: number,
     primaryAccessToken?: string

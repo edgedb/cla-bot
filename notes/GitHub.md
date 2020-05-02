@@ -581,3 +581,108 @@ curl -H "Authorization: token 71c51786930fbfeabc1812944052a1d6d3ba9182" https://
   "updated_at": "2020-04-29T17:03:31Z"
 }
 ```
+
+# Example response of call to get list of comments of a PR
+
+```
+[
+    {
+        "url": "https://api.github.com/repos/RobertoPrevato/GitHubActionsLab/issues/comments/622520851",
+        "html_url": "https://github.com/RobertoPrevato/GitHubActionsLab/pull/9#issuecomment-622520851",
+        "issue_url": "https://api.github.com/repos/RobertoPrevato/GitHubActionsLab/issues/9",
+        "id": 622520851,
+        "node_id": "MDEyOklzc3VlQ29tbWVudDYyMjUyMDg1MQ==",
+        "user": {
+            "login": "RobertoPrevato",
+            "id": 2576032,
+            "node_id": "MDQ6VXNlcjI1NzYwMzI=",
+            "avatar_url": "https://avatars2.githubusercontent.com/u/2576032?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/RobertoPrevato",
+            "html_url": "https://github.com/RobertoPrevato",
+            "followers_url": "https://api.github.com/users/RobertoPrevato/followers",
+            "following_url": "https://api.github.com/users/RobertoPrevato/following{/other_user}",
+            "gists_url": "https://api.github.com/users/RobertoPrevato/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/RobertoPrevato/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/RobertoPrevato/subscriptions",
+            "organizations_url": "https://api.github.com/users/RobertoPrevato/orgs",
+            "repos_url": "https://api.github.com/users/RobertoPrevato/repos",
+            "events_url": "https://api.github.com/users/RobertoPrevato/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/RobertoPrevato/received_events",
+            "type": "User",
+            "site_admin": false
+        },
+        "created_at": "2020-05-01T19:06:55Z",
+        "updated_at": "2020-05-01T19:06:55Z",
+        "author_association": "OWNER",
+        "body": "Hello There!"
+    },
+    {
+        "url": "https://api.github.com/repos/RobertoPrevato/GitHubActionsLab/issues/comments/622520913",
+        "html_url": "https://github.com/RobertoPrevato/GitHubActionsLab/pull/9#issuecomment-622520913",
+        "issue_url": "https://api.github.com/repos/RobertoPrevato/GitHubActionsLab/issues/9",
+        "id": 622520913,
+        "node_id": "MDEyOklzc3VlQ29tbWVudDYyMjUyMDkxMw==",
+        "user": {
+            "login": "RobertoPrevato",
+            "id": 2576032,
+            "node_id": "MDQ6VXNlcjI1NzYwMzI=",
+            "avatar_url": "https://avatars2.githubusercontent.com/u/2576032?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/RobertoPrevato",
+            "html_url": "https://github.com/RobertoPrevato",
+            "followers_url": "https://api.github.com/users/RobertoPrevato/followers",
+            "following_url": "https://api.github.com/users/RobertoPrevato/following{/other_user}",
+            "gists_url": "https://api.github.com/users/RobertoPrevato/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/RobertoPrevato/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/RobertoPrevato/subscriptions",
+            "organizations_url": "https://api.github.com/users/RobertoPrevato/orgs",
+            "repos_url": "https://api.github.com/users/RobertoPrevato/repos",
+            "events_url": "https://api.github.com/users/RobertoPrevato/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/RobertoPrevato/received_events",
+            "type": "User",
+            "site_admin": false
+        },
+        "created_at": "2020-05-01T19:07:06Z",
+        "updated_at": "2020-05-01T19:07:06Z",
+        "author_association": "OWNER",
+        "body": "Example"
+    }
+]
+```
+
+## Example response of create comment call
+
+```
+{
+    "url": "https://api.github.com/repos/RobertoPrevato/GitHubActionsLab/issues/comments/622521665",
+    "html_url": "https://github.com/RobertoPrevato/GitHubActionsLab/pull/9#issuecomment-622521665",
+    "issue_url": "https://api.github.com/repos/RobertoPrevato/GitHubActionsLab/issues/9",
+    "id": 622521665,
+    "node_id": "MDEyOklzc3VlQ29tbWVudDYyMjUyMTY2NQ==",
+    "user": {
+        "login": "robertoprevatolearningapp[bot]",
+        "id": 64354967,
+        "node_id": "MDM6Qm90NjQzNTQ5Njc=",
+        "avatar_url": "https://avatars3.githubusercontent.com/in/62427?v=4",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/robertoprevatolearningapp%5Bbot%5D",
+        "html_url": "https://github.com/apps/robertoprevatolearningapp",
+        "followers_url": "https://api.github.com/users/robertoprevatolearningapp%5Bbot%5D/followers",
+        "following_url": "https://api.github.com/users/robertoprevatolearningapp%5Bbot%5D/following{/other_user}",
+        "gists_url": "https://api.github.com/users/robertoprevatolearningapp%5Bbot%5D/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/robertoprevatolearningapp%5Bbot%5D/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/robertoprevatolearningapp%5Bbot%5D/subscriptions",
+        "organizations_url": "https://api.github.com/users/robertoprevatolearningapp%5Bbot%5D/orgs",
+        "repos_url": "https://api.github.com/users/robertoprevatolearningapp%5Bbot%5D/repos",
+        "events_url": "https://api.github.com/users/robertoprevatolearningapp%5Bbot%5D/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/robertoprevatolearningapp%5Bbot%5D/received_events",
+        "type": "Bot",
+        "site_admin": false
+    },
+    "created_at": "2020-05-01T19:09:08Z",
+    "updated_at": "2020-05-01T19:09:08Z",
+    "author_association": "NONE",
+    "body": "Comment from Postman"
+}
+```

@@ -1,5 +1,5 @@
 import fetch from "cross-fetch";
-import { aretry } from "../../common/resiliency";
+import { async_retry } from "../../common/resiliency";
 import { CheckState, StatusCheckInput, StatusChecksService } from "../../domain/checks";
 import { expectSuccessfulResponse } from "../../common/web";
 import { GitHubAccessHandler } from "./clientcredentials";
@@ -15,7 +15,7 @@ class GitHubStatusChecksAPI implements StatusChecksService {
       this._access_token_handler = new GitHubAccessHandler();
   }
 
-  @aretry()
+  @async_retry()
   async createStatus(
     targetAccountId: number,
     targetRepoFullName: string,

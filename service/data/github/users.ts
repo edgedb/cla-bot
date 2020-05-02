@@ -1,5 +1,5 @@
 import fetch from "cross-fetch";
-import { aretry } from "../../common/resiliency";
+import { async_retry } from "../../common/resiliency";
 import { expectSuccessfulResponse } from "../../common/web";
 import { injectable } from "inversify";
 import { UserInfo, UsersService } from "../../domain/users";
@@ -8,7 +8,7 @@ import { UserInfo, UsersService } from "../../domain/users";
 @injectable()
 class GitHubUsersService implements UsersService {
 
-  @aretry()
+  @async_retry()
   async getUserInfoFromAccessToken(accessToken: string) {
     const response = await fetch(
       "https://api.github.com/user",

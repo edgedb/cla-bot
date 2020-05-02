@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { aretry } from "../common/resiliency";
+import { async_retry } from "../common/resiliency";
 import { CheckState, StatusCheckInput, StatusChecksService } from "../../service/domain/checks";
 import { Cla, ClaCheckInput, ClaRepository } from "../../service/domain/cla";
 import { CLA_CHECK_CONTEXT, SUCCESS_MESSAGE } from "./check-cla";
@@ -34,7 +34,7 @@ class SignClaHandler
     }
   }
 
-  @aretry()
+  @async_retry()
   async createCla(user: UserInfo): Promise<Cla> {
     const cla = new Cla(
       uuid(),

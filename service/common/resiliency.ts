@@ -3,12 +3,15 @@ function timeout(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export function aretry(times: number = 3, delay: number = 100) {
+export function async_retry(times: number = 3, delay: number = 100) {
   return (
     target: Object,
     propertyKey: string,
     descriptor: TypedPropertyDescriptor<any>
   ) => {
+    // Wraps an async function to handle retries upon failure,
+    // attempting up to a given number of times, and applying a given delay between
+    // retries.
     const originalMethod = descriptor.value;
 
     descriptor.value = async function (...args: any[]) {
