@@ -11,7 +11,7 @@ export class RetryError extends Error {
   constructor(internalError: Error, methodName: string) {
     super(
       `The method ${methodName} failed more than allowed retry times. ` +
-      `Inspect the internal error for more details.`
+      `Inspect the internal error for more details on the last error.`
     );
     this.internalError = internalError;
   }

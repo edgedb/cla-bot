@@ -1,18 +1,19 @@
 import fetch from "cross-fetch";
+import { accessHandler, GitHubAccessHandler } from "./clientcredentials";
 import { async_retry } from "../../common/resiliency";
 import { CheckState, StatusCheckInput, StatusChecksService } from "../../domain/checks";
 import { expectSuccessfulResponse } from "../../common/web";
-import { GitHubAccessHandler } from "./clientcredentials";
+import { getHeadersForJsonContent } from "./headers";
 import { injectable } from "inversify";
 
 
 @injectable()
-class GitHubStatusChecksAPI implements StatusChecksService {
+export class GitHubStatusChecksAPI implements StatusChecksService {
 
   private _access_token_handler: GitHubAccessHandler;
 
   public constructor() {
-      this._access_token_handler = new GitHubAccessHandler();
+      this._access_token_handler = accessHandler;
   }
 
   @async_retry()
@@ -34,16 +35,10 @@ class GitHubStatusChecksAPI implements StatusChecksService {
           description: data.description,
           context: data.context
         }),
-        headers: {
-          "Accept": "application/vnd.github.machine-man-preview+json",
-          "Content-Type": "application/json; charset=utf-8",
-          "Authorization": `Bearer ${accessToken}`
-        }
+        headers: getHeadersForJsonContent(accessToken)
       }
     );
 
     await expectSuccessfulResponse(response);
   }
 }
-
-export { GitHubStatusChecksAPI };

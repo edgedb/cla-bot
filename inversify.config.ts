@@ -1,18 +1,19 @@
 // ATTENTION: the import of "reflect-metadata" must happen before inversify, otherwise
 // inversify doesn't work - so don't sort imports here...
 import "reflect-metadata";
+import { ClaCheckHandler } from "./service/handlers/check-cla";
 import { ClaRepository } from "./service/domain/cla";
+import { CommentsService } from "./service/domain/comments";
 import { Container } from "inversify";
 import { EdgeDBClaRepository } from "./service/data/edgedb/cla";
 import { GitHubStatusChecksAPI } from "./service/data/github/checks";
+import { GitHubCommentsService } from "./service/data/github/comments";
 import { GitHubUsersService } from "./service/data/github/users";
-import { StatusChecksService } from "./service/domain/checks";
-import { UsersService } from "./service/domain/users";
 import { ServiceSettings } from "./service/settings";
-import { SignClaHandler } from "./service/handlers/sign-cla"
-import { ClaCheckHandler } from "./service/handlers/check-cla"
+import { SignClaHandler } from "./service/handlers/sign-cla";
+import { StatusChecksService } from "./service/domain/checks";
 import { TYPES } from "./constants/types";
-
+import { UsersService } from "./service/domain/users";
 
 const container = new Container();
 
@@ -23,6 +24,8 @@ container.bind<StatusChecksService>(TYPES.StatusChecksService)
   .to(GitHubStatusChecksAPI).inSingletonScope();
 
 container.bind<UsersService>(TYPES.UsersService).to(GitHubUsersService);
+
+container.bind<CommentsService>(TYPES.CommentsService).to(GitHubCommentsService);
 
 container.bind<ServiceSettings>(TYPES.ServiceSettings).to(ServiceSettings).inSingletonScope();
 

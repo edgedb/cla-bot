@@ -2,6 +2,7 @@ import fetch from "cross-fetch";
 import fs from "fs";
 import jwt from "jsonwebtoken";
 import { async_retry } from "../../common/resiliency";
+import { getHeaders } from "./headers";
 import { expectSuccessfulResponse } from "../../common/web";
 
 
@@ -128,10 +129,7 @@ export class GitHubAccessHandler {
       "https://api.github.com/app/installations",
       {
         method: "GET",
-        headers: {
-          "Accept": "application/vnd.github.machine-man-preview+json",
-          "Authorization": `Bearer ${primaryAccessToken}`
-        }
+        headers: getHeaders(primaryAccessToken)
       }
     );
 
@@ -213,10 +211,7 @@ export class GitHubAccessHandler {
       `https://api.github.com/app/installations/${installationId}/access_tokens`,
       {
         method: "POST",
-        headers: {
-          "Accept": "application/vnd.github.machine-man-preview+json",
-          "Authorization": `Bearer ${primaryAccessToken}`
-        }
+        headers: getHeaders(primaryAccessToken)
       }
     );
 
@@ -226,3 +221,13 @@ export class GitHubAccessHandler {
     return data;
   }
 }
+
+
+// we might either configure the class as a singleton service in inversify and inject,
+// it into classes that need it, or create a singleton in this module;
+// since the classes defined under this namespace are anyway concrete classes
+// depending on the GitHub API and using DI in this case doesn't bring benefit,
+// the second approach is chosen (also to reduce code verbosity)
+const accessHandler = new GitHubAccessHandler();
+
+export { accessHandler };

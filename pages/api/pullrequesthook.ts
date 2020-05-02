@@ -1,6 +1,6 @@
 import { ClaCheckHandler } from "../../service/handlers/check-cla";
 import { ClaCheckInput } from "../../service/domain/cla";
-import { container } from "../../inversify.config"; // TODO: avoid this
+import { container } from "../../inversify.config";
 import { NextApiRequest, NextApiResponse } from "next";
 import { TYPES } from "../../constants/types";
 
@@ -48,6 +48,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       }
 
       const gitHubUserId = body?.pull_request?.user?.id;
+      const pullRequestNumber = body?.pull_request?.number;
       const pullRequestHeadSha = body?.pull_request?.head?.sha;
       const pullRequestUrl = body?.pull_request?.html_url;
       const targetRepositoryId = body?.repository?.id;
@@ -58,6 +59,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
       if (
         !gitHubUserId ||
+        !pullRequestNumber ||
         !pullRequestHeadSha ||
         !pullRequestUrl ||
         !targetRepositoryId ||
@@ -67,6 +69,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         !targetRepositoryName
       ) {
         return res.status(400).end(`Expected a pull request webhook payload with:
+          pull_request.number;
           pull_request.user.id;
           pull_request.url;
           pull_request.head.sha;
@@ -79,8 +82,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       }
 
       const input: ClaCheckInput = {
+        action,
         gitHubUserId,
         pullRequest: {
+          number: pullRequestNumber,
           url: pullRequestUrl,
           headSha: pullRequestHeadSha
         },

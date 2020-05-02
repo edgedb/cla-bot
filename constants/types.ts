@@ -4,7 +4,8 @@ const TYPES = {
   ServiceSettings: Symbol.for("ServiceSettings"),
   UsersService: Symbol.for("UsersService"),
   SignClaHandler: Symbol.for("SignClaHandler"),
-  ClaCheckHandler: Symbol.for("ClaCheckHandler")
+  ClaCheckHandler: Symbol.for("ClaCheckHandler"),
+  CommentsService: Symbol.for("CommentsService"),
 };
 
 export { TYPES };

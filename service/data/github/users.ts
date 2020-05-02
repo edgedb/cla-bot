@@ -6,7 +6,7 @@ import { UserInfo, UsersService } from "../../domain/users";
 
 
 @injectable()
-class GitHubUsersService implements UsersService {
+export class GitHubUsersService implements UsersService {
 
   @async_retry()
   async getUserInfoFromAccessToken(accessToken: string) {
@@ -24,7 +24,4 @@ class GitHubUsersService implements UsersService {
 
     return await response.json() as UserInfo;
   }
-
 }
-
-export { GitHubUsersService };

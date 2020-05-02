@@ -9,31 +9,37 @@ export interface ClaCheckRepository {
 }
 
 export interface ClaCheckPullRequest {
+  number: number
   headSha: string
   url: string
 }
 
 export interface ClaCheckInput {
+  action: string
   gitHubUserId: number
   repository: ClaCheckRepository
   pullRequest: ClaCheckPullRequest
 }
 
+export interface ClaCheckState extends ClaCheckInput {
+  commentId: string
+}
+
 export class Cla {
-  id: string;
-  gitHubUserId: number;
+  id: string
+  email: string
   timestamp: Date
 
-  constructor(id: string, gitHubUserId: number, timestamp: Date) {
+  constructor(id: string, email: string, timestamp: Date) {
     this.id = id;
-    this.gitHubUserId = gitHubUserId
+    this.email = email
     this.timestamp = timestamp
   }
 }
 
 export interface ClaRepository {
 
-  getClaByGitHubUserId(githubUserId: number): Promise<Cla | null>;
+  getClaByEmailAddress(email: string): Promise<Cla | null>;
 
   saveCla(data: Cla): Promise<void>;
 }
