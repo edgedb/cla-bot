@@ -6,7 +6,6 @@ import { injectable } from "inversify";
 export class EdgeDBCommentsRepository implements CommentsRepository {
 
   async getCommentInfoByPullRequestId(pullRequestId: number): Promise<CommentInfo | null> {
-    // throw new Error("Method not implemented.");
     return null;
   }
 

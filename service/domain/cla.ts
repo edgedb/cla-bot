@@ -26,11 +26,11 @@ export interface ClaCheckState extends ClaCheckInput {
 }
 
 export class Cla {
-  id: string
+  id: string | null
   email: string
   signed_at: Date
 
-  constructor(id: string, email: string, timestamp: Date) {
+  constructor(id: string | null, email: string, timestamp: Date) {
     this.id = id;
     this.email = email
     this.signed_at = timestamp

@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { async_retry } from "../common/resiliency";
 import { CheckState, StatusCheckInput, StatusChecksService } from "../../service/domain/checks";
-import { ClaCheckInput, ClaRepository } from "../../service/domain/cla";
+import { ClaCheckInput, ClaRepository, Cla } from "../../service/domain/cla";
 import { CommentsService, CommentsRepository } from "../../service/domain/comments";
 import { inject, injectable } from "inversify";
 import { ServiceSettings } from "../settings";
@@ -90,11 +90,6 @@ class ClaCheckHandler {
     // 3. create a status depending on that
 
     const challengeUrl = this.getTargetUrlWithChallenge(data);
-
-
-
-
-    // TODO: include comment id in state?
 
     if (cla == null) {
       status = new StatusCheckInput(
