@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import { async_retry } from "../common/resiliency";
 import { CheckState, StatusCheckInput, StatusChecksService } from "../../service/domain/checks";
 import { ClaCheckInput, ClaRepository } from "../../service/domain/cla";
-import { CommentsService } from "../../service/domain/comments";
+import { CommentsService, CommentsRepository } from "../../service/domain/comments";
 import { inject, injectable } from "inversify";
 import { ServiceSettings } from "../settings";
 import { TYPES } from "../../constants/types";
@@ -19,6 +19,7 @@ class ClaCheckHandler {
   @inject(TYPES.ServiceSettings) private _settings: ServiceSettings
   @inject(TYPES.ClaRepository) private _claRepository: ClaRepository
   @inject(TYPES.CommentsService) private _commentsService: CommentsService
+  @inject(TYPES.CommentsRepository) private _commentsRepository: CommentsRepository
   @inject(TYPES.StatusChecksService) private _statusCheckService: StatusChecksService
 
   getTargetUrlWithChallenge(data: ClaCheckInput): string {
@@ -43,13 +44,40 @@ class ClaCheckHandler {
     `[![CLA not signed](${this._settings.url}/cla-not-signed.svg)](${challengeUrl})`
   }
 
+  private async addCommentWithStatus(
+    data: ClaCheckInput,
+    challengeUrl: string
+  ): Promise<void> {
+    // was a CLA comment for this PR already written?
+    const commentInfo = await this._commentsRepository.getCommentInfoByPullRequestId(
+      data.pullRequest.id
+    )
+
+    if (commentInfo != null) {
+      return;
+    }
+
+    const commentId = await this._commentsService.createComment(
+      data.repository.ownerId,
+      data.repository.fullName,
+      data.pullRequest.number,
+      this.getNotSignedComment(challengeUrl)
+    )
+
+    await this._commentsRepository.storeCommentInfo(
+      commentId,
+      data.pullRequest.id,
+      new Date()
+    );
+  }
+
   @async_retry()
   async checkCla(
     data: ClaCheckInput
   ): Promise<void> {
     // TODO: check by email
 
-    const email = "example@foo.org";
+    const email = "roberto.prevato@gmail.com";
 
     const cla = await this._claRepository.getClaByEmailAddress(email);
 
@@ -61,24 +89,10 @@ class ClaCheckHandler {
     // 2. find all unique committers emails (commit.author.email)
     // 3. create a status depending on that
 
-    // Unfortunately, it is necessary to find a comment.
-
-    // Note: it is possible to include an HTML comment into the comment, to
     const challengeUrl = this.getTargetUrlWithChallenge(data);
 
-    // TODO: the following condition is wrong - instead check if a comment was already
-    // published! Because if the check fails the first time, then there is no comment.
-    if (data.action == "opened") {
-      // add a comment to the PR,
-      // to increase visibility; the id of this comment is stored in the state,
-      // so we can easily update it once all committers sign the CLA
-      const commentId = await this._commentsService.createComment(
-        data.repository.ownerId,
-        data.repository.fullName,
-        data.pullRequest.number,
-        this.getNotSignedComment(challengeUrl)
-      )
-    }
+
+
 
     // TODO: include comment id in state?
 
@@ -90,6 +104,8 @@ class ClaCheckHandler {
         CLA_CHECK_CONTEXT
       );
 
+      // add a comment to increase visibility
+      await this.addCommentWithStatus(data, challengeUrl);
     } else {
       status = new StatusCheckInput(
         CheckState.success,

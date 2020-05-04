@@ -18,3 +18,22 @@ export interface CommentsService {
 
   updateComment(id: string, text: string): Promise<void>
 }
+
+
+export interface CommentInfo {
+  id: string
+  pullRequestId: number,
+  createdAt: Date
+}
+
+
+export interface CommentsRepository {
+
+  getCommentInfoByPullRequestId(pullRequestId: number): Promise<CommentInfo>;
+
+  storeCommentInfo(
+    commentId: string,
+    pullRequestId: number,
+    createdAt: Date
+  ): Promise<void>
+}

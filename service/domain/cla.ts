@@ -9,13 +9,13 @@ export interface ClaCheckRepository {
 }
 
 export interface ClaCheckPullRequest {
+  id: number
   number: number
   headSha: string
   url: string
 }
 
 export interface ClaCheckInput {
-  action: string
   gitHubUserId: number
   repository: ClaCheckRepository
   pullRequest: ClaCheckPullRequest
@@ -28,12 +28,12 @@ export interface ClaCheckState extends ClaCheckInput {
 export class Cla {
   id: string
   email: string
-  timestamp: Date
+  signed_at: Date
 
   constructor(id: string, email: string, timestamp: Date) {
     this.id = id;
     this.email = email
-    this.timestamp = timestamp
+    this.signed_at = timestamp
   }
 }
 
