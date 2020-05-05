@@ -40,14 +40,14 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         action != "opened" &&
         action != "reopened"
       ) {
-        // do nothing;
-        // we check CLA only when
+        // do nothing; we check CLA only when
         // a PR is opened or reopened
         res.status(200).end(`Doing nothing: the pull_request action is ${action}`);
         break
       }
 
       const gitHubUserId = body?.pull_request?.user?.id;
+      const pullRequestId = body?.pull_request?.id;
       const pullRequestNumber = body?.pull_request?.number;
       const pullRequestHeadSha = body?.pull_request?.head?.sha;
       const pullRequestUrl = body?.pull_request?.html_url;
@@ -59,6 +59,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
       if (
         !gitHubUserId ||
+        !pullRequestId ||
         !pullRequestNumber ||
         !pullRequestHeadSha ||
         !pullRequestUrl ||
@@ -82,9 +83,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       }
 
       const input: ClaCheckInput = {
-        action,
         gitHubUserId,
         pullRequest: {
+          id: pullRequestId,
           number: pullRequestNumber,
           url: pullRequestUrl,
           headSha: pullRequestHeadSha

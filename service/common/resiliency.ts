@@ -48,7 +48,7 @@ export function async_retry(times: number = 3, delay: number = 100) {
           }
 
           console.log(
-            `Attempt ${attempt} to execute method ${propertyKey} failed ` +
+            `Attempt ${attempt} to execute method "${propertyKey}" failed ` +
             `with error: ${error}, retrying...`
           );
 

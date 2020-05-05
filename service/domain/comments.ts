@@ -22,14 +22,15 @@ export interface CommentsService {
 
 export interface CommentInfo {
   id: string
-  pullRequestId: number,
+  comment_id: string
+  pullRequestId: number
   createdAt: Date
 }
 
 
 export interface CommentsRepository {
 
-  getCommentInfoByPullRequestId(pullRequestId: number): Promise<CommentInfo>;
+  getCommentInfoByPullRequestId(pullRequestId: number): Promise<CommentInfo | null>;
 
   storeCommentInfo(
     commentId: string,

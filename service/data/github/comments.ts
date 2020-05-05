@@ -42,7 +42,7 @@ export class GitHubCommentsService implements CommentsService {
     await expectSuccessfulResponse(response);
 
     const data: CratedCommentOutput = await response.json();
-    return data.id;
+    return data.id.toString();
   }
 
   getComment(id: string): Promise<Comment> {

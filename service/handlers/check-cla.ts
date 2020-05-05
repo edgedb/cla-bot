@@ -54,6 +54,7 @@ class ClaCheckHandler {
     )
 
     if (commentInfo != null) {
+      console.info(`CLA comment already present on PR ${data.pullRequest.number}`);
       return;
     }
 
@@ -77,7 +78,7 @@ class ClaCheckHandler {
   ): Promise<void> {
     // TODO: check by email
 
-    const email = "roberto.prevato@gmail.com";
+    const email = "roberto.prevato+nono@gmail.com";
 
     const cla = await this._claRepository.getClaByEmailAddress(email);
 

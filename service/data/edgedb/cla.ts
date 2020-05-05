@@ -1,6 +1,5 @@
-import { async_retry } from "../../common/resiliency";
 import { Cla, ClaRepository } from "../../domain/cla";
-import { connect } from "./connect";
+import { EdgeDBRepository } from "./base";
 import { injectable } from "inversify";
 
 
@@ -12,34 +11,26 @@ interface ClaItem {
 
 
 @injectable()
-export class EdgeDBClaRepository implements ClaRepository {
+export class EdgeDBClaRepository extends EdgeDBRepository implements ClaRepository {
 
-  @async_retry()
   async getClaByEmailAddress(email: string): Promise<Cla | null> {
-    let signed_cla: ClaItem[];
-    const connection = await connect()
-    try {
-      signed_cla = await connection.fetchAll(
+    let signed_cla: ClaItem[] = await this.run(async (connection) => {
+      return await connection.fetchAll(
         "select CLA { email, signed_at } filter .email = <str>$0 limit 1;",
         [email]
-      )
-    } finally {
-      await connection.close();
-    }
+      );
+    })
 
-    if (signed_cla) {
+    if (signed_cla.length) {
       const item = signed_cla[0];
-      const cla = new Cla(item.id, item.email, item.signed_at);
-      return cla;
+      return new Cla(item.id, item.email, item.signed_at);
     }
 
     return null;
   }
 
-  @async_retry()
   async saveCla(data: Cla): Promise<void> {
-    const connection = await connect()
-    try {
+    await this.run(async connection => {
       const result = await connection.fetchAll(
         `
         INSERT CLA {
@@ -55,8 +46,6 @@ export class EdgeDBClaRepository implements ClaRepository {
         }
       )
       data.id = result[0].id;
-    } finally {
-      await connection.close();
-    }
+    });
   }
 }

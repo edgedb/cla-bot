@@ -1,5 +1,3 @@
-create database cla;
-
 START TRANSACTION;
 
 CREATE MIGRATION structure TO {
