@@ -113,7 +113,13 @@ class SignClaHandler
       )
     }
 
-    await this.createCla(userInfo)
+    // did the user already signed the CLA?
+    const existingCla = await this._claRepository.getClaByEmailAddress(userInfo.email);
+
+    if (existingCla == null) {
+      await this.createCla(userInfo)
+    }
+
     await this.checkIfAllSigned(data, committers)
 
     return {
