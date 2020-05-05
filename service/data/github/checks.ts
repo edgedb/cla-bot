@@ -7,6 +7,31 @@ import { getHeadersForJsonContent } from "./headers";
 import { injectable } from "inversify";
 
 
+interface GitHubPersonInfo {
+  name: string
+  email: string
+  date: string
+}
+
+
+interface GitHubCommitInfo {
+  author: GitHubPersonInfo
+  committer: GitHubPersonInfo
+  message: string
+  url: string
+}
+
+
+interface GitHubCommitItem {
+  sha: string,
+  node_id: string
+  commit: GitHubCommitInfo
+  url: string
+  html_url: string
+}
+
+
+
 @injectable()
 export class GitHubStatusChecksAPI implements StatusChecksService {
 
@@ -14,6 +39,46 @@ export class GitHubStatusChecksAPI implements StatusChecksService {
 
   public constructor() {
       this._access_token_handler = accessHandler;
+  }
+
+  @async_retry()
+  async getAllCommittersByPullRequestId(
+    targetRepoFullName: string,
+    pullRequestNumber: number
+  ): Promise<string[]> {
+    var pageNumber = 0;
+    const committersEmails: string[] = [];
+
+    // GitHub returns commits in pages of 30 items;
+    // we have two ways to know when we should stop fetching commits:
+    // either do a call to get PR infor and see how many "commits" were done
+    // or make web requests increasing the page until the
+    while (true) {
+      const response = await fetch(
+        `https://api.github.com/repos/${targetRepoFullName}/pulls/${pullRequestNumber}/commits?page=${pageNumber}`
+      );
+
+      await expectSuccessfulResponse(response);
+
+      const data: GitHubCommitItem[] = await response.json();
+
+      data.forEach(item => {
+        const committerEmail = item.commit.committer.email;
+
+        if (committersEmails.indexOf(committerEmail) == -1) {
+          committersEmails.push(item.commit.committer.email);
+        }
+      });
+
+      if (data.length < 30) {
+        // there cannot be more items
+        break;
+      }
+
+      pageNumber += 1;
+    }
+
+    return committersEmails;
   }
 
   @async_retry()

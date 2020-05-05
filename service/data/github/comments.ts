@@ -45,11 +45,24 @@ export class GitHubCommentsService implements CommentsService {
     return data.id.toString();
   }
 
-  getComment(id: string): Promise<Comment> {
-    throw new Error("Method not implemented.");
-  }
+  @async_retry()
+  async updateComment(
+    targetAccountId: number,
+    targetRepoFullName: string,
+    commentId: string,
+    body: string
+  ): Promise<void> {
+    const accessToken = await this._access_token_handler.getAccessTokenForAccount(targetAccountId);
 
-  updateComment(id: string, text: string): Promise<void> {
-    throw new Error("Method not implemented.");
+    const response = await fetch(
+      `https://api.github.com/repos/${targetRepoFullName}/issues/comments/${commentId}`,
+      {
+        method: "PATCH",
+        body: JSON.stringify({ body }),
+        headers: getHeadersForJsonContent(accessToken)
+      }
+    );
+
+    await expectSuccessfulResponse(response);
   }
 }

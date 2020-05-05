@@ -17,6 +17,7 @@ export interface ClaCheckPullRequest {
 
 export interface ClaCheckInput {
   gitHubUserId: number
+  committers: string[] | null
   repository: ClaCheckRepository
   pullRequest: ClaCheckPullRequest
 }
@@ -30,10 +31,10 @@ export class Cla {
   email: string
   signed_at: Date
 
-  constructor(id: string | null, email: string, timestamp: Date) {
+  constructor(id: string | null, email: string, signed_at: Date) {
     this.id = id;
     this.email = email
-    this.signed_at = timestamp
+    this.signed_at = signed_at
   }
 }
 

@@ -14,9 +14,12 @@ export interface CommentsService {
     body: string
   ): Promise<string>
 
-  getComment(id: string): Promise<Comment>
-
-  updateComment(id: string, text: string): Promise<void>
+  updateComment(
+    targetAccountId: number,
+    targetRepoFullName: string,
+    commentId: string,
+    body: string
+  ): Promise<void>
 }
 
 

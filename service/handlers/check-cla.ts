@@ -33,13 +33,12 @@ class ClaCheckHandler {
     return `${this._settings.url}/contributor-license-agreement?state=${jwt.sign(data, this._settings.secret)}`
   }
 
-  // TODO: put in another place
-  private getSignedComment(): string {
+  getSignedComment(): string {
     return `All committers signed the Contributor License Agreement. <br/> ` +
     `![CLA signed](${this._settings.url}/cla-signed.svg)`
   }
 
-  private getNotSignedComment(challengeUrl: string): string {
+  getNotSignedComment(challengeUrl: string): string {
     return `Committers are required to sign the Contributor License Agreement. <br/> ` +
     `[![CLA not signed](${this._settings.url}/cla-not-signed.svg)](${challengeUrl})`
   }
@@ -72,27 +71,53 @@ class ClaCheckHandler {
     );
   }
 
+  async allCommittersHaveSignedTheCla(
+    allCommitters: string[]
+  ): Promise<boolean> {
+    // This code works fine in realistic scenarios: most PRs will have a single
+    // committer email, or only a few.
+    // However, someone might trick our service by faking a big number of unique users
+    // and a big number of commits.
+
+    for (let i = 0; i < allCommitters.length; i++) {
+      const email = allCommitters[i];
+
+      const cla = await this._claRepository.getClaByEmailAddress(email);
+
+      if (cla == null) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
   @async_retry()
   async checkCla(
     data: ClaCheckInput
   ): Promise<void> {
-    // TODO: check by email
 
-    const email = "roberto.prevato+nono@gmail.com";
+    const allCommitters = await this._statusCheckService
+      .getAllCommittersByPullRequestId(data.repository.fullName, data.pullRequest.number)
 
-    const cla = await this._claRepository.getClaByEmailAddress(email);
+    if (!allCommitters.length) {
+      throw new Error("Failed to extract the committers emails for the pull request.")
+    }
 
-    let status: StatusCheckInput;
+    // store committers in the input state, so we don't need to fetch again the same
+    // information when validating each committer (after each of them authorizes our app)
+    data.committers = allCommitters;
 
-    // TODO: instead of checking the user id,
-    // 1. list all commits of the PR (https://api.github.com/repos/RobertoPrevato/GitHubActionsLab/pulls/12/commits?page=9)
-    // 1B. if the PR has more than 30 commits, fetch all pages
-    // 2. find all unique committers emails (commit.author.email)
-    // 3. create a status depending on that
+    console.info(`Checking committers: [${allCommitters}] for PR ${data.pullRequest.number}`)
+
+    let status: StatusCheckInput
 
     const challengeUrl = this.getTargetUrlWithChallenge(data);
+    const allCommittersHaveSignedTheCla = await this.allCommittersHaveSignedTheCla(
+      allCommitters
+    )
 
-    if (cla == null) {
+    if (allCommittersHaveSignedTheCla) {
       status = new StatusCheckInput(
         CheckState.failure,
         challengeUrl,
@@ -105,7 +130,7 @@ class ClaCheckHandler {
     } else {
       status = new StatusCheckInput(
         CheckState.success,
-        `${this._settings.url}/signed-contributor-license-agreement?id=${cla.id}`,
+        `${this._settings.url}/signed-contributor-license-agreement`,
         SUCCESS_MESSAGE,
         CLA_CHECK_CONTEXT
       );
