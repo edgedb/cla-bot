@@ -4,6 +4,7 @@ import { async_retry } from "../../common/resiliency";
 import { CheckState, StatusCheckInput, StatusChecksService } from "../../domain/checks";
 import { expectSuccessfulResponse } from "../../common/web";
 import { getHeadersForJsonContent } from "./headers";
+import { hasMoreItems } from "./utils";
 import { injectable } from "inversify";
 
 
@@ -70,8 +71,7 @@ export class GitHubStatusChecksAPI implements StatusChecksService {
         }
       });
 
-      if (data.length < 30) {
-        // there cannot be more items
+      if (!data.length || !hasMoreItems(response)) {
         break;
       }
 

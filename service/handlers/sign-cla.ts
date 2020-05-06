@@ -9,7 +9,7 @@ import { inject, injectable } from "inversify";
 import { SafeError } from "../common/web";
 import { ServiceSettings } from "../settings";
 import { TYPES } from "../../constants/types";
-import { UserInfo, UsersService, EmailInfo } from "../../service/domain/users";
+import { UsersService, EmailInfo } from "../../service/domain/users";
 import { v4 as uuid } from "uuid";
 
 
@@ -122,6 +122,24 @@ class SignClaHandler
     }
   }
 
+  private async handleAllMatchingEmails(matchingEmails: EmailInfo[]): Promise<void> {
+
+    for (let i = 0; i < matchingEmails.length; i++) {
+      const matchingEmail = matchingEmails[i];
+
+      this.ensureThatEmailIsVerified(matchingEmail);
+
+      // did the user already signed the CLA with this email address?
+      const existingCla = await this._claRepository.getClaByEmailAddress(
+        matchingEmail.email.toLowerCase()
+      );
+
+      if (existingCla == null) {
+        await this.createCla(matchingEmail)
+      }
+    }
+  }
+
   async signCla(rawState: string, accessToken: string): Promise<SignedClaOutput> {
     //
     // A user just signed-in, after authorizing the OAuth app that can read email
@@ -149,20 +167,14 @@ class SignClaHandler
       )
     }
 
-    matchingEmails.forEach(async matchingEmail => {
-      this.ensureThatEmailIsVerified(matchingEmail);
+    await this.handleAllMatchingEmails(matchingEmails);
 
-      // did the user already signed the CLA with this email address?
-      const existingCla = await this._claRepository.getClaByEmailAddress(
-        matchingEmail.email.toLowerCase()
-      );
-
-      if (existingCla == null) {
-        await this.createCla(matchingEmail)
-      }
-    });
-
-    await this.checkIfAllSigned(data, committers)
+    if (committers.length === 1) {
+      // single committer: the CLA is signed
+      await this.completeClaCheck(data);
+    } else {
+      await this.checkIfAllSigned(data, committers)
+    }
 
     return {
       redirectUrl: data.pullRequest.url
