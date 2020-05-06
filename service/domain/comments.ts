@@ -25,7 +25,7 @@ export interface CommentsService {
 
 export interface CommentInfo {
   id: string
-  comment_id: string
+  commentId: string
   pullRequestId: number
   createdAt: Date
 }

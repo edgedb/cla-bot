@@ -9,7 +9,7 @@ import { inject, injectable } from "inversify";
 import { SafeError } from "../common/web";
 import { ServiceSettings } from "../settings";
 import { TYPES } from "../../constants/types";
-import { UserInfo, UsersService } from "../../service/domain/users";
+import { UserInfo, UsersService, EmailInfo } from "../../service/domain/users";
 import { v4 as uuid } from "uuid";
 
 
@@ -40,10 +40,10 @@ class SignClaHandler
   }
 
   @async_retry()
-  async createCla(user: UserInfo): Promise<Cla> {
+  async createCla(emailInfo: EmailInfo): Promise<Cla> {
     const cla = new Cla(
       uuid(),
-      user.id.toString(),
+      emailInfo.email.toString(),
       new Date()
     )
 
@@ -85,7 +85,7 @@ class SignClaHandler
     await this._commentsService.updateComment(
       data.repository.ownerId,
       data.repository.fullName,
-      commentInfo.comment_id,
+      commentInfo.commentId,
       this._claCheckHandler.getSignedComment()
     )
   }
@@ -98,27 +98,69 @@ class SignClaHandler
     }
   }
 
+  private getAllMatchingEmails(
+    committers: string[],
+    userEmails: EmailInfo[]
+  ): EmailInfo[] {
+    return userEmails.filter(emailInfo => {
+      if (!emailInfo.email) {
+        // this should never happen
+        return false;
+      }
+
+      const lowerEmailAddress = emailInfo.email.toLowerCase();
+      return committers.indexOf(lowerEmailAddress) > -1;
+    });
+  }
+
+  private ensureThatEmailIsVerified(emailInfo: EmailInfo): void {
+    if (emailInfo.verified === false) {
+      throw new SafeError(
+        `Email address: ${emailInfo.email} is not verified. ` +
+        `Please verify your email address and try again.`
+      );
+    }
+  }
+
   async signCla(rawState: string, accessToken: string): Promise<SignedClaOutput> {
+    //
+    // A user just signed-in, after authorizing the OAuth app that can read email
+    // addresses.
+    //
+    // This method handles the unlikely scenario of a single user committing using
+    // several email addresses, and being owner of all of them.
+    //
     const data = this.parseState(rawState);
-    const userInfo = await this._usersService.getUserInfoFromAccessToken(accessToken);
-
     const committers = this.getAllCommitters(data);
+    const userEmails = await this._usersService.getUserEmailAddresses(accessToken);
 
-    // ensure that the user who signed up is among those who created the PR
-    if (committers.indexOf(userInfo.email) == -1) {
+    const matchingEmails = this.getAllMatchingEmails(committers, userEmails);
+
+    if (!matchingEmails.length) {
+      // The user who signed in is not among those who contributed to the PR
+      // NB: this can also happen if the user has a private email address,
+      // and wants to preserve email privacy when committing.
+      // As of today, it is unclear how this scenario should be handled.
+      //
       throw new SafeError(
         `Thank you for authorizing our application, but the CLA must be signed ` +
         `by the users who contributed to the PR. ` +
-        `Committers emails are: ${committers}; found here email ${userInfo.email}.`
+        `Committers emails are: ${committers}.`
       )
     }
 
-    // did the user already signed the CLA?
-    const existingCla = await this._claRepository.getClaByEmailAddress(userInfo.email);
+    matchingEmails.forEach(async matchingEmail => {
+      this.ensureThatEmailIsVerified(matchingEmail);
 
-    if (existingCla == null) {
-      await this.createCla(userInfo)
-    }
+      // did the user already signed the CLA with this email address?
+      const existingCla = await this._claRepository.getClaByEmailAddress(
+        matchingEmail.email.toLowerCase()
+      );
+
+      if (existingCla == null) {
+        await this.createCla(matchingEmail)
+      }
+    });
 
     await this.checkIfAllSigned(data, committers)
 

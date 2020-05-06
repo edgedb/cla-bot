@@ -43,7 +43,7 @@ class ClaCheckHandler {
     `[![CLA not signed](${this._settings.url}/cla-not-signed.svg)](${challengeUrl})`
   }
 
-  private async addCommentWithStatus(
+  private async addCommentWithNegativeStatus(
     data: ClaCheckInput,
     challengeUrl: string
   ): Promise<void> {
@@ -54,6 +54,20 @@ class ClaCheckHandler {
 
     if (commentInfo != null) {
       console.info(`CLA comment already present on PR ${data.pullRequest.number}`);
+
+      // Make sure that the comment is updated with failure information,
+      // because the comment might have an outdated positive message.
+      // This scenario can happen if: someone first creates a PR and signs the CLA,
+      // later asks to be removed from our database (like GDPR in Europe),
+      // without completing this PR, finally closes and reopens the PR
+      //
+
+      await this._commentsService.updateComment(
+        data.repository.ownerId,
+        data.repository.fullName,
+        commentInfo.commentId,
+        this.getNotSignedComment(challengeUrl)
+      )
       return;
     }
 
@@ -74,7 +88,7 @@ class ClaCheckHandler {
   async allCommittersHaveSignedTheCla(
     allCommitters: string[]
   ): Promise<boolean> {
-    // This code works fine in realistic scenarios: most PRs will have a single
+    // This code performs fine in realistic scenarios: most PRs will have a single
     // committer email, or only a few.
     // However, someone might trick our service by faking a big number of unique users
     // and a big number of commits.
@@ -88,7 +102,6 @@ class ClaCheckHandler {
         return false;
       }
     }
-
     return true;
   }
 
@@ -96,7 +109,6 @@ class ClaCheckHandler {
   async checkCla(
     data: ClaCheckInput
   ): Promise<void> {
-
     const allCommitters = await this._statusCheckService
       .getAllCommittersByPullRequestId(data.repository.fullName, data.pullRequest.number)
 
@@ -105,8 +117,8 @@ class ClaCheckHandler {
     }
 
     // store committers in the input state, so we don't need to fetch again the same
-    // information when validating each committer (after each of them authorizes our app)
-    data.committers = allCommitters;
+    // information when validating each committer (after each of them authorizes our app);
+    data.committers = allCommitters.map(email => email.toLowerCase());
 
     console.info(`Checking committers: [${allCommitters}] for PR ${data.pullRequest.number}`)
 
@@ -119,6 +131,13 @@ class ClaCheckHandler {
 
     if (allCommittersHaveSignedTheCla) {
       status = new StatusCheckInput(
+        CheckState.success,
+        `${this._settings.url}/signed-contributor-license-agreement`,
+        SUCCESS_MESSAGE,
+        CLA_CHECK_CONTEXT
+      );
+    } else {
+      status = new StatusCheckInput(
         CheckState.failure,
         challengeUrl,
         FAILURE_MESSAGE,
@@ -126,14 +145,7 @@ class ClaCheckHandler {
       );
 
       // add a comment to increase visibility
-      await this.addCommentWithStatus(data, challengeUrl);
-    } else {
-      status = new StatusCheckInput(
-        CheckState.success,
-        `${this._settings.url}/signed-contributor-license-agreement`,
-        SUCCESS_MESSAGE,
-        CLA_CHECK_CONTEXT
-      );
+      await this.addCommentWithNegativeStatus(data, challengeUrl);
     }
 
     await this._statusCheckService.createStatus(

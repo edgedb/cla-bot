@@ -21,7 +21,7 @@ export class EdgeDBCommentsRepository extends EdgeDBRepository implements Commen
       const item = items[0];
       return {
         id: item.id,
-        comment_id: item.comment_id,
+        commentId: item.comment_id,
         pullRequestId,
         createdAt: item.created_at
       };

@@ -11,5 +11,5 @@ export default new ClientOAuth2({
   accessTokenUri: "https://github.com/login/oauth/access_token",
   authorizationUri: "https://github.com/login/oauth/authorize",
   redirectUri: `${OWN_SERVER_BASE_URL}/api/auth/github/callback`,
-  scopes: ["profile"]
+  scopes: ["profile", "user:email"]
 })
