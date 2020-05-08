@@ -7,6 +7,7 @@ const TYPES = {
   ClaCheckHandler: Symbol.for("ClaCheckHandler"),
   CommentsService: Symbol.for("CommentsService"),
   CommentsRepository: Symbol.for("CommentsRepository"),
+  LicensesRepository: Symbol.for("LicensesRepository")
 };
 
 export { TYPES };

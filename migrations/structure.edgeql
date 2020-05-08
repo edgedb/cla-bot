@@ -6,8 +6,14 @@ CREATE MIGRATION structure TO {
             required property email -> str {
                 constraint exclusive;
             };
+
+            index on (.email);
+
             required property version -> str;
-            required property signed_at -> datetime;
+
+            required property creation_time -> datetime {
+                default := datetime_current();
+            }
         }
         type CommentInfo {
             required property comment_id -> str {
@@ -16,7 +22,11 @@ CREATE MIGRATION structure TO {
             required property pull_request_id -> int64 {
                 constraint exclusive;
             };
-            required property created_at -> datetime;
+            required property creation_time -> datetime {
+                default := datetime_current();
+            }
+
+            index on (.pull_request_id);
         }
     }
 };

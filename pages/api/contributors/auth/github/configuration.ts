@@ -1,5 +1,5 @@
 import ClientOAuth2 from "client-oauth2";
-import { getEnvSettingOrThrow } from "../../../../service/common/settings";
+import { getEnvSettingOrThrow } from "../../../../../service/common/settings";
 
 
 const OWN_SERVER_BASE_URL = getEnvSettingOrThrow("SERVER_URL")

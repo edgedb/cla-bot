@@ -2,9 +2,11 @@ import { getEnvSettingOrThrow } from "./common/settings";
 import { injectable } from "inversify";
 
 
+/**
+ * Common service settings, not specific to an external service.
+*/
 @injectable()
 export class ServiceSettings {
-  // common service settings, not specific to an external service
 
   private _url: string;
   private _secret: string;
@@ -17,8 +19,8 @@ export class ServiceSettings {
     return this._secret;
   }
 
-  constructor() {
-    this._url = getEnvSettingOrThrow("SERVER_URL");
-    this._secret = getEnvSettingOrThrow("SECRET");
+  constructor(serverUrl?: string, secret?: string) {
+    this._url = serverUrl || getEnvSettingOrThrow("SERVER_URL");
+    this._secret = secret || getEnvSettingOrThrow("SECRET");
   }
 }
