@@ -25,7 +25,7 @@ export class TokensHandler {
     try {
       return jwt.verify(rawToken, this._settings.secret) as object;
     } catch (error) {
-      throw new SafeError("State validation error.", error);
+      throw new SafeError("Token validation error.", error);
     }
   }
 }

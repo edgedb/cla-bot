@@ -62,7 +62,7 @@ describe("TokensHandler", () => {
     b40E9T4RwMUXswp4KhDn5xAvqGsy83Wb3770X1qx_AEShitZQ`.replace(/[\n\s]/g, "")
 
     expect(stateHandler.parseToken.bind(stateHandler, invalidToken)).to.throw(
-      "State validation error."
+      "Token validation error."
     );
   });
 
@@ -76,7 +76,7 @@ describe("TokensHandler", () => {
     const token: string = stateHandler.createToken(input)
 
     expect(stateHandler2.parseToken.bind(stateHandler2, token)).to.throw(
-      "State validation error."
+      "Token validation error."
     );
 
     const value: IFoo = stateHandler.parseToken(token) as IFoo;
