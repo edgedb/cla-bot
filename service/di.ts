@@ -1,20 +1,20 @@
 // ATTENTION: the import of "reflect-metadata" must happen before inversify, otherwise
 // inversify doesn't work - so don't sort imports here...
 import "reflect-metadata";
-import { ClaCheckHandler } from "./service/handlers/check-cla";
-import { ClaRepository } from "./service/domain/cla";
-import { CommentsRepository, CommentsService } from "./service/domain/comments";
+import { ClaCheckHandler } from "./handlers/check-cla";
+import { ClaRepository } from "./domain/cla";
+import { CommentsRepository, CommentsService } from "./domain/comments";
 import { Container } from "inversify";
-import { EdgeDBClaRepository } from "./service/data/edgedb/cla";
-import { EdgeDBCommentsRepository } from "./service/data/edgedb/comments";
-import { GitHubStatusChecksAPI } from "./service/data/github/checks";
-import { GitHubCommentsService } from "./service/data/github/comments";
-import { GitHubUsersService } from "./service/data/github/users";
-import { ServiceSettings } from "./service/settings";
-import { SignClaHandler } from "./service/handlers/sign-cla";
-import { StatusChecksService } from "./service/domain/checks";
-import { TYPES } from "./constants/types";
-import { UsersService } from "./service/domain/users";
+import { EdgeDBClaRepository } from "./data/edgedb/cla";
+import { EdgeDBCommentsRepository } from "./data/edgedb/comments";
+import { GitHubStatusChecksAPI } from "./data/github/checks";
+import { GitHubCommentsService } from "./data/github/comments";
+import { GitHubUsersService } from "./data/github/users";
+import { ServiceSettings } from "./settings";
+import { SignClaHandler } from "./handlers/sign-cla";
+import { StatusChecksService } from "./domain/checks";
+import { TYPES } from "../constants/types";
+import { UsersService } from "./domain/users";
 
 const container = new Container();
 
@@ -34,7 +34,7 @@ container.bind<CommentsService>(TYPES.CommentsService)
   .to(GitHubCommentsService);
 
 container.bind<ServiceSettings>(TYPES.ServiceSettings)
-  .to(ServiceSettings).inSingletonScope();
+  .toConstantValue(new ServiceSettings());
 
 container.bind<SignClaHandler>(TYPES.SignClaHandler)
   .to(SignClaHandler);
