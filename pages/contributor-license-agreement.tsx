@@ -1,38 +1,59 @@
 import Head from "next/head";
+import { ClaCheckInput } from "../service/domain/cla";
 import { Component } from "react";
+import { container } from "../service/di";
+import { TYPES } from "../constants/types";
 import { NextPageContext, } from "next";
+import { LicensesHandler } from "../service/handlers/licenses";
+import { TokensHandler } from "../service/handlers/tokens";
 
 
-interface Props {
-  state: string
+interface LicenseProps {
+  state: string,
+  title: string,
   text: string
 }
 
 
-export default class LicensePage extends Component<Props> {
+const tokensHandler = container.get<TokensHandler>(TYPES.TokensHandler);
+const licensesHandler = container.get<LicensesHandler>(TYPES.LicensesHandler);
 
-  static async getInitialProps({ query }: NextPageContext) {
-    // This page requires a valid state, to be passed over to OAuth flow and
-    // handled back by our service, to know the source PR and PR author id
-    const state = query.state;
-    const cultureCode = query.culture || "en";
 
-    // TODO: parse state, get full repo name, and fetch license by full repo name and culture code
-    const text = `<p style="color: pink;">Example</p>`;
+function readStateParameter(context: NextPageContext): string {
+  const state = context.query.state;
 
-    return { state, text };
+  if (typeof state != "string") {
+    throw new Error("Expected a single state parameter")
   }
 
-  // async getServerSideProps(context: NextPageContext): Promise<any> {
-  //   return {
-  //     props: {
-  //       text: "Example"
-  //     }, // will be passed to the page component as props
-  //   }
-  // }
+  return state;
+}
+
+
+export async function getServerSideProps(context: NextPageContext) {
+  const rawState = readStateParameter(context)
+  const state = tokensHandler.parseToken(rawState) as ClaCheckInput;
+  // Note: we support English only on the front-end, but data model supports localization
+  const cultureCode = "en";
+
+  const text = await licensesHandler.getLicenseForRepository(
+    state.repository.fullName,
+    cultureCode
+  )
+
+  // TODO: handle License title using the description from database
+  // TODO: either remove the `signed-contributor-license-agreement` page,
+  // or modify this page to handle signed agreements
+  // TODO: when a user signs a CLA, store its version. When checking if a user signed the CLA,
+  // check the signed version against the current License version.
+  return { props: { state: rawState, text, title: "TODO" } };
+}
+
+
+export default class LicensePage extends Component<LicenseProps> {
 
   render() {
-    const { state, text } = this.props
+    const { state, text, title } = this.props
     const signInAnchorOps = { href: `/api/contributors/auth/github?state=${state}` }
 
     // We are the owners of the text configured for licenses,
@@ -42,7 +63,7 @@ export default class LicensePage extends Component<Props> {
     return (
       <div className="container">
         <Head>
-          <title>CLA for EdgeDB</title>
+          <title>{title}</title>
           <link rel="icon" href="/favicon.png" type="image/x-icon" />
         </Head>
 

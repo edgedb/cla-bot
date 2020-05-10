@@ -28,6 +28,13 @@ export class SafeError extends Error {
 }
 
 
+export class NotFoundError extends SafeError {
+  constructor(message: string = "Object not found") {
+    super(message, 404)
+  }
+}
+
+
 export class FailedHttpRequestError extends WebRequestError {
   constructor(response: Response, body: string) {
     super(`The web request response status does not indicate success: ` +

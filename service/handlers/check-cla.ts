@@ -111,6 +111,9 @@ class ClaCheckHandler {
   async checkCla(
     data: ClaCheckInput
   ): Promise<void> {
+    // TODO: is a license configured for the PR repository?
+    // if not, there is no need to do a check for CLA
+
     const allCommitters = await this._statusCheckService
       .getAllCommittersByPullRequestId(data.repository.fullName, data.pullRequest.number)
 

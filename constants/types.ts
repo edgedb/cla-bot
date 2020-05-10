@@ -1,4 +1,5 @@
 const TYPES = {
+  TokensHandler: Symbol.for("TokensHandler"),
   ClaRepository: Symbol.for("ClaRepository"),
   StatusChecksService: Symbol.for("StatusChecksService"),
   ServiceSettings: Symbol.for("ServiceSettings"),
@@ -8,7 +9,7 @@ const TYPES = {
   CommentsService: Symbol.for("CommentsService"),
   CommentsRepository: Symbol.for("CommentsRepository"),
   LicensesRepository: Symbol.for("LicensesRepository"),
-  TokensHandler: Symbol.for("TokensHandler"),
+  LicensesHandler: Symbol.for("LicensesHandler"),
 };
 
 export { TYPES };

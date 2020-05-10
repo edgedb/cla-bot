@@ -55,7 +55,7 @@ CREATE MIGRATION structure TO {
         }
 
         type LicenseVersion {
-            required property serial -> int32;
+            required property number -> int32;
 
             required property current -> bool {
                 default := False;
