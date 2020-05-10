@@ -15,6 +15,8 @@ import { SignClaHandler } from "./handlers/sign-cla";
 import { StatusChecksService } from "./domain/checks";
 import { TYPES } from "../constants/types";
 import { UsersService } from "./domain/users";
+import { TokensHandler } from "./handlers/tokens";
+
 
 const container = new Container();
 
@@ -41,5 +43,8 @@ container.bind<SignClaHandler>(TYPES.SignClaHandler)
 
 container.bind<ClaCheckHandler>(TYPES.ClaCheckHandler)
   .to(ClaCheckHandler);
+
+container.bind<TokensHandler>(TYPES.TokensHandler)
+  .to(TokensHandler);
 
 export { container };

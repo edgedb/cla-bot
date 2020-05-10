@@ -8,12 +8,16 @@ import { TYPES } from "../../constants/types";
 @injectable()
 export class TokensHandler {
 
-  private _settings: ServiceSettings
+  @inject(TYPES.ServiceSettings) private _settings: ServiceSettings
 
-  constructor(
-    @inject(TYPES.ServiceSettings) settings: ServiceSettings
-  ) {
-    this._settings = settings;
+  set settings(value: ServiceSettings) {
+    this._settings = value;
+  }
+
+  static withServices(settings: ServiceSettings): TokensHandler {
+    const handler = new TokensHandler();
+    handler.settings = settings;
+    return handler;
   }
 
   createToken(data: any): string {

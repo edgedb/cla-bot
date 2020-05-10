@@ -1,11 +1,11 @@
-import jwt from "jsonwebtoken";
 import { async_retry } from "../common/resiliency";
 import { CheckState, StatusCheckInput, StatusChecksService } from "../../service/domain/checks";
-import { ClaCheckInput, ClaRepository, Cla } from "../../service/domain/cla";
+import { ClaCheckInput, ClaRepository } from "../../service/domain/cla";
 import { CommentsService, CommentsRepository } from "../../service/domain/comments";
 import { inject, injectable } from "inversify";
 import { ServiceSettings } from "../settings";
 import { TYPES } from "../../constants/types";
+import { TokensHandler } from "../handlers/tokens"
 
 
 export const CLA_CHECK_CONTEXT = "CLA Signing"
@@ -21,6 +21,7 @@ class ClaCheckHandler {
   @inject(TYPES.CommentsService) private _commentsService: CommentsService
   @inject(TYPES.CommentsRepository) private _commentsRepository: CommentsRepository
   @inject(TYPES.StatusChecksService) private _statusCheckService: StatusChecksService
+  @inject(TYPES.TokensHandler) private _tokensHandler: TokensHandler
 
   getTargetUrlWithChallenge(data: ClaCheckInput): string {
     // The target URL for the check must not only point to this instance of the web application
@@ -30,7 +31,8 @@ class ClaCheckHandler {
     // is the one who authorizes our app and does sign-in to sign the agreement.
 
     // We create a JWT token, to ensure that the user cannot modify the parameter
-    return `${this._settings.url}/contributor-license-agreement?state=${jwt.sign(data, this._settings.secret)}`
+    const token = this._tokensHandler.createToken(data);
+    return `${this._settings.url}/contributor-license-agreement?state=${token}`
   }
 
   getSignedComment(): string {

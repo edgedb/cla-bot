@@ -38,21 +38,21 @@ class TestServiceSettings extends ServiceSettings {
 describe("TokensHandler", () => {
 
   it("Can create a token from an instance of a class", () => {
-    const stateHandler = new TokensHandler(new TestServiceSettings());
+    const stateHandler = TokensHandler.withServices(new TestServiceSettings());
 
     const token: string = stateHandler.createToken(new Foo())
     assert(typeof token === 'string');
   });
 
   it("Can create a token from a plain object", () => {
-    const stateHandler = new TokensHandler(new TestServiceSettings());
+    const stateHandler = TokensHandler.withServices(new TestServiceSettings());
 
     const token: string = stateHandler.createToken({ foo: "foo" })
     assert(typeof token === 'string');
   });
 
   it("Throws exception for an invalid token", () => {
-    const stateHandler = new TokensHandler(new TestServiceSettings());
+    const stateHandler = TokensHandler.withServices(new TestServiceSettings());
 
     const invalidToken = `eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE1ODg5NDkwNzIs
     ImV4cCI6MTU4ODk0OTY3MiwiaXNzIjoiNjI0MjcifQ.H3LLTic7JpvXkFSyFkvb-c3n_znNSglwgTdQxSPWY
@@ -67,8 +67,8 @@ describe("TokensHandler", () => {
   });
 
   it("Uses secret from configured settings to create tokens", () => {
-    const stateHandler = new TokensHandler(new TestServiceSettings());
-    const stateHandler2 = new TokensHandler(
+    const stateHandler = TokensHandler.withServices(new TestServiceSettings());
+    const stateHandler2 = TokensHandler.withServices(
       new TestServiceSettings("", "OTHER_SECRET")
     )
 

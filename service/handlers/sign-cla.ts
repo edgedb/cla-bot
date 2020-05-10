@@ -1,15 +1,15 @@
-import jwt from "jsonwebtoken";
 import { async_retry } from "../common/resiliency";
 import { CheckState, StatusCheckInput, StatusChecksService } from "../../service/domain/checks";
 import { Cla, ClaCheckInput, ClaRepository } from "../../service/domain/cla";
 import { CLA_CHECK_CONTEXT, SUCCESS_MESSAGE } from "./check-cla";
 import { ClaCheckHandler } from "./check-cla";
 import { CommentsRepository, CommentsService } from "../../service/domain/comments";
+import { EmailInfo, UsersService } from "../../service/domain/users";
 import { inject, injectable } from "inversify";
 import { SafeError } from "../common/web";
 import { ServiceSettings } from "../settings";
+import { TokensHandler } from "./tokens";
 import { TYPES } from "../../constants/types";
-import { UsersService, EmailInfo } from "../../service/domain/users";
 import { v4 as uuid } from "uuid";
 
 
@@ -28,15 +28,11 @@ class SignClaHandler
   @inject(TYPES.CommentsService) private _commentsService: CommentsService
   @inject(TYPES.CommentsRepository) private _commentsRepository: CommentsRepository
   @inject(TYPES.StatusChecksService) private _statusCheckService: StatusChecksService
+  @inject(TYPES.TokensHandler) private _tokensHandler: TokensHandler
 
   parseState(rawState: string): ClaCheckInput
   {
-    try {
-      return jwt.verify(rawState, this._settings.secret) as ClaCheckInput;
-    } catch (error) {
-      console.error(`State validation error: ${error}`);
-      throw new SafeError("State validation error.");
-    }
+    return this._tokensHandler.parseToken(rawState) as ClaCheckInput;
   }
 
   @async_retry()
