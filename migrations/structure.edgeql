@@ -2,19 +2,7 @@ START TRANSACTION;
 
 CREATE MIGRATION structure TO {
     module default {
-        type CLA {
-            required property email -> str {
-                constraint exclusive;
-            };
 
-            index on (.email);
-
-            required property version -> str;
-
-            required property creation_time -> datetime {
-                default := datetime_current();
-            }
-        }
         type CommentInfo {
             required property comment_id -> str {
                 constraint exclusive;
@@ -28,18 +16,11 @@ CREATE MIGRATION structure TO {
 
             index on (.pull_request_id);
         }
+
         type Admin {
             property name -> str;
 
-            multi link emails -> AdminEmail;
-        }
-
-        type AdminEmail {
-            required property principal -> bool {
-                default := False;
-            }
-
-            required property address -> str {
+            required property email -> str {
                 constraint exclusive;
             }
         }
@@ -55,7 +36,9 @@ CREATE MIGRATION structure TO {
         }
 
         type LicenseVersion {
-            required property number -> int32;
+            required property number -> int32 {
+                constraint exclusive;
+            }
 
             required property current -> bool {
                 default := False;
@@ -84,6 +67,20 @@ CREATE MIGRATION structure TO {
             };
 
             required link license -> License;
+        }
+
+        type ContributorLicenseAgreement {
+            required property email -> str;
+
+            required property creation_time -> datetime {
+                default := datetime_current();
+            }
+
+            required link licenseVersion -> LicenseVersion;
+
+            index on (.email);
+
+            index on (.licenseVersion);
         }
     }
 };

@@ -1,6 +1,6 @@
 import { async_retry } from "../common/resiliency";
 import { CheckState, StatusCheckInput, StatusChecksService } from "../../service/domain/checks";
-import { Cla, ClaCheckInput, ClaRepository } from "../../service/domain/cla";
+import { ContributorLicenseAgreement, ClaCheckInput, ClaRepository } from "../../service/domain/cla";
 import { CLA_CHECK_CONTEXT, SUCCESS_MESSAGE } from "./check-cla";
 import { ClaCheckHandler } from "./check-cla";
 import { CommentsRepository, CommentsService } from "../../service/domain/comments";
@@ -36,10 +36,11 @@ class SignClaHandler
   }
 
   @async_retry()
-  async createCla(emailInfo: EmailInfo): Promise<Cla> {
-    const cla = new Cla(
+  async createCla(emailInfo: EmailInfo, licenseVersionId: string): Promise<ContributorLicenseAgreement> {
+    const cla = new ContributorLicenseAgreement(
       uuid(),
       emailInfo.email.toString(),
+      licenseVersionId,
       new Date()
     )
 
@@ -57,13 +58,15 @@ class SignClaHandler
   }
 
   async completeClaCheck(data: ClaCheckInput): Promise<void> {
+    const licenseVersionId = this.readLicenseVersionId(data);
+
     await this._statusCheckService.createStatus(
       data.repository.ownerId,
       data.repository.fullName,
       data.pullRequest.headSha,
       new StatusCheckInput(
         CheckState.success,
-        `${this._settings.url}/signed-contributor-license-agreement`,
+        this._claCheckHandler.getSuccessStatusTargetUrl(licenseVersionId),
         SUCCESS_MESSAGE,
         CLA_CHECK_CONTEXT
       )
@@ -87,7 +90,10 @@ class SignClaHandler
   }
 
   async checkIfAllSigned(data: ClaCheckInput, committers: string[]): Promise<void> {
-    const allSigned = await this._claCheckHandler.allCommittersHaveSignedTheCla(committers)
+    const allSigned = await this._claCheckHandler.allCommittersHaveSignedTheCla(
+      committers,
+      this.readLicenseVersionId(data)
+    )
 
     if (allSigned) {
       await this.completeClaCheck(data);
@@ -118,7 +124,10 @@ class SignClaHandler
     }
   }
 
-  private async handleAllMatchingEmails(matchingEmails: EmailInfo[]): Promise<void> {
+  private async handleAllMatchingEmails(
+    matchingEmails: EmailInfo[],
+    licenseVersionId: string
+  ): Promise<void> {
 
     for (let i = 0; i < matchingEmails.length; i++) {
       const matchingEmail = matchingEmails[i];
@@ -126,14 +135,22 @@ class SignClaHandler
       this.ensureThatEmailIsVerified(matchingEmail);
 
       // did the user already signed the CLA with this email address?
-      const existingCla = await this._claRepository.getClaByEmailAddress(
-        matchingEmail.email.toLowerCase()
+      const existingCla = await this._claRepository.getClaByEmailAddressAndVersion(
+        matchingEmail.email.toLowerCase(),
+        licenseVersionId
       );
 
       if (existingCla == null) {
-        await this.createCla(matchingEmail)
+        await this.createCla(matchingEmail, licenseVersionId)
       }
     }
+  }
+
+  readLicenseVersionId(data: ClaCheckInput): string {
+    if (!data.licenseVersionId) {
+      throw new Error("Missing license version id in state");
+    }
+    return data.licenseVersionId
   }
 
   async signCla(rawState: string, accessToken: string): Promise<SignedClaOutput> {
@@ -163,7 +180,10 @@ class SignClaHandler
       )
     }
 
-    await this.handleAllMatchingEmails(matchingEmails);
+    await this.handleAllMatchingEmails(
+      matchingEmails,
+      this.readLicenseVersionId(data)
+    );
 
     if (committers.length === 1) {
       // single committer: the CLA is signed

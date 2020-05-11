@@ -22,18 +22,18 @@ export class LicensesHandler
     throw new Error("Not implemented")
   }
 
-  async getLicenseForRepository(
-    fullRepositoryName: string,
+  async getLicenseText(
+    versionId: string,
     cultureCode: string
   ) : Promise<string> {
-    const licenseText = await this._licensesRepository.getLicenseForRepository(
-      fullRepositoryName, cultureCode
+    const licenseText = await this._licensesRepository.getLicenseText(
+      versionId, cultureCode
     )
 
     if (licenseText == null) {
-      throw new NotFoundError(`License agreement for: ${fullRepositoryName}`)
+      throw new NotFoundError(`License agreement not found ${versionId} ${cultureCode}`)
     }
 
-    return licenseText
+    return licenseText.text
   }
 }

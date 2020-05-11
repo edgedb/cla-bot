@@ -1,4 +1,4 @@
-import { Cla, ClaRepository } from "../../domain/cla";
+import { ContributorLicenseAgreement, ClaRepository } from "../../domain/cla";
 import { EdgeDBRepository } from "./base";
 import { injectable } from "inversify";
 
@@ -13,35 +13,47 @@ interface ClaItem {
 @injectable()
 export class EdgeDBClaRepository extends EdgeDBRepository implements ClaRepository {
 
-  async getClaByEmailAddress(email: string): Promise<Cla | null> {
+  async getClaByEmailAddressAndVersion(
+    email: string,
+    versionId: string
+  ): Promise<ContributorLicenseAgreement | null> {
     let signed_cla: ClaItem[] = await this.run(async (connection) => {
       return await connection.fetchAll(
-        "select CLA { email, creation_time } filter .email = <str>$0 limit 1;",
-        [email]
+        `select ContributorLicenseAgreement {
+          email,
+          creation_time
+        }
+        filter .email = <str>$0 and .licenseVersion.id = <uuid>$1 limit 1;`,
+        [email, versionId]
       );
     })
 
     if (signed_cla.length) {
       const item = signed_cla[0];
-      return new Cla(item.id, item.email, item.creation_time);
+      return new ContributorLicenseAgreement(
+        item.id,
+        item.email,
+        versionId,
+        item.creation_time
+      );
     }
 
     return null;
   }
 
-  async saveCla(data: Cla): Promise<void> {
+  async saveCla(data: ContributorLicenseAgreement): Promise<void> {
     await this.run(async connection => {
       const result = await connection.fetchAll(
         `
-        INSERT CLA {
+        INSERT ContributorLicenseAgreement {
           email := <str>$email,
-          version := <str>$version,
+          licenseVersion := (SELECT LicenseVersion FILTER .id = <uuid>$version),
           creation_time := <datetime>$creation_time
         }
         `,
         {
           email: data.email,
-          version: "1",
+          version: data.versionId,
           creation_time: data.signed_at
         }
       )

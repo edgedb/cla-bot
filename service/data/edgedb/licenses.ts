@@ -1,15 +1,68 @@
 import { EdgeDBRepository } from "./base";
 import { injectable } from "inversify";
-import { LicensesRepository, License, LicenseText } from "../../domain/licenses";
+import { LicensesRepository, License, LicenseText, RepositoryLicenseInfo } from "../../domain/licenses";
 
 
 @injectable()
 export class EdgeDBLicensesRepository extends EdgeDBRepository implements LicensesRepository {
 
-  // async getLicenseDetails(): Promise<LicenseDetail>;
+  async getCurrentLicenseVersionForRepository(
+    fullRepositoryName: string
+  ): Promise<RepositoryLicenseInfo | null> {
+    let items = await this.run(async (connection) => {
+      return await connection.fetchAll(
+        `SELECT Repository {
+          license: {
+            versions: {
+              number
+            } FILTER .current = True and .texts.culture = <str>$culture LIMIT 1
+          }
+        } FILTER .full_name = <str>$full_name;`,
+        {
+          culture: "en",
+          full_name: fullRepositoryName
+        }
+      )
+    })
 
-  async getLicenseText(licenseId: string, cultureCode: string): Promise<LicenseText> {
-    throw new Error("Not implemented");
+    if (!items.length)
+      return null;
+
+    const currentVersion = items[0].license?.versions[0];
+    return new RepositoryLicenseInfo(
+      currentVersion.id,
+      currentVersion.number.toString()
+    )
+  }
+
+  async getLicenseText(
+    versionId: string,
+    cultureCode: string
+  ): Promise<LicenseText | null> {
+    let items = await this.run(async (connection) => {
+      return await connection.fetchAll(
+        `SELECT LicenseVersion {
+          texts: {
+            text,
+            culture
+          } FILTER .culture = <str>$culture LIMIT 1
+        } FILTER .id = <uuid>$version_id;`,
+        {
+          culture: cultureCode,
+          version_id: versionId
+        }
+      )
+    })
+
+    if (!items.length)
+      return null;
+
+    const text = items[0].texts[0];
+    return new LicenseText(
+      text.id,
+      text.text,
+      text.culture
+    )
   }
 
   async getLicenseForRepository(

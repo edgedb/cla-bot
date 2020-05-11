@@ -36,8 +36,11 @@ export async function getServerSideProps(context: NextPageContext) {
   // Note: we support English only on the front-end, but data model supports localization
   const cultureCode = "en";
 
-  const text = await licensesHandler.getLicenseForRepository(
-    state.repository.fullName,
+  if (!state.licenseVersionId)
+    throw new Error("Missing license id in state");
+
+  const text = await licensesHandler.getLicenseText(
+    state.licenseVersionId,
     cultureCode
   )
 

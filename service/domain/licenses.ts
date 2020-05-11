@@ -34,6 +34,26 @@ export class LicenseText {
   id: string | null
   text: string
   culture: string
+
+  constructor(id: string, text: string, culture: string) {
+    this.id = id
+    this.text = text
+    this.culture = culture
+  }
+}
+
+
+/**
+ * Basic information about a configured license for a repository.
+ */
+export class RepositoryLicenseInfo {
+  versionId: string
+  versionNumber: string
+
+  constructor(versionId: string, versionNumber: string) {
+    this.versionId = versionId
+    this.versionNumber = versionNumber
+  }
 }
 
 
@@ -56,12 +76,9 @@ export interface LicensesRepository {
 
   getLicenses(): Promise<License[]>;
 
-  // getLicenseDetails(): Promise<LicenseDetail>;
+  getLicenseText(versionId: string, cultureCode: string): Promise<LicenseText | null>;
 
-  getLicenseText(licenseId: string, cultureCode: string): Promise<LicenseText>;
-
-  getLicenseForRepository(
-    fullRepositoryName: string,
-    cultureCode: string
-  ) : Promise<string | null>;
+  getCurrentLicenseVersionForRepository(
+    fullRepositoryName: string
+  ): Promise<RepositoryLicenseInfo | null>;
 }
