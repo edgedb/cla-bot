@@ -58,6 +58,10 @@ CREATE MIGRATION structure TO {
         type LicenseText {
             required property text -> str;
 
+            required property title -> str {
+                default := "";
+            }
+
             required property culture -> str;
         }
 

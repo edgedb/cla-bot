@@ -39,17 +39,12 @@ export async function getServerSideProps(context: NextPageContext) {
   if (!state.licenseVersionId)
     throw new Error("Missing license id in state");
 
-  const text = await licensesHandler.getLicenseText(
+  const licenseText = await licensesHandler.getLicenseText(
     state.licenseVersionId,
     cultureCode
   )
 
-  // TODO: handle License title using the description from database
-  // TODO: either remove the `signed-contributor-license-agreement` page,
-  // or modify this page to handle signed agreements
-  // TODO: when a user signs a CLA, store its version. When checking if a user signed the CLA,
-  // check the signed version against the current License version.
-  return { props: { state: rawState, text, title: "TODO" } };
+  return { props: { state: rawState, text: licenseText.text, title: licenseText.title } };
 }
 
 

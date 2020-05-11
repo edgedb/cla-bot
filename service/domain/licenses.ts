@@ -30,14 +30,22 @@ export class LicenseVersion {
   }
 }
 
+
 export class LicenseText {
   id: string | null
+  title: string
   text: string
   culture: string
 
-  constructor(id: string, text: string, culture: string) {
+  constructor(
+    id: string,
+    title: string,
+    text: string,
+    culture: string
+  ) {
     this.id = id
     this.text = text
+    this.title = title
     this.culture = culture
   }
 }

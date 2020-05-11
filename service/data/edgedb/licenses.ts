@@ -44,6 +44,7 @@ export class EdgeDBLicensesRepository extends EdgeDBRepository implements Licens
         `SELECT LicenseVersion {
           texts: {
             text,
+            title,
             culture
           } FILTER .culture = <str>$culture LIMIT 1
         } FILTER .id = <uuid>$version_id;`,
@@ -60,6 +61,7 @@ export class EdgeDBLicensesRepository extends EdgeDBRepository implements Licens
     const text = items[0].texts[0];
     return new LicenseText(
       text.id,
+      text.title,
       text.text,
       text.culture
     )

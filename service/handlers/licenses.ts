@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import { LicensesRepository, License, LicenseDetail } from "../../service/domain/licenses";
+import { LicensesRepository, License, LicenseDetail, LicenseText } from "../../service/domain/licenses";
 import { NotFoundError } from "../common/web";
 import { TYPES } from "../../constants/types";
 
@@ -25,15 +25,15 @@ export class LicensesHandler
   async getLicenseText(
     versionId: string,
     cultureCode: string
-  ) : Promise<string> {
+  ) : Promise<LicenseText> {
     const licenseText = await this._licensesRepository.getLicenseText(
       versionId, cultureCode
     )
 
     if (licenseText == null) {
-      throw new NotFoundError(`License agreement not found ${versionId} ${cultureCode}`)
+      throw new NotFoundError(`License not found ${versionId} ${cultureCode}`)
     }
 
-    return licenseText.text
+    return licenseText
   }
 }
