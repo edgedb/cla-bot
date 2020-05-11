@@ -1,9 +1,9 @@
 import githubAuth from "./configuration";
-import { container } from "../../../../inversify.config";
+import { container } from "../../../../../service/di";
 import { NextApiRequest, NextApiResponse } from "next";
-import { SafeError } from "../../../../service/common/web";
-import { SignClaHandler } from "../../../../service/handlers/sign-cla";
-import { TYPES } from "../../../../constants/types";
+import { SafeError } from "../../../../../service/common/web";
+import { SignClaHandler } from "../../../../../service/handlers/sign-cla";
+import { TYPES } from "../../../../../constants/types";
 
 
 const signHandler = container.get<SignClaHandler>(TYPES.SignClaHandler);

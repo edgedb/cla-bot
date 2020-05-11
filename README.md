@@ -19,6 +19,12 @@ yarn install
 yarn next
 ```
 
+Running tests:
+
+```
+npm t
+```
+
 ## Project structure
 This project uses onion architecture, with the following namespaces:
 

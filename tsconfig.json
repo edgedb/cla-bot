@@ -8,7 +8,10 @@
       "es6"
     ],
     "strictPropertyInitialization": false,
-    "types": ["reflect-metadata"],
+    "types": [
+      "reflect-metadata",
+      "mocha"
+    ],
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noImplicitThis": true,
@@ -33,6 +36,7 @@
   "include": [
     "next-env.d.ts",
     "**/*.ts",
-    "**/*.tsx", "server.js"
+    "**/*.tsx",
+    "server.js"
   ]
 }

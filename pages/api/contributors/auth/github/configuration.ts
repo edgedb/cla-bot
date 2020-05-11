@@ -1,5 +1,5 @@
 import ClientOAuth2 from "client-oauth2";
-import { getEnvSettingOrThrow } from "../../../../service/common/settings";
+import { getEnvSettingOrThrow } from "../../../../../service/common/settings";
 
 
 const OWN_SERVER_BASE_URL = getEnvSettingOrThrow("SERVER_URL")
@@ -10,6 +10,6 @@ export default new ClientOAuth2({
   clientSecret: getEnvSettingOrThrow("GITHUB_OAUTH_APPLICATION_SECRET"),
   accessTokenUri: "https://github.com/login/oauth/access_token",
   authorizationUri: "https://github.com/login/oauth/authorize",
-  redirectUri: `${OWN_SERVER_BASE_URL}/api/auth/github/callback`,
+  redirectUri: `${OWN_SERVER_BASE_URL}/api/contributors/auth/github/callback`,
   scopes: ["profile", "user:email"]
 })

@@ -1,10 +1,11 @@
-import jwt from "jsonwebtoken";
 import { async_retry } from "../common/resiliency";
 import { CheckState, StatusCheckInput, StatusChecksService } from "../../service/domain/checks";
-import { ClaCheckInput, ClaRepository, Cla } from "../../service/domain/cla";
-import { CommentsService, CommentsRepository } from "../../service/domain/comments";
+import { ClaCheckInput, ClaRepository } from "../../service/domain/cla";
+import { CommentsRepository, CommentsService } from "../../service/domain/comments";
 import { inject, injectable } from "inversify";
+import { LicensesRepository } from "../domain/licenses";
 import { ServiceSettings } from "../settings";
+import { TokensHandler } from "../handlers/tokens";
 import { TYPES } from "../../constants/types";
 
 
@@ -21,6 +22,8 @@ class ClaCheckHandler {
   @inject(TYPES.CommentsService) private _commentsService: CommentsService
   @inject(TYPES.CommentsRepository) private _commentsRepository: CommentsRepository
   @inject(TYPES.StatusChecksService) private _statusCheckService: StatusChecksService
+  @inject(TYPES.LicensesRepository) private _licensesRepository: LicensesRepository
+  @inject(TYPES.TokensHandler) private _tokensHandler: TokensHandler
 
   getTargetUrlWithChallenge(data: ClaCheckInput): string {
     // The target URL for the check must not only point to this instance of the web application
@@ -30,7 +33,8 @@ class ClaCheckHandler {
     // is the one who authorizes our app and does sign-in to sign the agreement.
 
     // We create a JWT token, to ensure that the user cannot modify the parameter
-    return `${this._settings.url}/contributor-license-agreement?state=${jwt.sign(data, this._settings.secret)}`
+    const token = this._tokensHandler.createToken(data);
+    return `${this._settings.url}/contributor-license-agreement?state=${token}`
   }
 
   getSignedComment(): string {
@@ -86,17 +90,23 @@ class ClaCheckHandler {
   }
 
   async allCommittersHaveSignedTheCla(
-    allCommitters: string[]
+    allCommitters: string[],
+    licenseVersionId: string
   ): Promise<boolean> {
     // This code performs fine in realistic scenarios: most PRs will have a single
     // committer email, or only a few.
     // However, someone might trick our service by faking a big number of unique users
-    // and a big number of commits.
+    // and a big number of commits. In such unhappy case, it makes sense to handle
+    // committers sequentially one by one, to not starve our resources for a
+    // single request.
 
     for (let i = 0; i < allCommitters.length; i++) {
       const email = allCommitters[i];
 
-      const cla = await this._claRepository.getClaByEmailAddress(email);
+      const cla = await this._claRepository.getClaByEmailAddressAndVersion(
+        email,
+        licenseVersionId
+      );
 
       if (cla == null) {
         return false;
@@ -105,10 +115,29 @@ class ClaCheckHandler {
     return true;
   }
 
+  getSuccessStatusTargetUrl(versionId: string): string {
+    // Note: the success status URL is not going to change over time,
+    // but the license can change. Here we know that contributors signed
+    // a certain version of the CLA, therefore we keep the version id in the status
+    // URL: in the future we can display the exact license that was signed at this
+    // point in time.
+    return `${this._settings.url}/signed-contributor-license-agreement` +
+           `?version=${versionId}`;
+  }
+
   @async_retry()
   async checkCla(
     data: ClaCheckInput
   ): Promise<void> {
+    // Is a license configured for the PR repository?
+    // if not, there is no need to do a check for CLA signing
+    const currentLicenseForRepository = await this._licensesRepository
+      .getCurrentLicenseVersionForRepository(data.repository.fullName)
+
+    if (!currentLicenseForRepository) {
+      return;
+    }
+
     const allCommitters = await this._statusCheckService
       .getAllCommittersByPullRequestId(data.repository.fullName, data.pullRequest.number)
 
@@ -116,9 +145,15 @@ class ClaCheckHandler {
       throw new Error("Failed to extract the committers emails for the pull request.")
     }
 
-    // store committers in the input state, so we don't need to fetch again the same
-    // information when validating each committer (after each of them authorizes our app);
+    // Store committers in the input state, so we don't need to fetch again the same
+    // information when validating each committer (when each of them authorizes our app);
     data.committers = allCommitters.map(email => email.toLowerCase());
+
+    // Store license version id in the input state: this way when a user sees a license
+    // on screen and agrees to it, we ensure that we store the exact license version id.
+    // Because a license might be updated in the time span necessary to read and
+    // authorize our OAuth application.
+    data.licenseVersionId = currentLicenseForRepository.versionId;
 
     console.info(`Checking committers: [${allCommitters}] for PR ${data.pullRequest.number}`)
 
@@ -126,13 +161,14 @@ class ClaCheckHandler {
 
     const challengeUrl = this.getTargetUrlWithChallenge(data);
     const allCommittersHaveSignedTheCla = await this.allCommittersHaveSignedTheCla(
-      allCommitters
+      allCommitters,
+      currentLicenseForRepository.versionId
     )
 
     if (allCommittersHaveSignedTheCla) {
       status = new StatusCheckInput(
         CheckState.success,
-        `${this._settings.url}/signed-contributor-license-agreement`,
+        this.getSuccessStatusTargetUrl(currentLicenseForRepository.versionId),
         SUCCESS_MESSAGE,
         CLA_CHECK_CONTEXT
       );

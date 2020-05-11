@@ -1,6 +1,6 @@
 import { ClaCheckHandler } from "../../service/handlers/check-cla";
 import { ClaCheckInput } from "../../service/domain/cla";
-import { container } from "../../inversify.config";
+import { container } from "../../service/di";
 import { NextApiRequest, NextApiResponse } from "next";
 import { TYPES } from "../../constants/types";
 
@@ -42,6 +42,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       ) {
         // do nothing; we check CLA only when
         // a PR is opened or reopened
+
+        console.log(`Doing nothing: the pull_request action is ${action}`);
         res.status(200).end(`Doing nothing: the pull_request action is ${action}`);
         break
       }
@@ -84,6 +86,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
       const input: ClaCheckInput = {
         gitHubUserId,
+        licenseVersionId: null,
         committers: null,
         pullRequest: {
           id: pullRequestId,

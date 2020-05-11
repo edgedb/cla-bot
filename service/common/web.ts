@@ -3,19 +3,34 @@
 export class WebRequestError extends Error {}
 
 
+/**
+ * Represents an error whose details can be safely shared with the client.
+ */
 export class SafeError extends Error {
-  // Represents an error whose details can be safely shared with the client
 
   private _statusCode: number
+  private _internalError?: Error
 
   public get statusCode(): number {
     return this._statusCode;
   }
 
-  constructor(message: string, statusCode: number = 400)
+  public get internalError(): Error | undefined {
+    return this._internalError
+  }
+
+  constructor(message: string, statusCode: number = 400, internalError?: Error)
   {
-    super(message);
+    super(internalError ? `${message}. Internal error: ${internalError}` : message);
     this._statusCode = statusCode;
+    this._internalError = internalError;
+  }
+}
+
+
+export class NotFoundError extends SafeError {
+  constructor(message: string = "Object not found") {
+    super(message, 404)
   }
 }
 
