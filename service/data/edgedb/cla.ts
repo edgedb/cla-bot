@@ -6,6 +6,7 @@ import { injectable } from "inversify";
 interface ClaItem {
   id: string
   email: string
+  versionId: string
   creation_time: Date
 }
 
@@ -13,18 +14,18 @@ interface ClaItem {
 @injectable()
 export class EdgeDBClaRepository extends EdgeDBRepository implements ClaRepository {
 
-  async getClaByEmailAddressAndVersion(
-    email: string,
-    versionId: string
+  async getClaByEmailAddress(
+    email: string
   ): Promise<ContributorLicenseAgreement | null> {
     let signed_cla: ClaItem[] = await this.run(async (connection) => {
       return await connection.fetchAll(
         `select ContributorLicenseAgreement {
           email,
-          creation_time
+          creation_time,
+          versionId := .licenseVersion.id
         }
-        filter .email = <str>$0 and .licenseVersion.id = <uuid>$1 limit 1;`,
-        [email, versionId]
+        filter .email = <str>$0;`,
+        [email]
       );
     })
 
@@ -33,7 +34,7 @@ export class EdgeDBClaRepository extends EdgeDBRepository implements ClaReposito
       return new ContributorLicenseAgreement(
         item.id,
         item.email,
-        versionId,
+        item.versionId,
         item.creation_time
       );
     }

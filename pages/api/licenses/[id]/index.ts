@@ -1,11 +1,11 @@
 import { container } from "../../../../service/di";
 import { License } from "../../../../service/domain/licenses";
-import { LicensesHandler } from "../../../../service/handlers/licenses";
+import { AgreementsHandler } from "../../../../service/handlers/licenses";
 import { NextApiRequest, NextApiResponse } from "next";
 import { TYPES } from "../../../../constants/types";
 
 
-const licensesHandler = container.get<LicensesHandler>(TYPES.LicensesHandler);
+const licensesHandler = container.get<AgreementsHandler>(TYPES.LicensesHandler);
 
 
 // TODO: create a middleware to require authentication?

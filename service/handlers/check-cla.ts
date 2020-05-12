@@ -90,8 +90,7 @@ class ClaCheckHandler {
   }
 
   async allCommittersHaveSignedTheCla(
-    allCommitters: string[],
-    licenseVersionId: string
+    allCommitters: string[]
   ): Promise<boolean> {
     // This code performs fine in realistic scenarios: most PRs will have a single
     // committer email, or only a few.
@@ -103,9 +102,8 @@ class ClaCheckHandler {
     for (let i = 0; i < allCommitters.length; i++) {
       const email = allCommitters[i];
 
-      const cla = await this._claRepository.getClaByEmailAddressAndVersion(
-        email,
-        licenseVersionId
+      const cla = await this._claRepository.getClaByEmailAddress(
+        email
       );
 
       if (cla == null) {
@@ -149,20 +147,15 @@ class ClaCheckHandler {
     // information when validating each committer (when each of them authorizes our app);
     data.committers = allCommitters.map(email => email.toLowerCase());
 
-    // Store license version id in the input state: this way when a user sees a license
-    // on screen and agrees to it, we ensure that we store the exact license version id.
-    // Because a license might be updated in the time span necessary to read and
-    // authorize our OAuth application.
-    data.licenseVersionId = currentLicenseForRepository.versionId;
-
+    // TODO: rename "License" to "Agreement"
+    // TODO: rename "ContributorLicenseAgreement" to "SignedAgreement"
     console.info(`Checking committers: [${allCommitters}] for PR ${data.pullRequest.number}`)
 
     let status: StatusCheckInput
 
     const challengeUrl = this.getTargetUrlWithChallenge(data);
     const allCommittersHaveSignedTheCla = await this.allCommittersHaveSignedTheCla(
-      allCommitters,
-      currentLicenseForRepository.versionId
+      allCommitters
     )
 
     if (allCommittersHaveSignedTheCla) {

@@ -15,13 +15,13 @@ export class LicenseVersion {
   id: string | null
   current: boolean
   draft: boolean
-  texts: LicenseText[]
+  texts: AgreementText[]
 
   constructor(
     id: string | null,
     current: boolean,
     draft: boolean,
-    texts: LicenseText[]
+    texts: AgreementText[]
   ) {
     this.id = id
     this.current = current
@@ -31,22 +31,22 @@ export class LicenseVersion {
 }
 
 
-export class LicenseText {
-  id: string | null
+export class AgreementText {
   title: string
   text: string
   culture: string
+  versionId: string
 
   constructor(
-    id: string,
     title: string,
     text: string,
-    culture: string
+    culture: string,
+    versionId: string
   ) {
-    this.id = id
     this.text = text
     this.title = title
     this.culture = culture
+    this.versionId = versionId
   }
 }
 
@@ -84,7 +84,12 @@ export interface LicensesRepository {
 
   getLicenses(): Promise<License[]>;
 
-  getLicenseText(versionId: string, cultureCode: string): Promise<LicenseText | null>;
+  getAgreementTextForRepository(
+    repositoryFullName: string,
+    cultureCode: string
+  ): Promise<AgreementText | null>;
+
+  getLicenseText(versionId: string, cultureCode: string): Promise<AgreementText | null>;
 
   getCurrentLicenseVersionForRepository(
     fullRepositoryName: string

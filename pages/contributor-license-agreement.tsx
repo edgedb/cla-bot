@@ -4,19 +4,20 @@ import { Component } from "react";
 import { container } from "../service/di";
 import { TYPES } from "../constants/types";
 import { NextPageContext, } from "next";
-import { LicensesHandler } from "../service/handlers/licenses";
+import { AgreementsHandler } from "../service/handlers/licenses";
 import { TokensHandler } from "../service/handlers/tokens";
 
 
 interface LicenseProps {
   state: string,
   title: string,
-  text: string
+  text: string,
+  error: string | null
 }
 
 
 const tokensHandler = container.get<TokensHandler>(TYPES.TokensHandler);
-const licensesHandler = container.get<LicensesHandler>(TYPES.LicensesHandler);
+const licensesHandler = container.get<AgreementsHandler>(TYPES.LicensesHandler);
 
 
 function readStateParameter(context: NextPageContext): string {
@@ -33,26 +34,38 @@ function readStateParameter(context: NextPageContext): string {
 export async function getServerSideProps(context: NextPageContext) {
   const rawState = readStateParameter(context)
   const state = tokensHandler.parseToken(rawState) as ClaCheckInput;
-  // Note: we support English only on the front-end, but data model supports localization
-  const cultureCode = "en";
 
-  if (!state.licenseVersionId)
-    throw new Error("Missing license id in state");
-
-  const licenseText = await licensesHandler.getLicenseText(
-    state.licenseVersionId,
-    cultureCode
+  // Read the current agreement for the PR repository
+  const licenseText = await licensesHandler.getAgreementTextForRepository(
+    state.repository.fullName,
+    "en"
   )
 
-  return { props: { state: rawState, text: licenseText.text, title: licenseText.title } };
+  state.licenseVersionId = licenseText.versionId;
+
+  // Modify the state parameter to include the version id:
+  // this ensures that we store the right version id when the user signs in to agree
+  return {
+    props: {
+      state: tokensHandler.createToken(state),
+      text: licenseText.text,
+      title: licenseText.title
+    }
+  };
 }
 
 
 export default class LicensePage extends Component<LicenseProps> {
 
   render() {
-    const { state, text, title } = this.props
+    const {
+      state,
+      text,
+      title
+    } = this.props
     const signInAnchorOps = { href: `/api/contributors/auth/github?state=${state}` }
+
+    // TODO: use markdown, disable HTML tags for extra security
 
     // We are the owners of the text configured for licenses,
     // so dangerouslySetInnerHTML is not dangerous, unless an administrator

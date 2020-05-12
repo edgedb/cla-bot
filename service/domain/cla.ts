@@ -48,10 +48,7 @@ export class ContributorLicenseAgreement {
 
 export interface ClaRepository {
 
-  getClaByEmailAddressAndVersion(
-    email: string,
-    versionId: string
-  ): Promise<ContributorLicenseAgreement | null>;
+  getClaByEmailAddress(email: string): Promise<ContributorLicenseAgreement | null>;
 
   saveCla(data: ContributorLicenseAgreement): Promise<void>;
 }

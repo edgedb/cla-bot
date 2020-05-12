@@ -1,13 +1,13 @@
 import { EdgeDBRepository } from "./base";
 import { injectable } from "inversify";
-import { LicensesRepository, License, LicenseText, RepositoryLicenseInfo } from "../../domain/licenses";
+import { LicensesRepository, License, AgreementText, RepositoryLicenseInfo } from "../../domain/licenses";
 
 
 @injectable()
 export class EdgeDBLicensesRepository extends EdgeDBRepository implements LicensesRepository {
 
   async getCurrentLicenseVersionForRepository(
-    fullRepositoryName: string
+    repositoryFullName: string
   ): Promise<RepositoryLicenseInfo | null> {
     let items = await this.run(async (connection) => {
       return await connection.fetchAll(
@@ -20,7 +20,7 @@ export class EdgeDBLicensesRepository extends EdgeDBRepository implements Licens
         } FILTER .full_name = <str>$full_name;`,
         {
           culture: "en",
-          full_name: fullRepositoryName
+          full_name: repositoryFullName
         }
       )
     })
@@ -35,10 +35,48 @@ export class EdgeDBLicensesRepository extends EdgeDBRepository implements Licens
     )
   }
 
+  async getAgreementTextForRepository(
+    repositoryFullName: string,
+    cultureCode: string
+  ): Promise<AgreementText | null> {
+    let items = await this.run(async (connection) => {
+      return await connection.fetchAll(
+        `SELECT Repository {
+          license: {
+            versions: {
+              number,
+              texts: {
+                text,
+                title,
+                culture
+              } FILTER .culture = <str>$culture LIMIT 1
+            } FILTER .current = True LIMIT 1
+          }
+        } FILTER .full_name = <str>$full_name;`,
+        {
+          culture: "en",
+          full_name: repositoryFullName
+        }
+      )
+    })
+
+    if (!items.length)
+      return null;
+
+    const currentVersion = items[0].license?.versions[0];
+    const versionText = currentVersion.texts[0];
+    return new AgreementText(
+      versionText.title,
+      versionText.text,
+      cultureCode,
+      currentVersion.id
+    )
+  }
+
   async getLicenseText(
     versionId: string,
     cultureCode: string
-  ): Promise<LicenseText | null> {
+  ): Promise<AgreementText | null> {
     let items = await this.run(async (connection) => {
       return await connection.fetchAll(
         `SELECT LicenseVersion {
@@ -58,12 +96,13 @@ export class EdgeDBLicensesRepository extends EdgeDBRepository implements Licens
     if (!items.length)
       return null;
 
-    const text = items[0].texts[0];
-    return new LicenseText(
-      text.id,
+    const version = items[0];
+    const text = version.texts[0];
+    return new AgreementText(
       text.title,
       text.text,
-      text.culture
+      text.culture,
+      version.id
     )
   }
 

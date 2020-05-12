@@ -10,7 +10,7 @@ export interface SignedClaOutput {
 
 
 @injectable()
-export class LicensesHandler
+export class AgreementsHandler
 {
   @inject(TYPES.LicensesRepository) private _licensesRepository: LicensesRepository
 
@@ -22,16 +22,33 @@ export class LicensesHandler
     throw new Error("Not implemented")
   }
 
+  async getAgreementTextForRepository(
+    repositoryFullName: string,
+    cultureCode: string
+  ): Promise<LicenseText> {
+    const licenseText = await this._licensesRepository.getAgreementTextForRepository(
+      repositoryFullName, cultureCode
+    )
+
+    if (licenseText == null) {
+      throw new NotFoundError(
+        `License not found: repository ${repositoryFullName} ${cultureCode}`
+      )
+    }
+
+    return licenseText
+  }
+
   async getLicenseText(
     versionId: string,
     cultureCode: string
-  ) : Promise<LicenseText> {
+  ): Promise<LicenseText> {
     const licenseText = await this._licensesRepository.getLicenseText(
       versionId, cultureCode
     )
 
     if (licenseText == null) {
-      throw new NotFoundError(`License not found ${versionId} ${cultureCode}`)
+      throw new NotFoundError(`License not found: version ${versionId} ${cultureCode}`)
     }
 
     return licenseText

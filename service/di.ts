@@ -7,7 +7,7 @@ import { ServiceSettings } from "./settings";
 import { SignClaHandler } from "./handlers/sign-cla";
 import { TYPES } from "../constants/types";
 import { TokensHandler } from "./handlers/tokens";
-import { LicensesHandler } from "./handlers/licenses";
+import { AgreementsHandler } from "./handlers/licenses";
 import { registerEdgeDBRepositories } from "./data/edgedb/di";
 import { registerGitHubServices } from "./data/github/di";
 
@@ -32,8 +32,8 @@ container.bind<SignClaHandler>(TYPES.SignClaHandler)
 container.bind<ClaCheckHandler>(TYPES.ClaCheckHandler)
   .to(ClaCheckHandler);
 
-container.bind<LicensesHandler>(TYPES.LicensesHandler)
-  .to(LicensesHandler);
+container.bind<AgreementsHandler>(TYPES.LicensesHandler)
+  .to(AgreementsHandler);
 
 container.bind<TokensHandler>(TYPES.TokensHandler)
   .to(TokensHandler);

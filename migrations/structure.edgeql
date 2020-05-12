@@ -74,7 +74,9 @@ CREATE MIGRATION structure TO {
         }
 
         type ContributorLicenseAgreement {
-            required property email -> str;
+            required property email -> str {
+                constraint exclusive;
+            };
 
             required property creation_time -> datetime {
                 default := datetime_current();

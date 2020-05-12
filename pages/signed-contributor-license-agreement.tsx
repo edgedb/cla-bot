@@ -1,7 +1,7 @@
 import Head from "next/head";
 import { Component } from "react";
 import { container } from "../service/di";
-import { LicensesHandler } from "../service/handlers/licenses";
+import { AgreementsHandler } from "../service/handlers/licenses";
 import { TYPES } from "../constants/types";
 import { NextPageContext, } from "next";
 
@@ -12,7 +12,7 @@ interface SignedLicenseProps {
 }
 
 
-const licensesHandler = container.get<LicensesHandler>(TYPES.LicensesHandler);
+const licensesHandler = container.get<AgreementsHandler>(TYPES.LicensesHandler);
 
 
 function readVersionParameter(context: NextPageContext): string {

@@ -36,13 +36,12 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       const { body } = req;
 
       const action = body.action;
-      if (
-        action != "opened" &&
-        action != "reopened"
-      ) {
-        // do nothing; we check CLA only when
-        // a PR is opened or reopened
-
+      if ([
+        "opened",
+        "reopened",
+        "synchronize"
+      ].indexOf(action) == -1) {
+        // do nothing
         console.log(`Doing nothing: the pull_request action is ${action}`);
         res.status(200).end(`Doing nothing: the pull_request action is ${action}`);
         break

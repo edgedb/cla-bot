@@ -91,8 +91,7 @@ class SignClaHandler
 
   async checkIfAllSigned(data: ClaCheckInput, committers: string[]): Promise<void> {
     const allSigned = await this._claCheckHandler.allCommittersHaveSignedTheCla(
-      committers,
-      this.readLicenseVersionId(data)
+      committers
     )
 
     if (allSigned) {
@@ -110,8 +109,7 @@ class SignClaHandler
         return false;
       }
 
-      const lowerEmailAddress = emailInfo.email.toLowerCase();
-      return committers.indexOf(lowerEmailAddress) > -1;
+      return committers.indexOf(emailInfo.email.toLowerCase()) > -1;
     });
   }
 
@@ -135,9 +133,8 @@ class SignClaHandler
       this.ensureThatEmailIsVerified(matchingEmail);
 
       // did the user already signed the CLA with this email address?
-      const existingCla = await this._claRepository.getClaByEmailAddressAndVersion(
-        matchingEmail.email.toLowerCase(),
-        licenseVersionId
+      const existingCla = await this._claRepository.getClaByEmailAddress(
+        matchingEmail.email.toLowerCase()
       );
 
       if (existingCla == null) {
