@@ -7,3 +7,23 @@ body {
   color: $main_black;
   background: white;
 }
+
+button a {
+  color: white;
+  text-decoration: none;
+}
+
+.contributor-agreement-area {
+  margin: 40px auto;
+  font-size: 1.1rem;
+
+  button {
+    margin-top: 10px;
+  }
+}
+
+button {
+  .fab {
+    margin-right: 10px;
+  }
+}

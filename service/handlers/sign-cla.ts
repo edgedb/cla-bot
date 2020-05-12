@@ -58,15 +58,15 @@ class SignClaHandler
   }
 
   async completeClaCheck(data: ClaCheckInput): Promise<void> {
-    const licenseVersionId = this.readLicenseVersionId(data);
-
+    const licenseVersionId = this.readLicenseVersionId(data)
+    const statusUrl = this._claCheckHandler.getSuccessStatusTargetUrl(licenseVersionId)
     await this._statusCheckService.createStatus(
       data.repository.ownerId,
       data.repository.fullName,
       data.pullRequest.headSha,
       new StatusCheckInput(
         CheckState.success,
-        this._claCheckHandler.getSuccessStatusTargetUrl(licenseVersionId),
+        statusUrl,
         SUCCESS_MESSAGE,
         CLA_CHECK_CONTEXT
       )
@@ -85,7 +85,7 @@ class SignClaHandler
       data.repository.ownerId,
       data.repository.fullName,
       commentInfo.commentId,
-      this._claCheckHandler.getSignedComment()
+      this._claCheckHandler.getSignedComment(statusUrl)
     )
   }
 

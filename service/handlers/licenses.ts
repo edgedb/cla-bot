@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import { LicensesRepository, License, LicenseDetail, LicenseText } from "../../service/domain/licenses";
+import { LicensesRepository, License, LicenseDetail, AgreementText } from "../../service/domain/licenses";
 import { NotFoundError } from "../common/web";
 import { TYPES } from "../../constants/types";
 
@@ -22,10 +22,16 @@ export class AgreementsHandler
     throw new Error("Not implemented")
   }
 
+  /**
+   * Returns the current agreement text for a given repository, and a given culture.
+   *
+   * @param repositoryFullName
+   * @param cultureCode
+   */
   async getAgreementTextForRepository(
     repositoryFullName: string,
     cultureCode: string
-  ): Promise<LicenseText> {
+  ): Promise<AgreementText> {
     const licenseText = await this._licensesRepository.getAgreementTextForRepository(
       repositoryFullName, cultureCode
     )
@@ -42,7 +48,7 @@ export class AgreementsHandler
   async getLicenseText(
     versionId: string,
     cultureCode: string
-  ): Promise<LicenseText> {
+  ): Promise<AgreementText> {
     const licenseText = await this._licensesRepository.getLicenseText(
       versionId, cultureCode
     )

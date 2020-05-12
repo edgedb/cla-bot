@@ -1,4 +1,5 @@
 import Head from "next/head";
+import { Container } from "@material-ui/core";
 import { Component } from "react";
 import { container } from "../service/di";
 import { AgreementsHandler } from "../service/handlers/licenses";
@@ -47,7 +48,7 @@ export default class SignedContributorLicenseAgreementPage extends Component<Sig
     const { text, title } = this.props
 
     return (
-      <div className="container">
+      <Container className="contributor-agreement-area" maxWidth="md">
         <Head>
           <title>{title}</title>
           <link rel="icon" href="/favicon.png" type="image/x-icon" />
@@ -58,7 +59,7 @@ export default class SignedContributorLicenseAgreementPage extends Component<Sig
         </main>
         <footer>
         </footer>
-      </div>
+      </Container>
     )
   }
 }

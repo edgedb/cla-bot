@@ -1,4 +1,5 @@
 import Head from "next/head";
+import { Button, Container } from "@material-ui/core";
 import { ClaCheckInput } from "../service/domain/cla";
 import { Component } from "react";
 import { container } from "../service/di";
@@ -8,7 +9,7 @@ import { AgreementsHandler } from "../service/handlers/licenses";
 import { TokensHandler } from "../service/handlers/tokens";
 
 
-interface LicenseProps {
+interface AgreementPageProps {
   state: string,
   title: string,
   text: string,
@@ -55,7 +56,7 @@ export async function getServerSideProps(context: NextPageContext) {
 }
 
 
-export default class LicensePage extends Component<LicenseProps> {
+export default class AgreementPage extends Component<AgreementPageProps> {
 
   render() {
     const {
@@ -72,7 +73,7 @@ export default class LicensePage extends Component<LicenseProps> {
     // wants to sabotage the system (we have a bigger problem then).
 
     return (
-      <div className="container">
+      <Container className="contributor-agreement-area" maxWidth="md">
         <Head>
           <title>{title}</title>
           <link rel="icon" href="/favicon.png" type="image/x-icon" />
@@ -80,13 +81,13 @@ export default class LicensePage extends Component<LicenseProps> {
 
         <main>
           <div dangerouslySetInnerHTML={{ __html: text }}></div>
-          <div>
+          <Button variant="contained" color="primary">
             <a {...signInAnchorOps}>Sign in with GitHub to agree</a>
-          </div>
+          </Button>
         </main>
         <footer>
         </footer>
-      </div>
+      </Container>
     )
   }
 }

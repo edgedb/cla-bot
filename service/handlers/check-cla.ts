@@ -37,9 +37,9 @@ class ClaCheckHandler {
     return `${this._settings.url}/contributor-license-agreement?state=${token}`
   }
 
-  getSignedComment(): string {
+  getSignedComment(signedUrl: string): string {
     return `All committers signed the Contributor License Agreement. <br/> ` +
-    `![CLA signed](${this._settings.url}/cla-signed.svg)`
+    `[![CLA signed](${this._settings.url}/cla-signed.svg)](${signedUrl})`
   }
 
   getNotSignedComment(challengeUrl: string): string {
