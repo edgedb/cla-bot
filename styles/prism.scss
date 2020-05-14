@@ -1,0 +1,136 @@
+@import "./settings.vars.scss";
+
+$green_dark: #2dd8a5;
+$red_dark: #ee464d;
+$yellow_dark: #e5df59;
+$orange_dark: #fb9256;
+$purple_dark: #b466ce;
+
+$green_light: #26a073;
+$purple_light: #791590;
+$blue_light: #1c79de;
+$orange_light: #bf901d;
+$pink_light: #c12f54;
+
+@mixin colorit($comment, $operator, $string, $keyword, $literal, $name) {
+  &.comment,
+  &.prolog,
+  &.doctype,
+  &.cdata {
+    color: $comment;
+  }
+
+  &.operator {
+    color: $operator;
+  }
+
+  &.boolean,
+  &.number {
+    color: $literal;
+  }
+
+  &.string,
+  &.attr-name,
+  &.entity,
+  &.url {
+    color: $string;
+  }
+
+  &.string {
+    .escaped {
+      color: $literal;
+    }
+  }
+
+  &.number,
+  &.string {
+    .valuetype {
+      color: $name;
+    }
+  }
+
+  &.keyword,
+  &.important,
+  &.statement {
+    color: $keyword;
+  }
+
+  &.function,
+  &.variable,
+  &.builtin {
+    color: $name;
+  }
+
+  &.faded {
+    opacity: 0.7;
+    font-weight: bold;
+  }
+}
+
+.prismjs-dark-syntax,
+.prismjs-light-syntax {
+  line-height: 1.38;
+}
+
+.prismjs-dark-syntax {
+  color: #dedede;
+  .token {
+    @include colorit(
+      $comment: #8b8b8f,
+      $operator: $orange_dark,
+      $string: $yellow_dark,
+      $keyword: $red_dark,
+      $literal: $purple_dark,
+      $name: $green_dark
+    );
+  }
+}
+
+.prismjs-light-syntax {
+  color: #4f525b;
+
+  .token {
+    @include colorit(
+      $comment: #9a9ca5,
+      $operator: $pink_light,
+      $string: $green_light,
+      $keyword: $purple_light,
+      $literal: $orange_light,
+      $name: $blue_light
+    );
+  }
+
+  &.code-language-edgeql-synopsis,
+  &.code-language-sdl-synopsis {
+    .token {
+      color: $main_black;
+
+      &.keyword,
+      &.string {
+        font-weight: bold;
+      }
+      &.synopsis-placeholder {
+        font-style: italic;
+      }
+      &.synopsis-text {
+        color: #7f7f7f;
+        * {
+          color: #7f7f7f;
+        }
+      }
+      &.optional {
+        color: #999;
+      }
+    }
+  }
+
+  .tokens-new {
+    --code-block-inner-border-color: #b5d3af;
+    --code-block-background: #e8f3e6;
+  }
+
+  .tokens-changed {
+    --code-block-inner-border-color: #e7d595;
+    --code-block-background: #f3f1e6;
+  }
+}
