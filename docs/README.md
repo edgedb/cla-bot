@@ -1,5 +1,22 @@
-# Notes for developers
-The file `GitHub.md` contains examples of payloads handled by GitHub API.
+# First time setup
+The service requires:
+* an instance of EdgeDB with a configured database
+* a pull request web hook configured in the desired GitHub account
+* a GitHub application configured with necessary rights
+* a OAuth application to handle users' sign-in
+
+## EdgeDB configuration
+
+1. Connect to an instance of EdgeDB
+2. Create a database called "cla"
+
+```
+create database cla;
+
+\c cla
+```
+
+3. Execute the script provided in `migrations/structure.edgeql` file.
 
 ## GitHub app configuration
 A GitHub app to interact with PR statuses and comments must be configured under account `Settings > Developer settings` with the following permissions:
@@ -9,20 +26,17 @@ A GitHub app to interact with PR statuses and comments must be configured under 
 and required metadata (automatically set by GitHub UI).
 
 Then, a private RSA key must be downloaded to be used by this service.
-Currently, the private RSA key is read from file system, and its path is configured in the `.env` file at the application root.
+Currently, the private RSA key is read from file system, and its path is configured in the `.env` file at the application root, with key `GITHUB_RSA_PRIVATE_KEY`.
 
 ## OAuth app configuration
-A OAuth app to interact with end users and
+A OAuth application is used to enable sign-in for contributors and administrators.
+_TODO: document how to create the OAuth app registration._
 
+## GitHub integration requires public endpoints
+During local development, it's recommended to use [`ngrok`](https://ngrok.com/) to create a tunnel and use public endpoints provided by this tool. This is also recommended by GitHub. If a paid license is available, it's possible to use a fixed DNS name, which is convenient to configure only once the redirect URI for the OAuth application, the web hook for pull requests, and `SERVER_URL` application setting.
 
-## Requirements
-This application has been developed to address these needs:
-
-1. when someone tries to do a PR,
-2. check by username or user ID if the person signed the configured CLA
-3. if not, publish a failure status in the PR and challenge with the agreement to be signed (ask for it), with a link to a page where the license is displayed
-4. if yes, update the existing status to set it to succeeded, and return "OK"
-5. the interface is simple: it shows the agreement and the button to accept / reject (requiring OAuth integration to verify user's identity)
+## Notes for developers
+The file `GitHub.md` contains examples of payloads handled by GitHub API.
 
 ## Useful links
 
