@@ -1,5 +1,5 @@
 
-export class License {
+export class Agreement {
   id: string | null
   name: string
   description: string
@@ -65,7 +65,7 @@ export class RepositoryLicenseInfo {
 }
 
 
-export class LicenseDetail extends License {
+export class LicenseDetail extends Agreement {
   versions: LicenseVersion[]
 
   constructor(
@@ -82,14 +82,17 @@ export class LicenseDetail extends License {
 
 export interface LicensesRepository {
 
-  getLicenses(): Promise<License[]>;
+  getLicenses(): Promise<Agreement[]>;
 
   getAgreementTextForRepository(
     repositoryFullName: string,
     cultureCode: string
   ): Promise<AgreementText | null>;
 
-  getLicenseText(versionId: string, cultureCode: string): Promise<AgreementText | null>;
+  getLicenseText(
+    versionId: string,
+    cultureCode: string
+  ): Promise<AgreementText | null>;
 
   getCurrentLicenseVersionForRepository(
     fullRepositoryName: string

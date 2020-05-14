@@ -20,19 +20,25 @@ class ClaCheckHandler {
   @inject(TYPES.ServiceSettings) private _settings: ServiceSettings
   @inject(TYPES.ClaRepository) private _claRepository: ClaRepository
   @inject(TYPES.CommentsService) private _commentsService: CommentsService
-  @inject(TYPES.CommentsRepository) private _commentsRepository: CommentsRepository
-  @inject(TYPES.StatusChecksService) private _statusCheckService: StatusChecksService
-  @inject(TYPES.LicensesRepository) private _licensesRepository: LicensesRepository
+  @inject(
+    TYPES.CommentsRepository) private _commentsRepository: CommentsRepository
+  @inject(
+    TYPES.StatusChecksService) private _statusCheckService: StatusChecksService
+  @inject(
+    TYPES.LicensesRepository) private _licensesRepository: LicensesRepository
   @inject(TYPES.TokensHandler) private _tokensHandler: TokensHandler
 
   getTargetUrlWithChallenge(data: ClaCheckInput): string {
-    // The target URL for the check must not only point to this instance of the web application
-    // to the page that displays the license agreement,
-    // it must also include a `state` query string parameter that will be handled through
-    // OAuth. The state is necessary to ensure that the same person who opened the PR
-    // is the one who authorizes our app and does sign-in to sign the agreement.
+    // The target URL for the check must not only point to this instance of
+    // the web application to the page that displays the license agreement,
+    //
+    // it must also include a `state` query string parameter that will be
+    // handled through OAuth. The state is necessary to ensure that the same
+    // person who opened the PR is the one who authorizes our app and does
+    // sign-in to sign the agreement.
 
-    // We create a JWT token, to ensure that the user cannot modify the parameter
+    // We create a JWT token, to ensure that the user cannot modify the
+    // parameter
     const token = this._tokensHandler.createToken(data);
     return `${this._settings.url}/contributor-license-agreement?state=${token}`
   }
@@ -52,19 +58,16 @@ class ClaCheckHandler {
     challengeUrl: string
   ): Promise<void> {
     // was a CLA comment for this PR already written?
-    const commentInfo = await this._commentsRepository.getCommentInfoByPullRequestId(
-      data.pullRequest.id
-    )
+    const commentInfo = await this._commentsRepository
+      .getCommentInfoByPullRequestId(data.pullRequest.id)
 
     if (commentInfo != null) {
-      console.info(`CLA comment already present on PR ${data.pullRequest.number}`);
-
       // Make sure that the comment is updated with failure information,
       // because the comment might have an outdated positive message.
-      // This scenario can happen if: someone first creates a PR and signs the CLA,
-      // later asks to be removed from our database (like GDPR in Europe),
-      // without completing this PR, finally closes and reopens the PR
-      //
+      // This scenario can happen if: someone first creates a PR and signs
+      // the CLA, later asks to be removed from our database
+      // (like GDPR in Europe), without completing this PR, finally closes
+      // and reopens the PR
 
       await this._commentsService.updateComment(
         data.repository.ownerId,
@@ -92,10 +95,11 @@ class ClaCheckHandler {
   async allCommittersHaveSignedTheCla(
     allCommitters: string[]
   ): Promise<boolean> {
-    // This code performs fine in realistic scenarios: most PRs will have a single
-    // committer email, or only a few.
-    // However, someone might trick our service by faking a big number of unique users
-    // and a big number of commits. In such unhappy case, it makes sense to handle
+    // This code performs fine in realistic scenarios: most PRs will
+    // have a single committer email, or only a few.
+    // However, someone might trick our service by faking a big number of
+    // unique users and a big number of commits.
+    // In such unhappy case, it makes sense to handle
     // committers sequentially one by one, to not starve our resources for a
     // single request.
 
@@ -116,9 +120,9 @@ class ClaCheckHandler {
   getSuccessStatusTargetUrl(versionId: string): string {
     // Note: the success status URL is not going to change over time,
     // but the license can change. Here we know that contributors signed
-    // a certain version of the CLA, therefore we keep the version id in the status
-    // URL: in the future we can display the exact license that was signed at this
-    // point in time.
+    // a certain version of the CLA, therefore we keep the version id in
+    // the status URL: in the future we can display the exact license that
+    // was signed at this point in time.
     return `${this._settings.url}/signed-contributor-license-agreement` +
            `?version=${versionId}`;
   }
@@ -137,26 +141,27 @@ class ClaCheckHandler {
     }
 
     const allCommitters = await this._statusCheckService
-      .getAllCommittersByPullRequestId(data.repository.fullName, data.pullRequest.number)
+      .getAllCommittersByPullRequestId(
+        data.repository.fullName,
+        data.pullRequest.number
+      )
 
     if (!allCommitters.length) {
       throw new Error("Failed to extract the committers emails for the pull request.")
     }
 
-    // Store committers in the input state, so we don't need to fetch again the same
-    // information when validating each committer (when each of them authorizes our app);
+    // Store committers in the input state, so we don't need to fetch
+    // again the same information when validating each committer
+    // (when each of them authorizes our app);
     data.committers = allCommitters.map(email => email.toLowerCase());
 
     // TODO: rename "License" to "Agreement"
     // TODO: rename "ContributorLicenseAgreement" to "SignedAgreement"
-    console.info(`Checking committers: [${allCommitters}] for PR ${data.pullRequest.number}`)
-
     let status: StatusCheckInput
 
     const challengeUrl = this.getTargetUrlWithChallenge(data);
-    const allCommittersHaveSignedTheCla = await this.allCommittersHaveSignedTheCla(
-      allCommitters
-    )
+    const allCommittersHaveSignedTheCla = await this
+      .allCommittersHaveSignedTheCla(allCommitters)
 
     if (allCommittersHaveSignedTheCla) {
       status = new StatusCheckInput(

@@ -1,15 +1,21 @@
 import { EdgeDBRepository } from "./base";
 import { injectable } from "inversify";
-import { LicensesRepository, License, AgreementText, RepositoryLicenseInfo } from "../../domain/licenses";
+import {
+  LicensesRepository,
+  Agreement,
+  AgreementText,
+  RepositoryLicenseInfo
+} from "../../domain/licenses";
 
 
 @injectable()
-export class EdgeDBLicensesRepository extends EdgeDBRepository implements LicensesRepository {
+export class EdgeDBLicensesRepository
+  extends EdgeDBRepository implements LicensesRepository {
 
   async getCurrentLicenseVersionForRepository(
     repositoryFullName: string
   ): Promise<RepositoryLicenseInfo | null> {
-    let items = await this.run(async (connection) => {
+    const items = await this.run(async (connection) => {
       return await connection.fetchAll(
         `SELECT Repository {
           license: {
@@ -39,7 +45,7 @@ export class EdgeDBLicensesRepository extends EdgeDBRepository implements Licens
     repositoryFullName: string,
     cultureCode: string
   ): Promise<AgreementText | null> {
-    let items = await this.run(async (connection) => {
+    const items = await this.run(async (connection) => {
       return await connection.fetchAll(
         `SELECT Repository {
           license: {
@@ -77,7 +83,7 @@ export class EdgeDBLicensesRepository extends EdgeDBRepository implements Licens
     versionId: string,
     cultureCode: string
   ): Promise<AgreementText | null> {
-    let items = await this.run(async (connection) => {
+    const items = await this.run(async (connection) => {
       return await connection.fetchAll(
         `SELECT LicenseVersion {
           texts: {
@@ -110,7 +116,7 @@ export class EdgeDBLicensesRepository extends EdgeDBRepository implements Licens
     fullRepositoryName: string,
     cultureCode: string
   ): Promise<string | null> {
-    let items = await this.run(async (connection) => {
+    const items = await this.run(async (connection) => {
       return await connection.fetchAll(
         `SELECT Repository {
           license: {
@@ -135,8 +141,8 @@ export class EdgeDBLicensesRepository extends EdgeDBRepository implements Licens
     return item.license?.versions[0]?.texts[0]?.text || null;
   }
 
-  async getLicenses(): Promise<License[]> {
-    let items = await this.run(async (connection) => {
+  async getLicenses(): Promise<Agreement[]> {
+    const items = await this.run(async (connection) => {
       return await connection.fetchAll(
         `select License {
           name,
@@ -145,7 +151,11 @@ export class EdgeDBLicensesRepository extends EdgeDBRepository implements Licens
       );
     })
 
-    return items.map(entity => new License(entity.id, entity.name, entity.description));
+    return items.map(entity => new Agreement(
+      entity.id,
+      entity.name,
+      entity.description
+    ));
   }
 
 }

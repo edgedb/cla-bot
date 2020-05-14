@@ -1,30 +1,32 @@
 import Head from "next/head";
+import Props from "../components/props";
+import { AgreementsHandler } from "../service/handlers/licenses";
 import { Button, Container } from "@material-ui/core";
 import { ClaCheckInput } from "../service/domain/cla";
-import { Component } from "react";
+import { Component, ReactElement } from "react";
 import { container } from "../service/di";
+import { TokensHandler } from "../service/handlers/tokens";
 import { TYPES } from "../constants/types";
 import { NextPageContext, } from "next";
-import { AgreementsHandler } from "../service/handlers/licenses";
-import { TokensHandler } from "../service/handlers/tokens";
 
 
 interface AgreementPageProps {
   state: string,
   title: string,
-  text: string,
-  error: string | null
+  text: string
 }
 
 
-const tokensHandler = container.get<TokensHandler>(TYPES.TokensHandler);
-const licensesHandler = container.get<AgreementsHandler>(TYPES.LicensesHandler);
+const tokensHandler = container
+  .get<TokensHandler>(TYPES.TokensHandler);
+const licensesHandler = container
+  .get<AgreementsHandler>(TYPES.AgreementsHandler);
 
 
 function readStateParameter(context: NextPageContext): string {
   const state = context.query.state;
 
-  if (typeof state != "string") {
+  if (typeof state !== "string") {
     throw new Error("Expected a single state parameter")
   }
 
@@ -32,7 +34,9 @@ function readStateParameter(context: NextPageContext): string {
 }
 
 
-export async function getServerSideProps(context: NextPageContext) {
+export async function getServerSideProps(
+  context: NextPageContext
+): Promise<Props<AgreementPageProps>> {
   const rawState = readStateParameter(context)
   const state = tokensHandler.parseToken(rawState) as ClaCheckInput;
 
@@ -45,7 +49,8 @@ export async function getServerSideProps(context: NextPageContext) {
   state.licenseVersionId = licenseText.versionId;
 
   // Modify the state parameter to include the version id:
-  // this ensures that we store the right version id when the user signs in to agree
+  // this ensures that we store the right version id when the user signs in
+  // to agree
   return {
     props: {
       state: tokensHandler.createToken(state),
@@ -58,7 +63,7 @@ export async function getServerSideProps(context: NextPageContext) {
 
 export default class AgreementPage extends Component<AgreementPageProps> {
 
-  render() {
+  render(): ReactElement {
     const {
       state,
       text,

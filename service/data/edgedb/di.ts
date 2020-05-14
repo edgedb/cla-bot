@@ -8,7 +8,7 @@ import { LicensesRepository } from "../../domain/licenses";
 import { EdgeDBLicensesRepository } from "./licenses";
 
 
-export function registerEdgeDBRepositories(container: Container) {
+export function registerEdgeDBRepositories(container: Container): void {
 
   container.bind<ClaRepository>(TYPES.ClaRepository)
     .to(EdgeDBClaRepository).inSingletonScope();

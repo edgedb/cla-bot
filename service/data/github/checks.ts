@@ -32,7 +32,6 @@ interface GitHubCommitItem {
 }
 
 
-
 @injectable()
 export class GitHubStatusChecksAPI implements StatusChecksService {
 
@@ -47,7 +46,7 @@ export class GitHubStatusChecksAPI implements StatusChecksService {
     targetRepoFullName: string,
     pullRequestNumber: number
   ): Promise<string[]> {
-    var pageNumber = 0;
+    let pageNumber = 0;
     const committersEmails: string[] = [];
 
     // GitHub returns commits in pages of 30 items;
@@ -66,7 +65,7 @@ export class GitHubStatusChecksAPI implements StatusChecksService {
       data.forEach(item => {
         const committerEmail = item.commit.committer.email;
 
-        if (committersEmails.indexOf(committerEmail) == -1) {
+        if (committersEmails.indexOf(committerEmail) === -1) {
           committersEmails.push(item.commit.committer.email);
         }
       });
@@ -88,7 +87,8 @@ export class GitHubStatusChecksAPI implements StatusChecksService {
     pullRequestHeadSha: string,
     data: StatusCheckInput
   ): Promise<void> {
-    const accessToken = await this._access_token_handler.getAccessTokenForAccount(targetAccountId);
+    const accessToken = await this._access_token_handler
+      .getAccessTokenForAccount(targetAccountId);
 
     const response = await fetch(
       `https://api.github.com/repos/${targetRepoFullName}/statuses/${pullRequestHeadSha}`,

@@ -8,7 +8,9 @@ import { injectable } from "inversify";
 export class EdgeDBRepository {
 
   @async_retry()
-  async run<T>(action: (connection: AwaitConnection) => Promise<T>): Promise<T> {
+  async run<T>(
+    action: (connection: AwaitConnection) => Promise<T>
+  ): Promise<T> {
     const connection = await connect()
     try {
       return await action(connection);

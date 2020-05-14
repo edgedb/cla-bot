@@ -1,14 +1,18 @@
 import { container } from "../../../service/di";
-import { License } from "../../../service/domain/licenses";
+import { Agreement } from "../../../service/domain/licenses";
 import { AgreementsHandler } from "../../../service/handlers/licenses";
 import { NextApiRequest, NextApiResponse } from "next";
 import { TYPES } from "../../../constants/types";
 
 
-const licensesHandler = container.get<AgreementsHandler>(TYPES.LicensesHandler);
+const agreementsHandler = container
+  .get<AgreementsHandler>(TYPES.AgreementsHandler);
 
 
-export default async (req: NextApiRequest, res: NextApiResponse<License[]>) => {
+export default async (
+  req: NextApiRequest,
+  res: NextApiResponse<Agreement[]>
+) => {
   const {
     method
   } = req
@@ -16,7 +20,7 @@ export default async (req: NextApiRequest, res: NextApiResponse<License[]>) => {
   switch (method) {
     case "GET":
       // return a list of licenses without details
-      const licenses = await licensesHandler.getLicenses()
+      const licenses = await agreementsHandler.getLicenses()
       res.status(200).json(licenses)
 
       return

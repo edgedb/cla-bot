@@ -16,12 +16,12 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     method
   } = req
 
-  if (method != 'POST') {
+  if (method !== 'POST') {
     return res.status(404).end("Not found");
   }
 
   // Next.js enforces lowercase header names
-  let event = req.headers['x-github-event']
+  const event = req.headers['x-github-event']
 
   if (!event) {
     return res.status(400).end("Missing X-GitHub-Event header");
@@ -40,9 +40,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         "opened",
         "reopened",
         "synchronize"
-      ].indexOf(action) == -1) {
-        // do nothing
-        console.log(`Doing nothing: the pull_request action is ${action}`);
+      ].indexOf(action) === -1) {
         res.status(200).end(`Doing nothing: the pull_request action is ${action}`);
         break
       }
@@ -104,8 +102,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
       await handler.checkCla(input)
       res.status(200).end("OK")
-
-      console.log(`Handled hook for PR on ${targetRepositoryFullName}`);
       break
     default:
       return res.status(400).end(`The event ${event} is not handled.`);

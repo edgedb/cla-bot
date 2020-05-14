@@ -9,7 +9,7 @@ const TYPES = {
   CommentsService: Symbol.for("CommentsService"),
   CommentsRepository: Symbol.for("CommentsRepository"),
   LicensesRepository: Symbol.for("LicensesRepository"),
-  LicensesHandler: Symbol.for("LicensesHandler"),
+  AgreementsHandler: Symbol.for("LicensesHandler"),
 };
 
 export { TYPES };

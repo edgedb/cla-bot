@@ -4,10 +4,13 @@ import { injectable } from "inversify";
 
 
 @injectable()
-export class EdgeDBCommentsRepository extends EdgeDBRepository implements CommentsRepository {
+export class EdgeDBCommentsRepository
+extends EdgeDBRepository implements CommentsRepository {
 
-  async getCommentInfoByPullRequestId(pullRequestId: number): Promise<CommentInfo | null> {
-    let items = await this.run(async (connection) => {
+  async getCommentInfoByPullRequestId(
+    pullRequestId: number
+  ): Promise<CommentInfo | null> {
+    const items = await this.run(async (connection) => {
       return await connection.fetchAll(
         `select CommentInfo {
           comment_id,

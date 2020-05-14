@@ -22,8 +22,8 @@ function readOAuthError(req: NextApiRequest): string | null {
 
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-  // This function handles an incoming HTTP request following an attempt to sign in,
-  // or a redirect fired by GitHub in case of a configuration error
+  // This function handles an incoming HTTP request following an attempt
+  // to sign in, or a redirect fired by GitHub in case of a configuration error
   const error = readOAuthError(req);
 
   if (error) {
@@ -63,7 +63,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       return;
     }
 
-    console.error(error);
     res.status(500).end("Internal server error");
   }
 }

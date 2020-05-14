@@ -22,7 +22,8 @@ interface GitHubInstallationAccessTokenResult {
 }
 
 
-// GitHub api returns much more information, but here we care only about the following:
+// GitHub api returns much more information,
+// but here we care only about the following:
 interface GitHubInstallationItem {
   id: number,
   target_id: number
@@ -36,8 +37,8 @@ interface AccessToken {
 
 
 export class GitHubAccessHandler {
-  // This class handles client credentials flow to obtain access tokens to interact
-  // with our own organization
+  // This class handles client credentials flow to obtain access tokens
+  // to interact with our own organization
 
   private _privateKey: Buffer;
   private _githubApplicationId: number;
@@ -71,7 +72,7 @@ export class GitHubAccessHandler {
       );
     }
 
-    const githubApplicationId = parseInt(githubApplicationIdRaw);
+    const githubApplicationId = parseInt(githubApplicationIdRaw, 10);
 
     if (isNaN(githubApplicationId)) {
       throw new Error(
@@ -83,8 +84,7 @@ export class GitHubAccessHandler {
   }
 
   private getPrivateKey(): Buffer {
-    var privateKeyPath = this.getPrivateKeyPath();
-    return fs.readFileSync(privateKeyPath);
+    return fs.readFileSync(this.getPrivateKeyPath());
   }
 
   createPrimaryAccessToken(): string {
@@ -106,11 +106,12 @@ export class GitHubAccessHandler {
   getCachedAccessToken(targetAccountId: number): AccessToken | null
   {
     if (targetAccountId in this._accountAccessTokensCache) {
-      const cachedAccessToken = this._accountAccessTokensCache[targetAccountId];
+      const cachedAccessToken = this
+        ._accountAccessTokensCache[targetAccountId];
 
       // applies a margin of 60 seconds while checking for expiration
       if ((new Date().getTime() + 60000) < cachedAccessToken.expiresAt) {
-        console.info(`Reusing a cached access token for account ${targetAccountId}`);
+        // reusing a cached access token
         return cachedAccessToken;
       }
 
@@ -136,10 +137,10 @@ export class GitHubAccessHandler {
     await expectSuccessfulResponse(response);
 
     const data: GitHubInstallationItem[] = await response.json();
-    var installationId: number | null = null;
+    let installationId: number | null = null;
 
     data.forEach(installation => {
-      if (installation.target_id == targetAccountId) {
+      if (installation.target_id === targetAccountId) {
         installationId = installation.id;
       }
     });
@@ -159,14 +160,15 @@ export class GitHubAccessHandler {
     // it is necessary to obtain first the "installation id", which represents
     // the authorization of the GitHub app over the target account, and then
     // obtain an access token for the installation.
-    // It is possible that a GitHub app has access rights over a different repository,
-    // but here for simplicity we don't verify if the app is authorized on the
-    // repository where the PR is being done (a call to this API:
+    // It is possible that a GitHub app has access rights over a different
+    // repository, but here for simplicity we don't verify if the app is
+    // authorized on the repository on which the PR is being done.
+    // A call to this API:
     // https://api.github.com/installation/repositories
-    // would enable to follow "look before you leap")
+    // would enable to follow "look before you leap"
 
-    // installation access tokens issued by GitHub last one hour, so we cache them
-    // in memory and reuse them if possible
+    // installation access tokens issued by GitHub last one hour, so we
+    // cache them in memory and reuse them if possible
     const cachedAccessToken = this.getCachedAccessToken(targetAccountId);
 
     if (cachedAccessToken !== null) {
@@ -181,9 +183,8 @@ export class GitHubAccessHandler {
       primaryAccessToken
     )
 
-    const installationAccessTokenResult = await this.getAccessTokenForInstallation(
-      installationId
-    );
+    const installationAccessTokenResult = await this
+      .getAccessTokenForInstallation(installationId);
 
     this.setCachedAccessToken(targetAccountId, {
       value: installationAccessTokenResult.token,
@@ -198,8 +199,8 @@ export class GitHubAccessHandler {
     installationId: number,
     primaryAccessToken?: string
   ): Promise<GitHubInstallationAccessTokenResult> {
-    // An installation, in GitHub terminology, refers to a GitHub app being authorized
-    // over a certain organization.
+    // An installation, in GitHub terminology, refers to a GitHub app
+    // being authorized over a certain organization.
     // To interact with repositories inside an organization, we
     // need an access token issued for the installation.
     // https://api.github.com/app/installations
@@ -222,12 +223,6 @@ export class GitHubAccessHandler {
   }
 }
 
-
-// we might either configure the class as a singleton service in inversify and inject,
-// it into classes that need it, or create a singleton in this module;
-// since the classes defined under this namespace are anyway concrete classes
-// depending on the GitHub API and using DI in this case doesn't bring benefit,
-// the second approach is chosen (also to reduce code verbosity)
 const accessHandler = new GitHubAccessHandler();
 
 export { accessHandler };

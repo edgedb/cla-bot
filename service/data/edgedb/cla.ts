@@ -12,12 +12,13 @@ interface ClaItem {
 
 
 @injectable()
-export class EdgeDBClaRepository extends EdgeDBRepository implements ClaRepository {
+export class EdgeDBClaRepository
+extends EdgeDBRepository implements ClaRepository {
 
   async getClaByEmailAddress(
     email: string
   ): Promise<ContributorLicenseAgreement | null> {
-    let signed_cla: ClaItem[] = await this.run(async (connection) => {
+    const signed_cla: ClaItem[] = await this.run(async (connection) => {
       return await connection.fetchAll(
         `select ContributorLicenseAgreement {
           email,

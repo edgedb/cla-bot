@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import { LicensesRepository, License, LicenseDetail, AgreementText } from "../../service/domain/licenses";
+import { LicensesRepository, Agreement, LicenseDetail, AgreementText } from "../../service/domain/licenses";
 import { NotFoundError } from "../common/web";
 import { TYPES } from "../../constants/types";
 
@@ -12,9 +12,10 @@ export interface SignedClaOutput {
 @injectable()
 export class AgreementsHandler
 {
-  @inject(TYPES.LicensesRepository) private _licensesRepository: LicensesRepository
+  @inject(
+    TYPES.LicensesRepository) private _licensesRepository: LicensesRepository
 
-  async getLicenses(): Promise<License[]> {
+  async getLicenses(): Promise<Agreement[]> {
     return await this._licensesRepository.getLicenses();
   }
 
@@ -23,7 +24,8 @@ export class AgreementsHandler
   }
 
   /**
-   * Returns the current agreement text for a given repository, and a given culture.
+   * Returns the current agreement text for a given repository,
+   * and a given culture.
    *
    * @param repositoryFullName
    * @param cultureCode
@@ -32,9 +34,8 @@ export class AgreementsHandler
     repositoryFullName: string,
     cultureCode: string
   ): Promise<AgreementText> {
-    const licenseText = await this._licensesRepository.getAgreementTextForRepository(
-      repositoryFullName, cultureCode
-    )
+    const licenseText = await this._licensesRepository
+      .getAgreementTextForRepository(repositoryFullName, cultureCode)
 
     if (licenseText == null) {
       throw new NotFoundError(
@@ -54,7 +55,9 @@ export class AgreementsHandler
     )
 
     if (licenseText == null) {
-      throw new NotFoundError(`License not found: version ${versionId} ${cultureCode}`)
+      throw new NotFoundError(
+        `License not found: version ${versionId} ${cultureCode}`
+      )
     }
 
     return licenseText

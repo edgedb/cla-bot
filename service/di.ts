@@ -1,5 +1,5 @@
-// ATTENTION: the import of "reflect-metadata" must happen before inversify, otherwise
-// inversify doesn't work - so don't sort imports here...
+// ATTENTION: the import of "reflect-metadata" must happen before inversify,
+// otherwise inversify doesn't work - so don't sort imports here...
 import "reflect-metadata";
 import { ClaCheckHandler } from "./handlers/check-cla";
 import { Container } from "inversify";
@@ -10,11 +10,6 @@ import { TokensHandler } from "./handlers/tokens";
 import { AgreementsHandler } from "./handlers/licenses";
 import { registerEdgeDBRepositories } from "./data/edgedb/di";
 import { registerGitHubServices } from "./data/github/di";
-
-
-// TODO: since next.js doesn't support inversify out of the box,
-// and defining a custom server for this purpose requires more time and sacrificing
-// built-in optimizations; support here DI test setup using environmental variables.
 
 
 const container = new Container();
@@ -32,7 +27,7 @@ container.bind<SignClaHandler>(TYPES.SignClaHandler)
 container.bind<ClaCheckHandler>(TYPES.ClaCheckHandler)
   .to(ClaCheckHandler);
 
-container.bind<AgreementsHandler>(TYPES.LicensesHandler)
+container.bind<AgreementsHandler>(TYPES.AgreementsHandler)
   .to(AgreementsHandler);
 
 container.bind<TokensHandler>(TYPES.TokensHandler)

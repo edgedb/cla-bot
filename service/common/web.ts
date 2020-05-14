@@ -21,7 +21,10 @@ export class SafeError extends Error {
 
   constructor(message: string, statusCode: number = 400, internalError?: Error)
   {
-    super(internalError ? `${message}. Internal error: ${internalError}` : message);
+    super(internalError
+      ? `${message}. Internal error: ${internalError}`
+      : message
+    );
     this._statusCode = statusCode;
     this._internalError = internalError;
   }
@@ -52,7 +55,9 @@ export class MissingResponseBodyError extends WebRequestError {
 }
 
 
-export async function expectSuccessfulResponse(response: Response) {
+export async function expectSuccessfulResponse(
+  response: Response
+): Promise<void> {
   if (response.status < 200 || response.status > 299) {
     throw new FailedHttpRequestError(response, await response.text());
   }

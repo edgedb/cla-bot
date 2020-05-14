@@ -1,9 +1,6 @@
 import githubAuth from "./configuration";
-import { container } from "../../../../../service/di";
 import { NextApiRequest, NextApiResponse } from "next";
 import { SafeError } from "../../../../../service/common/web";
-import { SignClaHandler } from "../../../../../service/handlers/sign-cla";
-import { TYPES } from "../../../../../constants/types";
 
 
 function readOAuthError(req: NextApiRequest): string | null {
@@ -19,8 +16,8 @@ function readOAuthError(req: NextApiRequest): string | null {
 
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-  // This function handles an incoming HTTP request following an attempt to sign in,
-  // or a redirect fired by GitHub in case of a configuration error
+  // This function handles an incoming HTTP request following an attempt
+  // to sign in, or a redirect fired by GitHub in case of a configuration error
   const error = readOAuthError(req);
 
   if (error) {
@@ -40,6 +37,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const accessToken = token.accessToken;
 
     // TODO: verify that the user is an administrator
+    // TODO: issue an access token for the user, to be used on the client,
+    // redirect to admin page
     res.status(200).end(accessToken)
   } catch (error) {
 
@@ -48,7 +47,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       return;
     }
 
-    console.error(error);
     res.status(500).end("Internal server error");
   }
 }

@@ -33,7 +33,9 @@ export interface CommentInfo {
 
 export interface CommentsRepository {
 
-  getCommentInfoByPullRequestId(pullRequestId: number): Promise<CommentInfo | null>;
+  getCommentInfoByPullRequestId(
+    pullRequestId: number
+  ): Promise<CommentInfo | null>;
 
   storeCommentInfo(
     commentId: string,

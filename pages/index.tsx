@@ -1,11 +1,12 @@
 import Head from 'next/head'
+import { ReactElement } from 'react'
 
-export default function Home() {
+
+export default function Home(): ReactElement {
   return (
     <div className="container">
       <Head>
         <title>EdgeDB CLA</title>
-        <link rel="icon" href="/favicon.png" type="image/x-icon" />
       </Head>
 
       <main>

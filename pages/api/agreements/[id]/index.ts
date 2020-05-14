@@ -1,22 +1,26 @@
 import { container } from "../../../../service/di";
-import { License } from "../../../../service/domain/licenses";
+import { Agreement } from "../../../../service/domain/licenses";
 import { AgreementsHandler } from "../../../../service/handlers/licenses";
 import { NextApiRequest, NextApiResponse } from "next";
 import { TYPES } from "../../../../constants/types";
 
 
-const licensesHandler = container.get<AgreementsHandler>(TYPES.LicensesHandler);
+const licensesHandler = container
+  .get<AgreementsHandler>(TYPES.AgreementsHandler);
 
 
 // TODO: create a middleware to require authentication?
 // Or a common method.
 
 
-export default async (req: NextApiRequest, res: NextApiResponse<License | void>) => {
+export default async (
+  req: NextApiRequest,
+  res: NextApiResponse<Agreement | void>
+) => {
   const { query: { id }} = req;
   // https://nextjs.org/docs/api-routes/dynamic-api-routes
 
-  if (typeof id != "string") {
+  if (typeof id !== "string") {
     // should never happen by definition
     return res.status(400).end("Invalid object id");
   }
@@ -32,10 +36,10 @@ export default async (req: NextApiRequest, res: NextApiResponse<License | void>)
 
       return res.status(200).json(data)
     case "POST":
-      // TODO: create a new license
+      // TODO: create a new agreement
       break
     case "PATCH":
-      // update an existing license
+      // update an existing agreement
       break
     case "DELETE":
       break

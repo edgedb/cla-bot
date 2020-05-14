@@ -4,7 +4,7 @@ import { injectable } from "inversify";
 
 /**
  * Common service settings, not specific to an external service.
-*/
+ */
 @injectable()
 export class ServiceSettings {
 

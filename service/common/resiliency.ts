@@ -1,5 +1,5 @@
 
-function timeout(ms: number) {
+function timeout(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
@@ -18,19 +18,26 @@ export class RetryError extends Error {
 }
 
 
-export function async_retry(times: number = 3, delay: number = 100) {
+export function async_retry(
+  times: number = 3,
+  delay: number = 100
+): (
+  target: object,
+  propertyKey: string,
+  descriptor: TypedPropertyDescriptor<any>
+) => TypedPropertyDescriptor<any> {
   return (
-    target: Object,
+    target: object,
     propertyKey: string,
     descriptor: TypedPropertyDescriptor<any>
   ) => {
     // Wraps an async function to handle retries upon failure,
-    // attempting up to a given number of times, and applying a given delay between
-    // retries.
+    // attempting up to a given number of times, and applying a given
+    // delay between retries.
     const originalMethod = descriptor.value;
 
-    descriptor.value = async function (...args: any[]) {
-      var attempt = 0;
+    descriptor.value = async function (...args: any[]): Promise<any> {
+      let attempt = 0;
 
       while (true) {
         try {
@@ -46,11 +53,6 @@ export function async_retry(times: number = 3, delay: number = 100) {
           if (attempt > times) {
             throw new RetryError(error, propertyKey);
           }
-
-          console.log(
-            `Attempt ${attempt} to execute method "${propertyKey}" failed ` +
-            `with error: ${error}, retrying...`
-          );
 
           if (delay > 0)
             await timeout(delay);

@@ -22,12 +22,13 @@ export interface SignedClaOutput {
 class SignClaHandler
 {
   @inject(TYPES.UsersService) private _usersService: UsersService
-  @inject(TYPES.ServiceSettings) private _settings: ServiceSettings
   @inject(TYPES.ClaRepository) private _claRepository: ClaRepository
   @inject(TYPES.ClaCheckHandler) private _claCheckHandler: ClaCheckHandler
   @inject(TYPES.CommentsService) private _commentsService: CommentsService
-  @inject(TYPES.CommentsRepository) private _commentsRepository: CommentsRepository
-  @inject(TYPES.StatusChecksService) private _statusCheckService: StatusChecksService
+  @inject(
+    TYPES.CommentsRepository) private _commentsRepository: CommentsRepository
+  @inject(
+    TYPES.StatusChecksService) private _statusCheckService: StatusChecksService
   @inject(TYPES.TokensHandler) private _tokensHandler: TokensHandler
 
   parseState(rawState: string): ClaCheckInput
@@ -36,7 +37,10 @@ class SignClaHandler
   }
 
   @async_retry()
-  async createCla(emailInfo: EmailInfo, licenseVersionId: string): Promise<ContributorLicenseAgreement> {
+  async createCla(
+    emailInfo: EmailInfo,
+    licenseVersionId: string
+  ): Promise<ContributorLicenseAgreement> {
     const cla = new ContributorLicenseAgreement(
       uuid(),
       emailInfo.email.toString(),
@@ -57,9 +61,13 @@ class SignClaHandler
     throw new Error("Missing committers information in state.")
   }
 
-  async completeClaCheck(data: ClaCheckInput): Promise<void> {
+  async completeClaCheck(
+    data: ClaCheckInput
+  ): Promise<void> {
     const licenseVersionId = this.readLicenseVersionId(data)
-    const statusUrl = this._claCheckHandler.getSuccessStatusTargetUrl(licenseVersionId)
+    const statusUrl = this._claCheckHandler
+      .getSuccessStatusTargetUrl(licenseVersionId)
+
     await this._statusCheckService.createStatus(
       data.repository.ownerId,
       data.repository.fullName,
@@ -73,9 +81,8 @@ class SignClaHandler
     );
 
     // if a commet was created, update its text;
-    const commentInfo = await this._commentsRepository.getCommentInfoByPullRequestId(
-      data.pullRequest.id
-    )
+    const commentInfo = await this._commentsRepository
+      .getCommentInfoByPullRequestId(data.pullRequest.id)
 
     if (commentInfo == null) {
       return;
@@ -89,10 +96,12 @@ class SignClaHandler
     )
   }
 
-  async checkIfAllSigned(data: ClaCheckInput, committers: string[]): Promise<void> {
-    const allSigned = await this._claCheckHandler.allCommittersHaveSignedTheCla(
-      committers
-    )
+  async checkIfAllSigned(
+    data: ClaCheckInput,
+    committers: string[]
+  ): Promise<void> {
+    const allSigned = await this._claCheckHandler
+      .allCommittersHaveSignedTheCla(committers)
 
     if (allSigned) {
       await this.completeClaCheck(data);
@@ -150,17 +159,21 @@ class SignClaHandler
     return data.licenseVersionId
   }
 
-  async signCla(rawState: string, accessToken: string): Promise<SignedClaOutput> {
+  async signCla(
+    rawState: string,
+    accessToken: string
+  ): Promise<SignedClaOutput> {
     //
-    // A user just signed-in, after authorizing the OAuth app that can read email
-    // addresses.
+    // A user just signed-in, after authorizing the OAuth
+    // app that can read email addresses.
     //
-    // This method handles the unlikely scenario of a single user committing using
-    // several email addresses, and being owner of all of them.
+    // This method handles the unlikely scenario of a single user committing
+    // using several email addresses, and being owner of all of them.
     //
     const data = this.parseState(rawState);
     const committers = this.getAllCommitters(data);
-    const userEmails = await this._usersService.getUserEmailAddresses(accessToken);
+    const userEmails = await this._usersService
+      .getUserEmailAddresses(accessToken);
 
     const matchingEmails = this.getAllMatchingEmails(committers, userEmails);
 

@@ -8,7 +8,7 @@ import { TYPES } from "../../../constants/types";
 import { UsersService } from "../../domain/users";
 
 
-export function registerGitHubServices(container: Container) {
+export function registerGitHubServices(container: Container): void {
   container.bind<StatusChecksService>(TYPES.StatusChecksService)
   .to(GitHubStatusChecksAPI).inSingletonScope();
 

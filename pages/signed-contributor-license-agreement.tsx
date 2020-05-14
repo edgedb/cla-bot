@@ -1,10 +1,11 @@
 import Head from "next/head";
 import { Container } from "@material-ui/core";
-import { Component } from "react";
+import { Component, ReactElement } from "react";
 import { container } from "../service/di";
 import { AgreementsHandler } from "../service/handlers/licenses";
 import { TYPES } from "../constants/types";
-import { NextPageContext, } from "next";
+import { NextPageContext, GetStaticProps, } from "next";
+import Props from "../components/props"
 
 
 interface SignedLicenseProps {
@@ -13,13 +14,14 @@ interface SignedLicenseProps {
 }
 
 
-const licensesHandler = container.get<AgreementsHandler>(TYPES.LicensesHandler);
+const licensesHandler = container
+  .get<AgreementsHandler>(TYPES.AgreementsHandler);
 
 
 function readVersionParameter(context: NextPageContext): string {
   const version = context.query.version;
 
-  if (typeof version != "string") {
+  if (typeof version !== "string") {
     throw new Error("Expected a version parameter")
   }
 
@@ -27,10 +29,13 @@ function readVersionParameter(context: NextPageContext): string {
 }
 
 
-export async function getServerSideProps(context: NextPageContext) {
+export async function getServerSideProps(
+  context: NextPageContext
+): Promise<Props<SignedLicenseProps>> {
   const versionId = readVersionParameter(context);
 
-  // Note: we support English only on the front-end, but data model supports localization
+  // We only support English on the front-end,
+  // but data model supports localization
   const cultureCode = "en";
 
   const licenseText = await licensesHandler.getLicenseText(
@@ -42,16 +47,16 @@ export async function getServerSideProps(context: NextPageContext) {
 }
 
 
-export default class SignedContributorLicenseAgreementPage extends Component<SignedLicenseProps> {
+export default class SignedContributorLicenseAgreementPage
+extends Component<SignedLicenseProps> {
 
-  render() {
+  render(): ReactElement {
     const { text, title } = this.props
 
     return (
       <Container className="contributor-agreement-area" maxWidth="md">
         <Head>
           <title>{title}</title>
-          <link rel="icon" href="/favicon.png" type="image/x-icon" />
         </Head>
 
         <main>
