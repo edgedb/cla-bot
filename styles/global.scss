@@ -1,0 +1,29 @@
+@import "settings.vars.scss";
+@import "mixins.scss";
+@import "prism.scss";
+
+body {
+  @include mainfont;
+  color: $main_black;
+  background: white;
+}
+
+button a {
+  color: white;
+  text-decoration: none;
+}
+
+.contributor-agreement-area {
+  margin: 40px auto;
+  font-size: 1.1rem;
+
+  button {
+    margin-top: 10px;
+  }
+}
+
+button {
+  .fab {
+    margin-right: 10px;
+  }
+}

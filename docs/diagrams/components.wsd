@@ -1,0 +1,46 @@
+@startuml
+title System components
+
+node "CLA app" {
+  [Web app]
+  [GitHub app]
+  [OAuth app]
+}
+
+node "GitHub" {
+  [GitHub UI]
+  [GitHub API]
+}
+
+folder "Users" {
+  [Contributors]
+  [Administrators]
+}
+
+
+database "EdgeDB" {
+  folder "cla" {
+    [...]
+  }
+}
+
+
+[GitHub app] --> [GitHub API]
+
+note left
+  The registered GitHub App (cla-bot) has
+  read and write access to checks,
+  commit statuses, and pull requests.
+end note
+
+[OAuth app] --> [Contributors]
+[OAuth app] --> [Administrators]
+
+note bottom
+  The registered OAuth app is used to authenticate
+  both committers and administrators.
+end note
+
+[Web app] -> EdgeDB
+
+@endumld

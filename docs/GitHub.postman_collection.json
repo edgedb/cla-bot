@@ -1,0 +1,163 @@
+{
+	"info": {
+		"_postman_id": "cd8baf74-356d-454c-8257-25dd03b92ba7",
+		"name": "GitHub",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Status",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "v1.3fa7d9976a508af8de01d420b998b94a723b5f23",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.github.machine-man-preview+json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"state\": \"failure\",\n  \"target_url\": \"https://example.com/build/status\",\n  \"description\": \"Please sign our Contributor License Agreement.\",\n  \"context\": \"CLA Signing\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://api.github.com/repos/RobertoPrevato/GitHubActionsLab/statuses/4118e153a7daf229da6439d630c6c7c6bbeffed9",
+					"protocol": "https",
+					"host": [
+						"api",
+						"github",
+						"com"
+					],
+					"path": [
+						"repos",
+						"RobertoPrevato",
+						"GitHubActionsLab",
+						"statuses",
+						"4118e153a7daf229da6439d630c6c7c6bbeffed9"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Statuses",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://api.github.com/repos/RobertoPrevato/GitHubActionsLab/statuses/e402d8e",
+					"protocol": "https",
+					"host": [
+						"api",
+						"github",
+						"com"
+					],
+					"path": [
+						"repos",
+						"RobertoPrevato",
+						"GitHubActionsLab",
+						"statuses",
+						"e402d8e"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get App Installations",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE1ODc5MTUyMjUsImV4cCI6MTU4NzkxNTgyNSwiaXNzIjo2MjQyN30.dKQMUyN6yrFtsHrifT8Z-dM5oHBXTFLqYIjiJMiYQiLXK43xWdVwsui0PCQEMP2qeWuUkbVhCuIT7GfrXCvHIf8MBClTDEJYKtkgwn5b26fzhvcMqB1-MMN00rQD_omS_CvH-Zj7SSDIi7VGsXgIwKp0L86PR-uChdw3N-shThrtnl0p-iz5NADGiyPn0cD4BoDSQ3nhfg-r-bX_vmLVwa8S2pRJKEWs8biAalyV5rt1LnIZmlI2Q1H9FZ4D1O9c-5tmVivNf_PCm14yDpKn_CYk2tUNutrkJ2Ip9dq0E22WLBeu3PbDHIKbVsN-b22fHwppSjncH4Ft_fskmUiBfA",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.github.machine-man-preview+json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://api.github.com/repos/RobertoPrevato/GitHubActionsLab/installation/repositories",
+					"protocol": "https",
+					"host": [
+						"api",
+						"github",
+						"com"
+					],
+					"path": [
+						"repos",
+						"RobertoPrevato",
+						"GitHubActionsLab",
+						"installation",
+						"repositories"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Installation Repositories",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "v1.d8576f67d152b2ab41ec076345bd4f57078bc429",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/vnd.github.machine-man-preview+json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "https://api.github.com/installation/repositories",
+					"protocol": "https",
+					"host": [
+						"api",
+						"github",
+						"com"
+					],
+					"path": [
+						"installation",
+						"repositories"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
