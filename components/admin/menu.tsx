@@ -23,7 +23,10 @@ export function getMenu(items: MenuItem[]): ReactElement {
   return (
     <div>
         {items.map(item =>
-        <Link href={item.href} key={item.href}>
+        <Link
+        href={item.href}
+        key={item.href}
+        >
           <ListItem button>
             <ListItemIcon>
               {item.icon}

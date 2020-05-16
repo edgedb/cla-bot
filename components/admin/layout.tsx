@@ -1,5 +1,4 @@
 import AppBar from "@material-ui/core/AppBar";
-import Badge from "@material-ui/core/Badge";
 import Box from "@material-ui/core/Box";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
@@ -42,19 +41,37 @@ extends React.Component<AdminLayoutProps, AdminLayoutState> {
     }
   }
 
+  readInitialOpen(): boolean {
+    return localStorage.getItem("DRAWER_OPEN") === "1";
+  }
+
+  setInitialOpen(value: boolean): void {
+    localStorage.setItem("DRAWER_OPEN", value ? "1" : "0");
+  }
+
+  componentDidMount(): void {
+    this.setState({
+      drawerOpen: this.readInitialOpen()
+    })
+  };
+
   toggleDrawer(): void {
     const isOpen = this.state.drawerOpen;
 
     this.setState({
       drawerOpen: !isOpen
     })
+
+    this.setInitialOpen(!isOpen);
   }
 
   render(): ReactElement {
     const open = this.state.drawerOpen;
 
     return (
-      <div className={open ? "ui-drawer-open" : "ui-drawer-closed"}>
+      <div
+      id="admin-layout"
+      className={open ? "ui-drawer-open" : "ui-drawer-closed"}>
         <Head>
           <title>{this.props.title}</title>
         </Head>
@@ -97,15 +114,9 @@ extends React.Component<AdminLayoutProps, AdminLayoutState> {
           <List>{secondaryListItems}</List>
         </Drawer>
         <main>
-          <div />
-          <Container>
-            <Grid container spacing={3}>
-              {this.props.children}
-            </Grid>
-            <Box pt={4}>
-              <Copyright />
-            </Box>
-          </Container>
+          <div id="content-area">
+            {this.props.children}
+          </div>
         </main>
       </div>
     );

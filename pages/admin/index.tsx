@@ -4,16 +4,12 @@ import Paper from "@material-ui/core/Paper";
 
 
 export default () => (
-  <Layout>
-    <Grid item xs={12} md={4} lg={3}>
-      <Paper>
-        <p>Hello</p>
-      </Paper>
-    </Grid>
-    <Grid item xs={12}>
-      <Paper>
+  <Layout title="Dashboard">
+    <Paper>
+      <p>Hello</p>
+    </Paper>
+    <Paper>
       <p>World</p>
-      </Paper>
-    </Grid>
+    </Paper>
   </Layout>
 )

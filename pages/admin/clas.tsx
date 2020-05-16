@@ -4,11 +4,9 @@ import Paper from "@material-ui/core/Paper";
 
 
 export default () => (
-  <Layout>
-    <Grid item xs={12} md={4} lg={3}>
-      <Paper>
-        <p>Clas</p>
-      </Paper>
-    </Grid>
+  <Layout title="Signed CLAs">
+    <Paper>
+      <p>CLAs</p>
+    </Paper>
   </Layout>
 )

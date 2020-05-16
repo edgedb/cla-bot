@@ -4,11 +4,9 @@ import Paper from "@material-ui/core/Paper";
 
 
 export default () => (
-  <Layout>
-    <Grid item xs={12} md={4} lg={3}>
-      <Paper>
-        <p>Administrators</p>
-      </Paper>
-    </Grid>
+  <Layout title="Administrators">
+    <Paper>
+      <p>Administrators</p>
+    </Paper>
   </Layout>
 )
