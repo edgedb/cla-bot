@@ -54,7 +54,7 @@ extends Component<SignedLicenseProps> {
     const { text, title } = this.props
 
     return (
-      <Container className="contributor-agreement-area" maxWidth="md">
+      <Container className="contributor-agreement-area">
         <Head>
           <title>{title}</title>
         </Head>

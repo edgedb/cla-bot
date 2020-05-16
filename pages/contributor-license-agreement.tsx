@@ -78,7 +78,7 @@ export default class AgreementPage extends Component<AgreementPageProps> {
     // wants to sabotage the system (we have a bigger problem then).
 
     return (
-      <Container className="contributor-agreement-area" maxWidth="md">
+      <Container className="contributor-agreement-area">
         <Head>
           <title>{title}</title>
           <link rel="icon" href="/favicon.png" type="image/x-icon" />

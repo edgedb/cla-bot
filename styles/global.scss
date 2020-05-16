@@ -1,6 +1,7 @@
 @import "settings.vars.scss";
 @import "mixins.scss";
 @import "prism.scss";
+@import "./admin//layout.scss";
 
 body {
   @include mainfont;

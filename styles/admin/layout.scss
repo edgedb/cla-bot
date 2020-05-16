@@ -1,0 +1,26 @@
+
+header, main, .drawer > div {
+  -webkit-transition: all 0.2s ease-in-out;
+  -o-transition: all 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
+}
+
+.drawer-toggle-btn {
+  text-align: center;
+}
+
+.ui-drawer-open {
+  > header, > main {
+    padding-left: 195px;
+  }
+}
+
+.ui-drawer-closed {
+  .drawer > div {
+    width: 60px;
+  }
+
+  > header, > main {
+    padding-left: 60px;
+  }
+}
