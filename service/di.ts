@@ -10,6 +10,7 @@ import { TokensHandler } from "./handlers/tokens";
 import { AgreementsHandler } from "./handlers/licenses";
 import { registerEdgeDBRepositories } from "./data/edgedb/di";
 import { registerGitHubServices } from "./data/github/di";
+import { RepositoriesHandler } from "./handlers/repositories";
 
 
 const container = new Container();
@@ -32,5 +33,8 @@ container.bind<AgreementsHandler>(TYPES.AgreementsHandler)
 
 container.bind<TokensHandler>(TYPES.TokensHandler)
   .to(TokensHandler);
+
+container.bind<RepositoriesHandler>(TYPES.RepositoriesHandler)
+  .to(RepositoriesHandler);
 
 export { container };

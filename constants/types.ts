@@ -10,6 +10,9 @@ const TYPES = {
   CommentsRepository: Symbol.for("CommentsRepository"),
   LicensesRepository: Symbol.for("LicensesRepository"),
   AgreementsHandler: Symbol.for("LicensesHandler"),
+  RepositoriesHandler: Symbol.for("RepositoriesHandler"),
+  RepositoriesService: Symbol.for("RepositoriesService"),
+  RepositoriesRepository: Symbol.for("RepositoriesRepository"),
 };
 
 export { TYPES };
