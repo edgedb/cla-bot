@@ -6,6 +6,8 @@ import { TYPES } from "../../../constants/types";
 import { EdgeDBCommentsRepository } from "./comments";
 import { LicensesRepository } from "../../domain/licenses";
 import { EdgeDBLicensesRepository } from "./licenses";
+import { RepositoriesRepository } from "../../domain/repositories";
+import { EdgeDBRepositoriesRepository } from "./repositories";
 
 
 export function registerEdgeDBRepositories(container: Container): void {
@@ -18,4 +20,7 @@ export function registerEdgeDBRepositories(container: Container): void {
 
   container.bind<LicensesRepository>(TYPES.LicensesRepository)
     .to(EdgeDBLicensesRepository).inSingletonScope();
+
+  container.bind<RepositoriesRepository>(TYPES.RepositoriesRepository)
+    .to(EdgeDBRepositoriesRepository).inSingletonScope();
 }

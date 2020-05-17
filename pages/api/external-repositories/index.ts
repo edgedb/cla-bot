@@ -2,7 +2,7 @@ import { container } from "../../../service/di";
 import { NextApiRequest, NextApiResponse } from "next";
 import { TYPES } from "../../../constants/types";
 import { RepositoriesHandler } from "../../../service/handlers/repositories";
-import { Repository } from "../../../service/domain/repositories";
+import { ExternalRepository } from "../../../service/domain/repositories";
 
 
 const repositoriesHandler = container
@@ -11,7 +11,7 @@ const repositoriesHandler = container
 
 export default async (
   req: NextApiRequest,
-  res: NextApiResponse<Repository[]>
+  res: NextApiResponse<ExternalRepository[]>
 ) => {
   const {
     method
@@ -19,8 +19,10 @@ export default async (
 
   switch (method) {
     case "GET":
+      // TODO: configurable organization
+      // TODO: support personal repositories
       const repositories = await repositoriesHandler
-        .getConfiguredRepositories()
+        .getAvailableRepositories("edgedb", 1)
       res.status(200).json(repositories)
       return
   }

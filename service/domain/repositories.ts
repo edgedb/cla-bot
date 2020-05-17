@@ -1,6 +1,5 @@
 
-
-export class RepositoryInfo {
+export class ExternalRepository {
   id: number
   name: string
   fullName: string
@@ -17,8 +16,25 @@ export class RepositoryInfo {
 }
 
 
+export class Repository {
+  id: string
+  fullName: string
+  agreementId: string
+
+  constructor(
+    id: string,
+    fullName: string,
+    agreementId: string
+  ) {
+    this.id = id
+    this.fullName = fullName
+    this.agreementId = agreementId
+  }
+}
+
+
 /**
- * Interface to an external API to handle information about
+ * Interface to an external API, used to handle information about
  * source code repositories.
  */
 export interface RepositoriesService {
@@ -26,17 +42,17 @@ export interface RepositoriesService {
   getRepositories(
     organization: string,
     pageNumber: number
-  ): Promise<RepositoryInfo[]>;
+  ): Promise<ExternalRepository[]>
 
 }
 
 
 /**
- * Interface to an internal persistence layer to handle repository metadata
- * handled by the system.
+ * Interface to an internal persistence layer, used to handle information
+ * about repositories, stored by the system.
  */
 export interface RepositoriesRepository {
 
-  getConfiguredRepositories(): Promise<RepositoryInfo[]>
+  getConfiguredRepositories(): Promise<Repository[]>
 
 }

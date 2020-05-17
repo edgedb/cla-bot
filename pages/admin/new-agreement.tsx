@@ -4,9 +4,9 @@ import Paper from "@material-ui/core/Paper";
 
 
 export default () => (
-  <Layout title="Agreements">
+  <Layout title="New agreement">
     <Paper>
-      <p>Agreements</p>
+      <h1>New agreement</h1>
     </Paper>
   </Layout>
 )

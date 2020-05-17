@@ -1,10 +1,10 @@
 import fetch from "cross-fetch";
 import { async_retry } from "../../../service/common/resiliency";
 import {
-  RepositoryInfo,
+  ExternalRepository,
   RepositoriesService
 } from "../../../service/domain/repositories";
-import { expectSuccessfulResponse } from "../../../service/common/web";
+import { expectSuccessfulResponse, NotFoundError } from "../../../service/common/web";
 import { injectable } from "inversify";
 
 
@@ -24,7 +24,7 @@ export class GitHubRepositoriesService implements RepositoriesService {
   async getRepositories(
     organization: string,
     pageNumber: number = 1
-  ): Promise<RepositoryInfo[]> {
+  ): Promise<ExternalRepository[]> {
     const response = await fetch(
       `https://api.github.com/orgs/${organization}/repos?page=${pageNumber}`,
       {
@@ -32,9 +32,13 @@ export class GitHubRepositoriesService implements RepositoriesService {
       }
     )
 
+    if (response.status === 404) {
+      throw new NotFoundError("Organization not found.")
+    }
+
     await expectSuccessfulResponse(response)
     const data: GitHubRepositoryInfo[] = await response.json()
-    return data.map(item => new RepositoryInfo(
+    return data.map(item => new ExternalRepository(
       item.id,
       item.name,
       item.full_name

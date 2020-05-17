@@ -1,36 +1,29 @@
 import fetch from "cross-fetch";
-import Layout from "../../components/admin/layout";
-import Panel from "../../components/common/panel";
-import { ErrorProps } from "../../components/common/error";
+import Layout from "../../../components/admin/layout";
+import Panel from "../../../components/common/panel";
+import { ErrorProps } from "../../../components/common/error";
 import { Component, ReactElement } from "react";
-import { Button } from "@material-ui/core";
+import { Button, Link } from "@material-ui/core";
 
 
-export interface RepositoriesProps {
-  foo?: boolean
-}
-
-
-interface RepositoryInfo {
+interface AgreementsInfo {
   id: string
-  fullName: string,
-  agreementId: string
+  name: string,
+  description: string
 }
 
 
-export interface RepositoriesState {
+export interface AgreementsState {
   error?: ErrorProps
   loading: boolean,
-  items: RepositoryInfo[] | null
+  items: AgreementsInfo[] | null
 }
 
 
-export default class Repositories
-extends Component<RepositoriesProps, RepositoriesState> {
+export default class Agreements
+extends Component<{}, AgreementsState> {
 
-  private _isMounted: boolean
-
-  constructor(props: RepositoriesProps) {
+  constructor(props: {}) {
     super(props);
 
     this.state = {
@@ -38,14 +31,6 @@ extends Component<RepositoriesProps, RepositoriesState> {
       error: undefined,
       items: null
     };
-  }
-
-  componentDidMount(): void {
-    this._isMounted = true;
-  }
-
-  componentWillUnmount(): void {
-    this._isMounted = false;
   }
 
   load(): void {
@@ -56,18 +41,14 @@ extends Component<RepositoriesProps, RepositoriesState> {
       })
     }
 
-    fetch("/api/repositories").then((response => {
+    fetch("/api/agreements").then((response => {
       response.json().then(data => {
-        if (!this._isMounted)
-          return;
         this.setState({
           loading: false,
-          items: data as RepositoryInfo[]
+          items: data as AgreementsInfo[]
         })
       })
     })).catch(reason => {
-      if (!this._isMounted)
-        return;
       this.setState({
         loading: false,
         error: {
@@ -79,6 +60,10 @@ extends Component<RepositoriesProps, RepositoriesState> {
     });
   }
 
+  componentWillUnmount(): void {
+    // TODO: cancel pending tasks, if any
+  }
+
   renderList(): ReactElement | ReactElement[] | null {
     const items = this.state.items;
 
@@ -86,14 +71,14 @@ extends Component<RepositoriesProps, RepositoriesState> {
       return null;
 
     if (items.length === 0)
-      return <p>There are no configured repositories.</p>
+      return <p>There are no configured agreements.</p>
 
     return <table>
       <thead>
         <tr>
           <th></th>
-          <th>Full name</th>
-          <th>Agreement name</th>
+          <th>Name</th>
+          <th>Description</th>
           <th></th>
         </tr>
       </thead>
@@ -102,7 +87,8 @@ extends Component<RepositoriesProps, RepositoriesState> {
       items.map((item, index) => {
         return <tr key={item.id}>
           <td>{index + 1}</td>
-          <td>{item.fullName}</td>
+          <td>{item.name}</td>
+          <td>{item.description}</td>
           <td>...</td>
           <td></td>
         </tr>
@@ -113,7 +99,7 @@ extends Component<RepositoriesProps, RepositoriesState> {
   }
 
   add(): void {
-    console.log("Add new repository!");
+    console.log("Add new agreement!");
   }
 
   render(): ReactElement {
@@ -122,21 +108,24 @@ extends Component<RepositoriesProps, RepositoriesState> {
     // TODO: display a list of repositories
 
     return (
-      <Layout title="Repositories">
+      <Layout title="Agreements">
         <Panel
-          id="repositories-list"
+          id="agreements-list"
           error={state.error}
           load={this.load.bind(this)}
           loading={state.loading}
         >
-          <h1>Configured Repositories</h1>
+          <h1>Agreements</h1>
           {this.renderList()}
 
           <hr />
           <div className="buttons-area">
-            <Button variant="contained" color="primary" onClick={this.add}>
+            <Link
+            color="primary"
+            href="/admin/new-agreement"
+            >
               Add
-            </Button>
+            </Link>
           </div>
         </Panel>
       </Layout>

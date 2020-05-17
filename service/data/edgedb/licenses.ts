@@ -144,7 +144,7 @@ export class EdgeDBLicensesRepository
   async getLicenses(): Promise<Agreement[]> {
     const items = await this.run(async (connection) => {
       return await connection.fetchAll(
-        `select License {
+        `SELECT License {
           name,
           description
         };`
