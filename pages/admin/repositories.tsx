@@ -6,11 +6,6 @@ import { Component, ReactElement } from "react";
 import { Button } from "@material-ui/core";
 
 
-export interface RepositoriesProps {
-  foo?: boolean
-}
-
-
 interface RepositoryInfo {
   id: string
   fullName: string,
@@ -18,7 +13,7 @@ interface RepositoryInfo {
 }
 
 
-export interface RepositoriesState {
+interface RepositoriesState {
   error?: ErrorProps
   loading: boolean,
   items: RepositoryInfo[] | null
@@ -26,11 +21,11 @@ export interface RepositoriesState {
 
 
 export default class Repositories
-extends Component<RepositoriesProps, RepositoriesState> {
+extends Component<{}, RepositoriesState> {
 
   private _isMounted: boolean
 
-  constructor(props: RepositoriesProps) {
+  constructor(props: {}) {
     super(props);
 
     this.state = {
@@ -118,8 +113,6 @@ extends Component<RepositoriesProps, RepositoriesState> {
 
   render(): ReactElement {
     const state = this.state;
-
-    // TODO: display a list of repositories
 
     return (
       <Layout title="Repositories">

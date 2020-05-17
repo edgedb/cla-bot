@@ -41,4 +41,13 @@ th, td {
 
 .buttons-area {
   padding: 20px 0;
+
+  button {
+    margin-left: 10px;
+    margin-right: 10px;
+
+    &:first-child {
+      margin-left: 0px;
+    }
+  }
 }

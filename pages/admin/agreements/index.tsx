@@ -3,7 +3,7 @@ import Layout from "../../../components/admin/layout";
 import Panel from "../../../components/common/panel";
 import { ErrorProps } from "../../../components/common/error";
 import { Component, ReactElement } from "react";
-import { Button, Link } from "@material-ui/core";
+import { Link } from "@material-ui/core";
 
 
 interface AgreementsInfo {

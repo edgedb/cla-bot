@@ -1,5 +1,11 @@
 #admin-layout {
 
+  min-width: 320px;
+
+  .drawer > div {
+    overflow: hidden;
+  }
+
   header, main, .drawer, .drawer > div {
     -webkit-transition: all 0.2s ease-in-out;
     -o-transition: all 0.2s ease-in-out;
