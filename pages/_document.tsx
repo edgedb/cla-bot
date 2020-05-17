@@ -8,6 +8,12 @@ import React, { ReactElement } from "react";
 import theme from "../components/theme";
 import { ServerStyleSheets } from "@material-ui/core/styles";
 
+
+// See:
+// https://github.com/zeit/next.js/issues/7322
+// https://github.com/zeit/next.js/issues/7322#issuecomment-603933531
+
+
 export default class MyDocument extends Document {
   render(): ReactElement {
     return (

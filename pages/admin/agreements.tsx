@@ -1,15 +1,17 @@
 import fetch from "cross-fetch";
-import Layout from "../../../components/admin/layout";
-import Panel from "../../../components/common/panel";
-import { ErrorProps } from "../../../components/common/error";
+import Layout from "../../components/admin/layout";
+import Panel from "../../components/common/panel";
+import { ErrorProps } from "../../components/common/error";
 import { Component, ReactElement } from "react";
-import { Link } from "@material-ui/core";
+import Link from "next/link";
+import { Button } from "@material-ui/core";
 
 
 interface AgreementsInfo {
   id: string
   name: string,
-  description: string
+  description: string,
+  creationTime: string
 }
 
 
@@ -79,6 +81,8 @@ extends Component<{}, AgreementsState> {
           <th></th>
           <th>Name</th>
           <th>Description</th>
+          <th>Created at</th>
+          <th></th>
           <th></th>
         </tr>
       </thead>
@@ -88,14 +92,15 @@ extends Component<{}, AgreementsState> {
         return <tr key={item.id}>
           <td>{index + 1}</td>
           <td>{item.name}</td>
-          <td>{item.description}</td>
+          <td className="description-cell">{item.description}</td>
+          <td>{new Date(Date.parse(item.creationTime)).toLocaleString()}</td>
           <td>...</td>
           <td></td>
         </tr>
       })
       }
       </tbody>
-      </table>;
+    </table>
   }
 
   add(): void {
@@ -104,8 +109,6 @@ extends Component<{}, AgreementsState> {
 
   render(): ReactElement {
     const state = this.state;
-
-    // TODO: display a list of repositories
 
     return (
       <Layout title="Agreements">
@@ -117,14 +120,15 @@ extends Component<{}, AgreementsState> {
         >
           <h1>Agreements</h1>
           {this.renderList()}
-
-          <hr />
           <div className="buttons-area">
-            <Link
-            color="primary"
-            href="/admin/new-agreement"
-            >
-              Add
+            <Link href="/admin/new-agreement">
+              <Button
+                type="button"
+                variant="contained"
+                color="primary"
+              >
+                Create new agreement
+              </Button>
             </Link>
           </div>
         </Panel>

@@ -52,15 +52,31 @@ extends Component<{}, RepositoriesState> {
     }
 
     fetch("/api/repositories").then((response => {
+      if (response.status !== 200) {
+        // TODO: put this code in a common place, use interface to achieve DRY
+        response.text().then(text => {
+          this.setState({
+            loading: false,
+            error: {
+              message: text,
+              retry: () => {
+                this.load();
+              }
+            }
+          })
+        })
+
+        return;
+      }
       response.json().then(data => {
-        if (!this._isMounted)
+        if (!this._isMounted) // TODO: how to handle this in a smart way?
           return;
         this.setState({
           loading: false,
           items: data as RepositoryInfo[]
         })
       })
-    })).catch(reason => {
+    })).catch(() => {
       if (!this._isMounted)
         return;
       this.setState({
@@ -124,11 +140,9 @@ extends Component<{}, RepositoriesState> {
         >
           <h1>Configured Repositories</h1>
           {this.renderList()}
-
-          <hr />
           <div className="buttons-area">
             <Button variant="contained" color="primary" onClick={this.add}>
-              Add
+              Add new configuration
             </Button>
           </div>
         </Panel>

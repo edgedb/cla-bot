@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import { LicensesRepository, Agreement, LicenseDetail, AgreementText } from "../../service/domain/licenses";
+import { AgreementsRepository, Agreement, AgreementDetail, AgreementText } from "../../service/domain/licenses";
 import { NotFoundError } from "../common/web";
 import { TYPES } from "../../constants/types";
 
@@ -12,15 +12,24 @@ export interface SignedClaOutput {
 @injectable()
 export class AgreementsHandler
 {
-  @inject(
-    TYPES.LicensesRepository) private _licensesRepository: LicensesRepository
+  @inject(TYPES.AgreementsRepository)
+    private _agreementsRepository: AgreementsRepository
 
   async getLicenses(): Promise<Agreement[]> {
-    return await this._licensesRepository.getLicenses();
+    return await this._agreementsRepository.getAgreements();
   }
 
-  async getLicenseDetails(id: string): Promise<LicenseDetail> {
+  async getLicenseDetails(id: string): Promise<AgreementDetail> {
     throw new Error("Not implemented")
+  }
+
+  async createAgreement(
+    name: string,
+    description?: string
+  ): Promise<Agreement> {
+    return await this._agreementsRepository.createAgreement(
+      name, description
+    );
   }
 
   /**
@@ -34,7 +43,7 @@ export class AgreementsHandler
     repositoryFullName: string,
     cultureCode: string
   ): Promise<AgreementText> {
-    const licenseText = await this._licensesRepository
+    const licenseText = await this._agreementsRepository
       .getAgreementTextForRepository(repositoryFullName, cultureCode)
 
     if (licenseText == null) {
@@ -50,7 +59,7 @@ export class AgreementsHandler
     versionId: string,
     cultureCode: string
   ): Promise<AgreementText> {
-    const licenseText = await this._licensesRepository.getLicenseText(
+    const licenseText = await this._agreementsRepository.getAgreementText(
       versionId, cultureCode
     )
 

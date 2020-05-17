@@ -3,7 +3,7 @@ import { CheckState, StatusCheckInput, StatusChecksService } from "../../service
 import { ClaCheckInput, ClaRepository } from "../../service/domain/cla";
 import { CommentsRepository, CommentsService } from "../../service/domain/comments";
 import { inject, injectable } from "inversify";
-import { LicensesRepository } from "../domain/licenses";
+import { AgreementsRepository } from "../domain/licenses";
 import { ServiceSettings } from "../settings";
 import { TokensHandler } from "../handlers/tokens";
 import { TYPES } from "../../constants/types";
@@ -25,7 +25,7 @@ class ClaCheckHandler {
   @inject(
     TYPES.StatusChecksService) private _statusCheckService: StatusChecksService
   @inject(
-    TYPES.LicensesRepository) private _licensesRepository: LicensesRepository
+    TYPES.AgreementsRepository) private _licensesRepository: AgreementsRepository
   @inject(TYPES.TokensHandler) private _tokensHandler: TokensHandler
 
   getTargetUrlWithChallenge(data: ClaCheckInput): string {
@@ -134,7 +134,7 @@ class ClaCheckHandler {
     // Is a license configured for the PR repository?
     // if not, there is no need to do a check for CLA signing
     const currentLicenseForRepository = await this._licensesRepository
-      .getCurrentLicenseVersionForRepository(data.repository.fullName)
+      .getCurrentAgreementVersionForRepository(data.repository.fullName)
 
     if (!currentLicenseForRepository) {
       return;

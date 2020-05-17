@@ -1,20 +1,20 @@
 import { EdgeDBRepository } from "./base";
 import { injectable } from "inversify";
 import {
-  LicensesRepository,
+  AgreementsRepository,
   Agreement,
   AgreementText,
-  RepositoryLicenseInfo
+  RepositoryAgreementInfo
 } from "../../domain/licenses";
 
 
 @injectable()
-export class EdgeDBLicensesRepository
-  extends EdgeDBRepository implements LicensesRepository {
+export class EdgeDBAgreementsRepository
+  extends EdgeDBRepository implements AgreementsRepository {
 
-  async getCurrentLicenseVersionForRepository(
+  async getCurrentAgreementVersionForRepository(
     repositoryFullName: string
-  ): Promise<RepositoryLicenseInfo | null> {
+  ): Promise<RepositoryAgreementInfo | null> {
     const items = await this.run(async (connection) => {
       return await connection.fetchAll(
         `SELECT Repository {
@@ -35,7 +35,7 @@ export class EdgeDBLicensesRepository
       return null;
 
     const currentVersion = items[0].license?.versions[0];
-    return new RepositoryLicenseInfo(
+    return new RepositoryAgreementInfo(
       currentVersion.id,
       currentVersion.number.toString()
     )
@@ -79,7 +79,7 @@ export class EdgeDBLicensesRepository
     )
   }
 
-  async getLicenseText(
+  async getAgreementText(
     versionId: string,
     cultureCode: string
   ): Promise<AgreementText | null> {
@@ -141,12 +141,13 @@ export class EdgeDBLicensesRepository
     return item.license?.versions[0]?.texts[0]?.text || null;
   }
 
-  async getLicenses(): Promise<Agreement[]> {
+  async getAgreements(): Promise<Agreement[]> {
     const items = await this.run(async (connection) => {
       return await connection.fetchAll(
         `SELECT License {
           name,
-          description
+          description,
+          creation_time
         };`
       );
     })
@@ -154,8 +155,38 @@ export class EdgeDBLicensesRepository
     return items.map(entity => new Agreement(
       entity.id,
       entity.name,
-      entity.description
+      entity.description,
+      entity.creation_time
     ));
   }
 
+  async createAgreement(
+    name: string,
+    description?: string
+  ): Promise<Agreement> {
+    return await this.run(async connection => {
+      const creationTime = new Date();
+      const result = await connection.fetchAll(
+        `
+        INSERT License {
+          name := <str>$name,
+          description := <str>$description,
+          creation_time := <datetime>$creation_time
+        }
+        `,
+        {
+          name: name,
+          description: description || "",
+          creation_time: creationTime
+        }
+      )
+      const item = result[0];
+      return new Agreement(
+        item.id,
+        name,
+        description,
+        creationTime
+      );
+    });
+  }
 }

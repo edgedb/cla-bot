@@ -1,8 +1,8 @@
 import { inject, injectable } from "inversify";
 import {
-  LicensesRepository,
+  AgreementsRepository,
   Agreement,
-  LicenseDetail,
+  AgreementDetail,
   AgreementText
 } from "../../service/domain/licenses";
 import { NotFoundError } from "../../service/common/web";
@@ -12,14 +12,14 @@ import { TYPES } from "../../constants/types";
 @injectable()
 export class AgreementsHandler
 {
-  @inject(
-    TYPES.LicensesRepository) private _licensesRepository: LicensesRepository
+  @inject(TYPES.AgreementsRepository)
+  private _licensesRepository: AgreementsRepository
 
   async getLicenses(): Promise<Agreement[]> {
-    return await this._licensesRepository.getLicenses();
+    return await this._licensesRepository.getAgreements();
   }
 
-  async getLicenseDetails(id: string): Promise<LicenseDetail> {
+  async getLicenseDetails(id: string): Promise<AgreementDetail> {
     throw new Error("Not implemented")
   }
 
@@ -50,7 +50,7 @@ export class AgreementsHandler
     versionId: string,
     cultureCode: string
   ): Promise<AgreementText> {
-    const licenseText = await this._licensesRepository.getLicenseText(
+    const licenseText = await this._licensesRepository.getAgreementText(
       versionId, cultureCode
     )
 

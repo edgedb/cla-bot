@@ -32,6 +32,10 @@ CREATE MIGRATION structure TO {
 
             property description -> str;
 
+            required property creation_time -> datetime {
+                default := datetime_current();
+            }
+
             multi link versions -> LicenseVersion;
         }
 

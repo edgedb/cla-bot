@@ -35,9 +35,6 @@ export default async (
       }
 
       return res.status(200).json(data)
-    case "POST":
-      // TODO: create a new agreement
-      break
     case "PATCH":
       // update an existing agreement
       break

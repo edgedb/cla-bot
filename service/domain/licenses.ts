@@ -2,16 +2,23 @@
 export class Agreement {
   id: string | null
   name: string
-  description: string
+  description?: string
+  creationTime?: Date
 
-  constructor(id: string | null, name: string, description: string) {
+  constructor(
+    id: string | null,
+    name: string,
+    description?: string,
+    creationTime?: Date
+    ) {
     this.id = id
     this.name = name
     this.description = description
+    this.creationTime = creationTime
   }
 }
 
-export class LicenseVersion {
+export class AgreementVersion {
   id: string | null
   current: boolean
   draft: boolean
@@ -54,7 +61,7 @@ export class AgreementText {
 /**
  * Basic information about a configured license for a repository.
  */
-export class RepositoryLicenseInfo {
+export class RepositoryAgreementInfo {
   versionId: string
   versionNumber: string
 
@@ -65,14 +72,14 @@ export class RepositoryLicenseInfo {
 }
 
 
-export class LicenseDetail extends Agreement {
-  versions: LicenseVersion[]
+export class AgreementDetail extends Agreement {
+  versions: AgreementVersion[]
 
   constructor(
     id: string,
     name: string,
     description: string,
-    versions: LicenseVersion[]
+    versions: AgreementVersion[]
   ) {
     super(id, name, description)
     this.versions = versions
@@ -80,21 +87,26 @@ export class LicenseDetail extends Agreement {
 }
 
 
-export interface LicensesRepository {
+export interface AgreementsRepository {
 
-  getLicenses(): Promise<Agreement[]>;
+  getAgreements(): Promise<Agreement[]>;
 
   getAgreementTextForRepository(
     repositoryFullName: string,
     cultureCode: string
   ): Promise<AgreementText | null>;
 
-  getLicenseText(
+  getAgreementText(
     versionId: string,
     cultureCode: string
   ): Promise<AgreementText | null>;
 
-  getCurrentLicenseVersionForRepository(
+  createAgreement(
+    name: string,
+    description?: string
+  ): Promise<Agreement>;
+
+  getCurrentAgreementVersionForRepository(
     fullRepositoryName: string
-  ): Promise<RepositoryLicenseInfo | null>;
+  ): Promise<RepositoryAgreementInfo | null>;
 }
