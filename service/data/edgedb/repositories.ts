@@ -12,7 +12,7 @@ export class EdgeDBRepositoriesRepository
       return await connection.fetchAll(
         `SELECT Repository {
           full_name,
-          agreementId := .license.id
+          agreementId := .agreement.id
         };`
       );
     })

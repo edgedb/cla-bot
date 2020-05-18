@@ -25,7 +25,7 @@ CREATE MIGRATION structure TO {
             }
         }
 
-        type License {
+        type Agreement {
             required property name -> str {
                 constraint exclusive;
             }
@@ -36,11 +36,11 @@ CREATE MIGRATION structure TO {
                 default := datetime_current();
             }
 
-            multi link versions -> LicenseVersion;
+            multi link versions -> AgreementVersion;
         }
 
-        type LicenseVersion {
-            required property number -> int32 {
+        type AgreementVersion {
+            required property number -> str {
                 constraint exclusive;
             }
 
@@ -48,18 +48,14 @@ CREATE MIGRATION structure TO {
                 default := False;
             }
 
-            required property draft -> bool {
-                default := True;
-            }
-
-            multi link texts -> LicenseText;
+            multi link texts -> AgreementText;
 
             required property creation_time -> datetime {
                 default := datetime_current();
             }
         }
 
-        type LicenseText {
+        type AgreementText {
             required property text -> str;
 
             required property title -> str {
@@ -67,6 +63,12 @@ CREATE MIGRATION structure TO {
             }
 
             required property culture -> str;
+
+            required property update_time -> datetime;
+
+            required property creation_time -> datetime {
+                default := datetime_current();
+            }
         }
 
         type Repository {
@@ -74,7 +76,7 @@ CREATE MIGRATION structure TO {
                 constraint exclusive;
             };
 
-            required link license -> License;
+            required link agreement -> Agreement;
         }
 
         type ContributorLicenseAgreement {
@@ -86,11 +88,11 @@ CREATE MIGRATION structure TO {
                 default := datetime_current();
             }
 
-            required link licenseVersion -> LicenseVersion;
+            required link agreement_version -> AgreementVersion;
 
             index on (.email);
 
-            index on (.licenseVersion);
+            index on (.agreement_version);
         }
     }
 };

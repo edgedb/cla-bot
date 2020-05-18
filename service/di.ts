@@ -7,7 +7,7 @@ import { ServiceSettings } from "./settings";
 import { SignClaHandler } from "./handlers/sign-cla";
 import { TYPES } from "../constants/types";
 import { TokensHandler } from "./handlers/tokens";
-import { AgreementsHandler } from "./handlers/licenses";
+import { AgreementsHandler } from "./handlers/agreements";
 import { registerEdgeDBRepositories } from "./data/edgedb/di";
 import { registerGitHubServices } from "./data/github/di";
 import { RepositoriesHandler } from "./handlers/repositories";

@@ -5,20 +5,14 @@ import { ErrorProps } from "../../components/common/error";
 import { Component, ReactElement } from "react";
 import Link from "next/link";
 import { Button } from "@material-ui/core";
-
-
-interface AgreementsInfo {
-  id: string
-  name: string,
-  description: string,
-  creationTime: string
-}
+import { AgreementsTableItem, AgreementsTable }
+from "../../components/admin/agreements/agreements-table";
 
 
 export interface AgreementsState {
   error?: ErrorProps
   loading: boolean,
-  items: AgreementsInfo[] | null
+  items: AgreementsTableItem[] | null
 }
 
 
@@ -47,7 +41,7 @@ extends Component<{}, AgreementsState> {
       response.json().then(data => {
         this.setState({
           loading: false,
-          items: data as AgreementsInfo[]
+          items: data as AgreementsTableItem[]
         })
       })
     })).catch(reason => {
@@ -62,64 +56,21 @@ extends Component<{}, AgreementsState> {
     });
   }
 
-  componentWillUnmount(): void {
-    // TODO: cancel pending tasks, if any
-  }
-
-  renderList(): ReactElement | ReactElement[] | null {
-    const items = this.state.items;
-
-    if (items === null)
-      return null;
-
-    if (items.length === 0)
-      return <p>There are no configured agreements.</p>
-
-    return <table>
-      <thead>
-        <tr>
-          <th></th>
-          <th>Name</th>
-          <th>Description</th>
-          <th>Created at</th>
-          <th></th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-      {
-      items.map((item, index) => {
-        return <tr key={item.id}>
-          <td>{index + 1}</td>
-          <td>{item.name}</td>
-          <td className="description-cell">{item.description}</td>
-          <td>{new Date(Date.parse(item.creationTime)).toLocaleString()}</td>
-          <td>...</td>
-          <td></td>
-        </tr>
-      })
-      }
-      </tbody>
-    </table>
-  }
-
-  add(): void {
-    console.log("Add new agreement!");
-  }
-
   render(): ReactElement {
     const state = this.state;
 
     return (
       <Layout title="Agreements">
         <Panel
-          id="agreements-list"
+          id="agreements-table"
           error={state.error}
           load={this.load.bind(this)}
           loading={state.loading}
         >
           <h1>Agreements</h1>
-          {this.renderList()}
+          {state.items !== null &&
+          <AgreementsTable items={state.items} />
+          }
           <div className="buttons-area">
             <Link href="/admin/new-agreement">
               <Button

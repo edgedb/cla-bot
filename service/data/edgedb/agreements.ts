@@ -2,15 +2,63 @@ import { EdgeDBRepository } from "./base";
 import { injectable } from "inversify";
 import {
   AgreementsRepository,
-  Agreement,
+  AgreementListItem,
   AgreementText,
-  RepositoryAgreementInfo
-} from "../../domain/licenses";
+  RepositoryAgreementInfo,
+  Agreement,
+  AgreementVersion
+} from "../../domain/agreements";
+
+
+interface IVersion {
+  id: string
+  number: string
+  current: boolean
+}
 
 
 @injectable()
 export class EdgeDBAgreementsRepository
   extends EdgeDBRepository implements AgreementsRepository {
+
+  async getAgreement(agreementId: string): Promise<Agreement | null> {
+    const items = await this.run(async (connection) => {
+      return await connection.fetchAll(
+        `SELECT Agreement {
+          name,
+          description,
+          creation_time,
+          versions: {
+            number,
+            current
+          }
+        }  FILTER .id = <uuid>$id;`,
+        {
+          id: agreementId
+        }
+      )
+    })
+
+    if (!items.length)
+      // agreement not found
+      return null;
+
+    const agreement = items[0];
+    const versions = agreement.versions as IVersion[];
+
+    return new Agreement(
+      agreement.id,
+      agreement.name,
+      agreement.description,
+      agreement.creation_time,
+      versions.map(entity => new AgreementVersion(
+        entity.id,
+        entity.number,
+        entity.current,
+        []
+      ))
+    )
+  }
 
   async getCurrentAgreementVersionForRepository(
     repositoryFullName: string
@@ -18,7 +66,7 @@ export class EdgeDBAgreementsRepository
     const items = await this.run(async (connection) => {
       return await connection.fetchAll(
         `SELECT Repository {
-          license: {
+          agreement: {
             versions: {
               number
             } FILTER .current = True and .texts.culture = <str>$culture LIMIT 1
@@ -48,7 +96,7 @@ export class EdgeDBAgreementsRepository
     const items = await this.run(async (connection) => {
       return await connection.fetchAll(
         `SELECT Repository {
-          license: {
+          agreement: {
             versions: {
               number,
               texts: {
@@ -85,7 +133,7 @@ export class EdgeDBAgreementsRepository
   ): Promise<AgreementText | null> {
     const items = await this.run(async (connection) => {
       return await connection.fetchAll(
-        `SELECT LicenseVersion {
+        `SELECT AgreementVersion {
           texts: {
             text,
             title,
@@ -119,12 +167,12 @@ export class EdgeDBAgreementsRepository
     const items = await this.run(async (connection) => {
       return await connection.fetchAll(
         `SELECT Repository {
-          license: {
-              versions: {
-                  texts: {
-                      text
-                  } FILTER .culture = <str>$culture
-              } FILTER .current = True
+          agreement: {
+            versions: {
+              texts: {
+                text
+              } FILTER .culture = <str>$culture
+            } FILTER .current = True
           }
         } FILTER .full_name = <str>$full_name;`,
         {
@@ -141,10 +189,10 @@ export class EdgeDBAgreementsRepository
     return item.license?.versions[0]?.texts[0]?.text || null;
   }
 
-  async getAgreements(): Promise<Agreement[]> {
+  async getAgreements(): Promise<AgreementListItem[]> {
     const items = await this.run(async (connection) => {
       return await connection.fetchAll(
-        `SELECT License {
+        `SELECT Agreement {
           name,
           description,
           creation_time
@@ -152,7 +200,7 @@ export class EdgeDBAgreementsRepository
       );
     })
 
-    return items.map(entity => new Agreement(
+    return items.map(entity => new AgreementListItem(
       entity.id,
       entity.name,
       entity.description,
@@ -163,12 +211,12 @@ export class EdgeDBAgreementsRepository
   async createAgreement(
     name: string,
     description?: string
-  ): Promise<Agreement> {
+  ): Promise<AgreementListItem> {
     return await this.run(async connection => {
       const creationTime = new Date();
       const result = await connection.fetchAll(
         `
-        INSERT License {
+        INSERT Agreement {
           name := <str>$name,
           description := <str>$description,
           creation_time := <datetime>$creation_time
@@ -181,7 +229,7 @@ export class EdgeDBAgreementsRepository
         }
       )
       const item = result[0];
-      return new Agreement(
+      return new AgreementListItem(
         item.id,
         name,
         description,

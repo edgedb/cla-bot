@@ -1,5 +1,5 @@
 
-export class Agreement {
+export class AgreementListItem {
   id: string | null
   name: string
   description?: string
@@ -18,21 +18,22 @@ export class Agreement {
   }
 }
 
+
 export class AgreementVersion {
-  id: string | null
+  id: string
+  number: string
   current: boolean
-  draft: boolean
   texts: AgreementText[]
 
   constructor(
-    id: string | null,
+    id: string,
+    number: string,
     current: boolean,
-    draft: boolean,
     texts: AgreementText[]
   ) {
     this.id = id
+    this.number = number
     this.current = current
-    this.draft = draft
     this.texts = texts
   }
 }
@@ -59,7 +60,7 @@ export class AgreementText {
 
 
 /**
- * Basic information about a configured license for a repository.
+ * Basic information about a configured agreement for a repository.
  */
 export class RepositoryAgreementInfo {
   versionId: string
@@ -72,16 +73,17 @@ export class RepositoryAgreementInfo {
 }
 
 
-export class AgreementDetail extends Agreement {
+export class Agreement extends AgreementListItem {
   versions: AgreementVersion[]
 
   constructor(
     id: string,
     name: string,
     description: string,
+    creationTime: Date,
     versions: AgreementVersion[]
   ) {
-    super(id, name, description)
+    super(id, name, description, creationTime)
     this.versions = versions
   }
 }
@@ -89,7 +91,9 @@ export class AgreementDetail extends Agreement {
 
 export interface AgreementsRepository {
 
-  getAgreements(): Promise<Agreement[]>;
+  getAgreements(): Promise<AgreementListItem[]>;
+
+  getAgreement(agreementId: string): Promise<Agreement | null>;
 
   getAgreementTextForRepository(
     repositoryFullName: string,
@@ -104,7 +108,7 @@ export interface AgreementsRepository {
   createAgreement(
     name: string,
     description?: string
-  ): Promise<Agreement>;
+  ): Promise<AgreementListItem>;
 
   getCurrentAgreementVersionForRepository(
     fullRepositoryName: string

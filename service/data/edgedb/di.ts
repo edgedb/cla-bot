@@ -4,7 +4,7 @@ import { EdgeDBClaRepository } from "./cla";
 import { CommentsRepository } from "../../domain/comments";
 import { TYPES } from "../../../constants/types";
 import { EdgeDBCommentsRepository } from "./comments";
-import { AgreementsRepository } from "../../domain/licenses";
+import { AgreementsRepository } from "../../domain/agreements";
 import { EdgeDBAgreementsRepository } from "./agreements";
 import { RepositoriesRepository } from "../../domain/repositories";
 import { EdgeDBRepositoriesRepository } from "./repositories";

@@ -123,10 +123,6 @@ extends Component<{}, RepositoriesState> {
       </table>;
   }
 
-  add(): void {
-    console.log("Add new repository!");
-  }
-
   render(): ReactElement {
     const state = this.state;
 
@@ -141,7 +137,7 @@ extends Component<{}, RepositoriesState> {
           <h1>Configured Repositories</h1>
           {this.renderList()}
           <div className="buttons-area">
-            <Button variant="contained" color="primary" onClick={this.add}>
+            <Button variant="contained" color="primary">
               Add new configuration
             </Button>
           </div>

@@ -3,7 +3,7 @@ import { CheckState, StatusCheckInput, StatusChecksService } from "../../service
 import { ClaCheckInput, ClaRepository } from "../../service/domain/cla";
 import { CommentsRepository, CommentsService } from "../../service/domain/comments";
 import { inject, injectable } from "inversify";
-import { AgreementsRepository } from "../domain/licenses";
+import { AgreementsRepository } from "../domain/agreements";
 import { ServiceSettings } from "../settings";
 import { TokensHandler } from "../handlers/tokens";
 import { TYPES } from "../../constants/types";
@@ -19,14 +19,21 @@ class ClaCheckHandler {
 
   @inject(TYPES.ServiceSettings) private _settings: ServiceSettings
   @inject(TYPES.ClaRepository) private _claRepository: ClaRepository
-  @inject(TYPES.CommentsService) private _commentsService: CommentsService
-  @inject(
-    TYPES.CommentsRepository) private _commentsRepository: CommentsRepository
-  @inject(
-    TYPES.StatusChecksService) private _statusCheckService: StatusChecksService
-  @inject(
-    TYPES.AgreementsRepository) private _licensesRepository: AgreementsRepository
-  @inject(TYPES.TokensHandler) private _tokensHandler: TokensHandler
+
+  @inject(TYPES.CommentsService)
+  private _commentsService: CommentsService
+
+  @inject(TYPES.CommentsRepository)
+  private _commentsRepository: CommentsRepository
+
+  @inject(TYPES.StatusChecksService)
+  private _statusCheckService: StatusChecksService
+
+  @inject(TYPES.AgreementsRepository)
+  private _licensesRepository: AgreementsRepository
+
+  @inject(TYPES.TokensHandler)
+  private _tokensHandler: TokensHandler
 
   getTargetUrlWithChallenge(data: ClaCheckInput): string {
     // The target URL for the check must not only point to this instance of

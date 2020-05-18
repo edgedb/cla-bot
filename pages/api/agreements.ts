@@ -1,6 +1,6 @@
 import { container } from "../../service/di";
-import { Agreement } from "../../service/domain/licenses";
-import { AgreementsHandler } from "../../service/handlers/licenses";
+import { AgreementListItem } from "../../service/domain/agreements";
+import { AgreementsHandler } from "../../service/handlers/agreements";
 import { NextApiRequest, NextApiResponse } from "next";
 import { TYPES } from "../../constants/types";
 import { SafeError, ErrorDetails } from "../../service/common/web";
@@ -33,7 +33,7 @@ async function handleExceptions<T>(
 
 export default async (
   req: NextApiRequest,
-  res: NextApiResponse<Agreement | Agreement[] | ErrorDetails>
+  res: NextApiResponse<AgreementListItem | AgreementListItem[] | ErrorDetails>
 ) => {
   const {
     method
@@ -42,7 +42,7 @@ export default async (
   switch (method) {
     case "GET":
       // return a list of licenses without details
-      const agreements = await agreementsHandler.getLicenses()
+      const agreements = await agreementsHandler.getAgreements()
       res.status(200).json(agreements)
       return
 
