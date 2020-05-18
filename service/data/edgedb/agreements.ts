@@ -14,6 +14,30 @@ interface IVersion {
   id: string
   number: string
   current: boolean
+  creation_time: string
+}
+
+
+// TODO: put in domain namespace
+function getDefaultVersionNumber(): string {
+  const dateTimeFormat = new Intl.DateTimeFormat('en', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  })
+  const [
+    { value: month },,
+    { value: day },,
+    { value: year },,
+    { value: hour },,
+    { value: minute },,
+    { value: second }
+  ] = dateTimeFormat .formatToParts(new Date())
+
+  return(`${year}-${month}-${day}-${hour}-${minute}-${second}`)
 }
 
 
@@ -30,7 +54,8 @@ export class EdgeDBAgreementsRepository
           creation_time,
           versions: {
             number,
-            current
+            current,
+            creation_time
           }
         }  FILTER .id = <uuid>$id;`,
         {
@@ -55,6 +80,7 @@ export class EdgeDBAgreementsRepository
         entity.id,
         entity.number,
         entity.current,
+        new Date(entity.creation_time),
         []
       ))
     )
@@ -212,6 +238,9 @@ export class EdgeDBAgreementsRepository
     name: string,
     description?: string
   ): Promise<AgreementListItem> {
+    // For best UX, a new agreement is created with a starting
+    // version and English text
+
     return await this.run(async connection => {
       const creationTime = new Date();
       const result = await connection.fetchAll(
@@ -219,13 +248,29 @@ export class EdgeDBAgreementsRepository
         INSERT Agreement {
           name := <str>$name,
           description := <str>$description,
-          creation_time := <datetime>$creation_time
-        }
+          creation_time := <datetime>$creation_time,
+          versions := (
+              (INSERT AgreementVersion {
+                  number := <str>$initial_version_number,
+                  current := True,
+                  texts := (
+                      (INSERT AgreementText {
+                          text := <str>$initial_text,
+                          culture := <str>$initial_culture,
+                          update_time := datetime_current()
+                      })
+                  )
+              })
+          )
+      };
         `,
         {
           name: name,
           description: description || "",
-          creation_time: creationTime
+          creation_time: creationTime,
+          initial_text: "Lorem ipsum dolor sit amet",
+          initial_culture: "en",
+          initial_version_number: getDefaultVersionNumber()
         }
       )
       const item = result[0];

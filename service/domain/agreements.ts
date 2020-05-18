@@ -24,17 +24,20 @@ export class AgreementVersion {
   number: string
   current: boolean
   texts: AgreementText[]
+  creationTime: Date
 
   constructor(
     id: string,
     number: string,
     current: boolean,
+    creationTime: Date,
     texts: AgreementText[]
   ) {
     this.id = id
     this.number = number
     this.current = current
     this.texts = texts
+    this.creationTime = creationTime
   }
 }
 

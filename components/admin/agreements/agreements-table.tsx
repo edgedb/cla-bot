@@ -1,13 +1,7 @@
-import { Component, ReactElement } from "react";
+import formatDate from "../../format-date";
 import Link from "next/link";
-
-
-export interface AgreementsTableItem {
-  id: string
-  name: string,
-  description: string,
-  creationTime: string
-}
+import { AgreementsTableItem } from "./contracts";
+import { Component, ReactElement } from "react";
 
 
 export interface AgreementsTableProps {
@@ -51,7 +45,7 @@ export class AgreementsTable extends Component<AgreementsTableProps> {
             </Link>
           </td>
           <td className="description-cell">{item.description}</td>
-          <td>{new Date(Date.parse(item.creationTime)).toLocaleString()}</td>
+          <td>{formatDate(item.creationTime)}</td>
           <td>
 
           </td>

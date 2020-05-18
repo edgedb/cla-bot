@@ -5,7 +5,9 @@ import { ErrorProps } from "../../components/common/error";
 import { Component, ReactElement } from "react";
 import Link from "next/link";
 import { Button } from "@material-ui/core";
-import { AgreementsTableItem, AgreementsTable }
+import { AgreementsTableItem }
+from "../../components/admin/agreements/contracts";
+import { AgreementsTable }
 from "../../components/admin/agreements/agreements-table";
 
 

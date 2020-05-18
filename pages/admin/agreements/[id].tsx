@@ -1,35 +1,89 @@
-import Grid from "@material-ui/core/Grid";
+import fetch from "cross-fetch";
 import Layout from "../../../components/admin/layout";
-import Paper from "@material-ui/core/Paper";
 import Link from "next/link";
 import { Button } from "@material-ui/core";
 import { ReactElement, Component } from "react";
 import { ErrorProps } from "../../../components/common/error";
+import Panel from "../../../components/common/panel";
+import { withRouter } from 'next/router'
+import { WithRouterProps } from "next/dist/client/with-router";
+import Preloader from "../../../components/common/preloader";
+import {
+  AgreementDetails,
+} from "../../../components/admin/agreements/contracts"
+
+import {
+  AgreementDetailsView
+} from "../../../components/admin/agreements/agreement"
 
 
-// TODO: fetch agreement details (make web request)
-export interface AgreementDetailsState {
-  error?: ErrorProps
-  loading: boolean
+interface AgreementDetailsPageProps {
+  id: string
 }
 
 
-export default class AgreementDetailsPage
-extends Component<{}, AgreementDetailsState> {
+export interface AgreementDetailsState {
+  error?: ErrorProps
+  loading: boolean
+  details: AgreementDetails | null
+}
 
-  constructor(props: {}) {
+
+class AgreementDetailsPage
+extends Component<AgreementDetailsPageProps, AgreementDetailsState> {
+
+  constructor(props: AgreementDetailsPageProps) {
     super(props)
+
+    this.state = {
+      error: undefined,
+      loading: true,
+      details: null
+    };
+  }
+
+  load(): void {
+    if (this.state.error) {
+      this.setState({
+        loading: true,
+        error: undefined
+      })
+    }
+
+    fetch(`/api/agreements/${this.props.id}`).then((response => {
+      response.json().then(data => {
+        this.setState({
+          loading: false,
+          details: data as AgreementDetails
+        })
+      })
+    })).catch(reason => {
+      this.setState({
+        loading: false,
+        error: {
+          retry: () => {
+            this.load();
+          }
+        }
+      })
+    });
   }
 
   render(): ReactElement {
+    const state = this.state;
     return (
       <Layout title="Agreement details">
-        <Paper>
+        <Panel
+          id="agreement-details"
+          error={state.error}
+          load={this.load.bind(this)}
+          loading={state.loading}
+        >
           <h1>Agreement details</h1>
-        </Paper>
-        <div>
-          <h2>Versions</h2>
-        </div>
+          {state.details &&
+          <AgreementDetailsView details={state.details} />
+          }
+        </Panel>
         <Link href="/admin/agreements">
           <Button
             type="button"
@@ -43,3 +97,22 @@ extends Component<{}, AgreementDetailsState> {
     )
   }
 }
+
+
+function Page({ router }: WithRouterProps): ReactElement {
+  const agreementId = router.query.id
+
+  if (typeof agreementId !== "string") {
+    // For some reason, the router query parameters are only
+    // populated when the code executes on the client.
+    // This doesn't look logical, since the route parameter is in the URL,
+    // which is of course parsed and used by the server side.
+    // Since we don't care about SEO here, return a preloader if the route
+    // is not available.
+    return <Preloader className="overlay" />
+  }
+
+  return <AgreementDetailsPage id={agreementId} />
+}
+
+export default withRouter(Page)
