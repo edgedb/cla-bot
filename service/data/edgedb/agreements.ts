@@ -6,7 +6,8 @@ import {
   AgreementText,
   RepositoryAgreementInfo,
   Agreement,
-  AgreementVersion
+  AgreementVersion,
+  getDefaultVersionNumber
 } from "../../domain/agreements";
 
 
@@ -15,29 +16,6 @@ interface IVersion {
   number: string
   current: boolean
   creation_time: string
-}
-
-
-// TODO: put in domain namespace
-function getDefaultVersionNumber(): string {
-  const dateTimeFormat = new Intl.DateTimeFormat('en', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit'
-  })
-  const [
-    { value: month },,
-    { value: day },,
-    { value: year },,
-    { value: hour },,
-    { value: minute },,
-    { value: second }
-  ] = dateTimeFormat .formatToParts(new Date())
-
-  return(`${year}-${month}-${day}-${hour}-${minute}-${second}`)
 }
 
 
@@ -249,10 +227,10 @@ export class EdgeDBAgreementsRepository
           name := <str>$name,
           description := <str>$description,
           creation_time := <datetime>$creation_time,
-          versions := (
+          versions := {
               (INSERT AgreementVersion {
                   number := <str>$initial_version_number,
-                  current := True,
+                  current := False,
                   texts := (
                       (INSERT AgreementText {
                           text := <str>$initial_text,
@@ -261,7 +239,7 @@ export class EdgeDBAgreementsRepository
                       })
                   )
               })
-          )
+          }
       };
         `,
         {

@@ -65,9 +65,9 @@ extends Component<{}, NewAgreementFormState> {
     }).then(response => {
       if (response.status === 201) {
         // everything's good
-        // TODO: write reusable code out of this:
-        // 1. success case
-        location.replace("/admin/agreements")
+        response.json().then(data => {
+          location.replace(`/admin/agreements/${data.id}`)
+        })
       } else {
 
         if (response.status === 409) {
@@ -79,6 +79,11 @@ extends Component<{}, NewAgreementFormState> {
               submitting: false
             })
           });
+        } else {
+          this.setState({
+            error: {},
+            submitting: false
+          })
         }
       }
     }).catch(error => {
