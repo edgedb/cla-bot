@@ -2,7 +2,7 @@ import Head from "next/head";
 import { Container } from "@material-ui/core";
 import { Component, ReactElement } from "react";
 import { container } from "../service/di";
-import { AgreementsHandler } from "../service/handlers/licenses";
+import { AgreementsHandler } from "../service/handlers/agreements";
 import { TYPES } from "../constants/types";
 import { NextPageContext, GetStaticProps, } from "next";
 import Props from "../components/props"
@@ -54,7 +54,7 @@ extends Component<SignedLicenseProps> {
     const { text, title } = this.props
 
     return (
-      <Container className="contributor-agreement-area" maxWidth="md">
+      <Container className="contributor-agreement-area">
         <Head>
           <title>{title}</title>
         </Head>

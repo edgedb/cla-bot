@@ -1,0 +1,103 @@
+@keyframes preloader4 {
+  from {transform: rotate(0deg);}
+  to {transform: rotate(360deg);}
+}
+@-webkit-keyframes preloader4 {
+  from {-webkit-transform: rotate(0deg);}
+  to {-webkit-transform: rotate(360deg);}
+}
+
+#global-preloader {
+  position: absolute;
+  z-index: 10000; //above anything else
+  top: 0px;
+  left: 0px;
+  background-color: rgb(255, 255, 255);
+  .preloader-icon {
+    max-height: 550px;
+  }
+}
+
+.preloader-mask {
+  height: 100%;
+  width: 100%;
+  min-height: 300px;
+  position: relative;
+  .preloader-icon {
+    position: absolute;
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    height: 100%;
+    width: 100%;
+
+    &:before {
+      content: "";
+      width: 64px;
+      height: 64px;
+      display: inline-block;
+      padding: 0;
+      border-radius: 100%;
+      border: 4px solid;
+      border-top-color: #bc7cd2;
+      border-bottom-color: rgba(102, 215, 220, 0.15);
+      border-left-color: #bc7cd2;
+      border-right-color: rgba(102, 215, 220, 0.15);
+      -webkit-animation: preloader4 .8s linear infinite;
+      animation: preloader4 .8s linear infinite;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+    }
+  }
+
+  &.overlay {
+    position: absolute;
+    background-color: rgba(255,255,255,.8);
+    z-index: 100;
+    top: 0;
+    left: 0;
+  }
+
+  &.modal-preloader {
+    min-height: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: rgba(255,255,255,.8);
+    z-index: 100;
+  }
+
+  &.mini-preloader {
+    width: 26px;
+    height: 26px;
+    min-height: 26px;
+
+    .preloader-icon {
+      background-size: 26px;
+      background-position: 0;
+      width: 26px;
+      height: 26px;
+      &:before {
+        width: 26px !important;
+        height: 26px !important;
+      }
+    }
+  }
+
+  &.tiny-preloader {
+    width: 16px;
+    height: 16px;
+    min-height: 16px;
+
+    .preloader-icon {
+      background-size: 16px;
+      background-position: 0;
+      &:before {
+        width: 16px;
+        height: 16px;
+        left: 0;
+        top: 0;
+      }
+    }
+  }
+}

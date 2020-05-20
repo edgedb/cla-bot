@@ -1,7 +1,7 @@
 const {parsed: localEnv} = require("dotenv").config();
 
 module.exports = {
-  exportTrailingSlash: true,
+  exportTrailingSlash: false,
   trailingSlash: false,
   devIndicators: {
     autoPrerender: false,

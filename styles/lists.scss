@@ -1,0 +1,32 @@
+
+dl {
+  font-size: 1.2em;
+
+  &.inline {
+    display: flex;
+    flex-flow: row;
+    flex-wrap: wrap;
+    overflow: visible;
+
+    dt {
+      flex: 0 0 20%;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      border-bottom: 1px dotted #eee;
+      padding: 10px 0;
+    }
+
+    dd {
+      flex:0 0 80%;
+      margin-left: auto;
+      text-align: left;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      padding: 10px 0;
+    }
+
+    input {
+      padding: 10px !important;
+    }
+  }
+}

@@ -1,0 +1,65 @@
+@import "./agreements.scss";
+
+
+#admin-layout {
+
+  min-width: 320px;
+
+  .drawer > div {
+    overflow: hidden;
+  }
+
+  header, main, .drawer, .drawer > div {
+    -webkit-transition: all 0.2s ease-in-out;
+    -o-transition: all 0.2s ease-in-out;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .drawer-toggle-btn {
+    text-align: center;
+    padding-top: 3px;
+    height: 55px;
+  }
+
+  &.ui-drawer-open {
+    > header, > main {
+      padding-left: 195px;
+    }
+  }
+
+  &.ui-drawer-closed {
+    .drawer > div {
+      width: 60px;
+    }
+
+    > header, > main {
+      padding-left: 60px;
+    }
+  }
+
+  #content-area {
+    padding: 20px;
+
+    h1 {
+      margin: 0 0 0.8em 0;
+    }
+  }
+
+  .region {
+    margin-top: 40px;
+    border-top: 1px dotted #dedede;
+  }
+}
+
+@media (min-width: 600px) {
+  #admin-layout {
+    .drawer-toggle-btn {
+      height: 64px;
+      padding-top: 8px;
+    }
+  }
+}
+
+.description-cell {
+  max-width: 200px;
+}

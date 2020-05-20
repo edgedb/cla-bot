@@ -7,53 +7,68 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import PeopleIcon from "@material-ui/icons/People";
-import React from "react";
+import React, { ReactElement } from "react";
 
 
-export const mainListItems = (
-  <div>
-    <ListItem button>
-      <ListItemIcon>
-        <DashboardIcon />
-      </ListItemIcon>
-      <Link href="/admin">
-        <ListItemText primary="Dashboard" />
-      </Link>
-    </ListItem>
-    <ListItem button>
-      <ListItemIcon>
-        <Description />
-      </ListItemIcon>
-      <Link href="/admin/agreements">
-        <ListItemText primary="Agreements" />
-      </Link>
-    </ListItem>
-    <ListItem button>
-      <ListItemIcon>
-        <GitHub />
-      </ListItemIcon>
-      <Link href="/admin/repositories">
-        <ListItemText primary="Repositories" />
-      </Link>
-    </ListItem>
-    <ListItem button>
-      <ListItemIcon>
-        <PeopleIcon />
-      </ListItemIcon>
-      <Link href="/admin/clas">
-        <ListItemText primary="Signed CLAs" />
-      </Link>
-    </ListItem>
-  </div>
-);
+interface MenuItem {
+  href: string
+  text: string
+  icon: ReactElement
+}
 
-export const secondaryListItems = (
-  <div>
-    <ListItem button>
-      <ListItemIcon>
-        <AssignmentInd />
-      </ListItemIcon>
-      <ListItemText primary="Administrators" />
-    </ListItem>
-  </div>
-);
+
+export function getMenu(items: MenuItem[]): ReactElement {
+  // Note: it would be possible to implement dynamic icon by name,
+  // but it increases the bundle size (bad design here in the Material UI)
+  return (
+    <div>
+        {items.map(item =>
+        <Link
+        href={item.href}
+        key={item.href}
+        >
+          <ListItem button>
+            <ListItemIcon>
+              {item.icon}
+            </ListItemIcon>
+            <ListItemText primary={item.text} />
+          </ListItem>
+        </Link>
+        )}
+    </div>
+  )
+}
+
+
+export const mainListItems =
+  getMenu([
+    {
+      href: "/admin",
+      text: "Dashboard",
+      icon: <DashboardIcon />
+    },
+    {
+      href: "/admin/agreements",
+      text: "Agreements",
+      icon: <Description />
+    },
+    {
+      href: "/admin/repositories",
+      text: "Repositories",
+      icon: <GitHub />
+    },
+    {
+      href: "/admin/clas",
+      text: "Signed CLAs",
+      icon: <PeopleIcon />
+    }
+  ]);
+
+export const secondaryListItems =
+  getMenu([
+    {
+      href: "/admin/administrators",
+      text: "Administrators",
+      icon: <AssignmentInd />
+    }
+  ]);

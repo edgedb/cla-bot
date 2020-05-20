@@ -20,12 +20,12 @@ extends EdgeDBRepository implements ClaRepository {
   ): Promise<ContributorLicenseAgreement | null> {
     const signed_cla: ClaItem[] = await this.run(async (connection) => {
       return await connection.fetchAll(
-        `select ContributorLicenseAgreement {
+        `SELECT ContributorLicenseAgreement {
           email,
           creation_time,
           versionId := .licenseVersion.id
         }
-        filter .email = <str>$0;`,
+        FILTER .email = <str>$0;`,
         [email]
       );
     })
