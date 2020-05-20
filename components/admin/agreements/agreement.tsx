@@ -1,10 +1,11 @@
 import { Component, ReactElement } from "react";
 import { VersionsTable } from "./versions-table";
-import { Button, TextField } from "@material-ui/core";
+import { TextField } from "@material-ui/core";
 import FormView from "../../common/form-view";
-import { AgreementDetails } from "./contracts";
+import { AgreementDetails, AgreementVersion } from "./contracts";
 import { changeHandler } from "../../forms";
 import formatDate from "../../format-date";
+import { Version } from "./version";
 
 
 export interface AgreementDetailsProps {
@@ -17,6 +18,7 @@ export interface AgreementDetailsState {
   mod_name: string
   mod_description: string
   editing: boolean
+  selectedVersion?: AgreementVersion
 }
 
 
@@ -26,10 +28,12 @@ extends Component<AgreementDetailsProps, AgreementDetailsState> {
   constructor(props: AgreementDetailsProps) {
     super(props);
 
+    const details = props.details
     this.state = {
-      mod_name: props.details.name,
-      mod_description: props.details.description,
-      editing: false
+      mod_name: details.name,
+      mod_description: details.description,
+      editing: false,
+      selectedVersion: details.versions[0]
     }
   }
 
@@ -84,6 +88,12 @@ extends Component<AgreementDetailsProps, AgreementDetailsState> {
     })
   }
 
+  selectVersion(version: AgreementVersion): void {
+    this.setState({
+      selectedVersion: version
+    })
+  }
+
   render(): ReactElement {
     const state = this.state;
     const editing = state.editing;
@@ -107,7 +117,7 @@ extends Component<AgreementDetailsProps, AgreementDetailsState> {
         </dd>
         <dt>Name</dt>
         <dd>
-          {editing
+        {editing
           ?
           <TextField
             name="mod_name"
@@ -146,8 +156,20 @@ extends Component<AgreementDetailsProps, AgreementDetailsState> {
       </FormView>
       <div className="versions-region region">
         <h2>Versions</h2>
-        <VersionsTable items={details.versions} />
+        <VersionsTable
+        items={details.versions}
+        selectedItem={state.selectedVersion}
+        onRowClick={(version) => this.selectVersion(version)}
+        />
       </div>
+      {state.selectedVersion !== undefined &&
+        <div className="version-region region">
+          <h2>Selected version</h2>
+          <Version
+            versionId={state.selectedVersion?.id}
+          />
+        </div>
+       }
     </div>
   }
 }

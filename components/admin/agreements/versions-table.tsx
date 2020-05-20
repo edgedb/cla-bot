@@ -9,6 +9,8 @@ import Link from "next/link";
 
 export interface VersionsTableProps {
   items: AgreementVersion[]
+  selectedItem?: AgreementVersion
+  onRowClick: (item: AgreementVersion) => void
 }
 
 
@@ -24,6 +26,8 @@ export class VersionsTable extends Component<VersionsTableProps> {
     if (items.length === 0)
       return <p>There are no configured versions.</p>
 
+    const selectedItem: AgreementVersion = this.props.selectedItem || items[0]
+
     return <table>
       <thead>
         <tr>
@@ -36,7 +40,11 @@ export class VersionsTable extends Component<VersionsTableProps> {
       <tbody>
       {
       items.map((item) => {
-        return <tr key={item.id}>
+        return <tr
+        key={item.id}
+        className={item === selectedItem ? "selected-item" : ""}
+        onClick={() => this.props.onRowClick(item)}
+        >
           <td className="current-version-icon-wrapper">
             {item.current ? <Star /> : <StarBorder />}
           </td>
