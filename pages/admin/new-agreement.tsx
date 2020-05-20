@@ -5,6 +5,7 @@ import { Button, TextField } from "@material-ui/core";
 import { ChangeEvent, Component, ReactElement } from "react";
 import ErrorPanel, { ErrorProps } from "../../components/common/error";
 import Preloader from "../../components/common/preloader";
+import { changeHandler } from "../../components/forms"
 
 
 interface NewAgreementFormState {
@@ -55,13 +56,17 @@ extends Component<{}, NewAgreementFormState> {
       submitting: true
     })
 
-    // TODO: POST to create a new agreement
+    // TODO: create common code that handles headers and errors in a single
+    // place
     fetch("/api/agreements", {
-      method: "post",
+      method: "POST",
       body: JSON.stringify({
         name,
         description: this.state.description
-      })
+      }),
+      headers: {
+        "Content-Type": "application/json; charset=utf-8"
+      }
     }).then(response => {
       if (response.status === 201) {
         // everything's good
@@ -81,7 +86,7 @@ extends Component<{}, NewAgreementFormState> {
           });
         } else {
           this.setState({
-            error: {},
+            error: undefined,
             submitting: false
           })
         }
@@ -94,17 +99,6 @@ extends Component<{}, NewAgreementFormState> {
         submitting: false
       })
     })
-  }
-
-  handleChange(
-    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ): void {
-    const target = event.target;
-    const name = target.name;
-    const update: {[key: string]: string} = {};
-    update[name] = target.value;
-    // @ts-ignore
-    this.setState(update)
   }
 
   render(): ReactElement {
@@ -124,11 +118,10 @@ extends Component<{}, NewAgreementFormState> {
               variant="outlined"
               required
               fullWidth
-              id="name"
               label="Name"
               autoFocus
               autoComplete="off"
-              onChange={this.handleChange.bind(this)}
+              onChange={changeHandler.bind(this)}
             />
           </Grid>
           <Grid item xs={12}>
@@ -138,12 +131,11 @@ extends Component<{}, NewAgreementFormState> {
               name="description"
               label="Description"
               type="textarea"
-              id="description"
               multiline
               rows={2}
               rowsMax={4}
               autoComplete="off"
-              onChange={this.handleChange.bind(this)}
+              onChange={changeHandler.bind(this)}
             />
           </Grid>
         </Grid>

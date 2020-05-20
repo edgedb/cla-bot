@@ -5,7 +5,7 @@ import {
   Agreement,
   AgreementText
 } from "../domain/agreements";
-import { NotFoundError } from "../../service/common/web";
+import { NotFoundError, InvalidArgumentError } from "../../service/common/web";
 import { TYPES } from "../../constants/types";
 
 
@@ -21,6 +21,19 @@ export class AgreementsHandler
 
   async getAgreementDetails(id: string): Promise<Agreement | null> {
     return await this._agreementsRepository.getAgreement(id)
+  }
+
+  async updateAgreement(
+    id: string,
+    name: string,
+    description: string
+  ): Promise<void> {
+    // TODO: check etag!! Disallow updating the entity if etag doesn't match
+
+    if (!name)
+      throw new InvalidArgumentError("Missing `name` input parameter.")
+
+    await this._agreementsRepository.updateAgreement(id, name, description)
   }
 
   async createAgreement(

@@ -13,6 +13,7 @@ dl {
       text-overflow: ellipsis;
       overflow: hidden;
       border-bottom: 1px dotted #eee;
+      padding: 10px 0;
     }
 
     dd {
@@ -21,6 +22,11 @@ dl {
       text-align: left;
       text-overflow: ellipsis;
       overflow: hidden;
+      padding: 10px 0;
+    }
+
+    input {
+      padding: 10px !important;
     }
   }
 }

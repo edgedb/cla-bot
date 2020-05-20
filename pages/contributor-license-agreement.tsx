@@ -1,6 +1,6 @@
 import Head from "next/head";
 import Props from "../components/props";
-import { AgreementsHandler } from "../service/handlers/licenses";
+import { AgreementsHandler } from "../service/handlers/agreements";
 import { Button, Container } from "@material-ui/core";
 import { ClaCheckInput } from "../service/domain/cla";
 import { Component, ReactElement } from "react";

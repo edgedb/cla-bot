@@ -64,6 +64,32 @@ export class EdgeDBAgreementsRepository
     )
   }
 
+  async updateAgreement(
+    id: string,
+    name: string,
+    description: string
+  ): Promise<void> {
+    await this.run(async (connection) => {
+      await connection.fetchOne(
+        `
+        UPDATE Agreement
+        FILTER .id = <uuid>$id
+        SET {
+          name := <str>$name,
+          description := <str>$description,
+          update_time := <datetime>$update_time,
+        }
+        `,
+        {
+          id,
+          name,
+          description,
+          update_time: new Date()
+        }
+      )
+    })
+  }
+
   async getCurrentAgreementVersionForRepository(
     repositoryFullName: string
   ): Promise<RepositoryAgreementInfo | null> {

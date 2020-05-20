@@ -69,6 +69,19 @@ extends Component<AgreementDetailsPageProps, AgreementDetailsState> {
     });
   }
 
+  update(name: string, description: string): void {
+    const details = this.state.details;
+
+    if (details === null)
+      throw new Error("Missing object in state");
+
+    details.name = name;
+    details.description = description
+    this.setState({
+      details
+    })
+  }
+
   render(): ReactElement {
     const state = this.state;
     return (
@@ -76,23 +89,26 @@ extends Component<AgreementDetailsPageProps, AgreementDetailsState> {
         <Panel
           id="agreement-details"
           error={state.error}
-          load={this.load.bind(this)}
+          load={() => this.load()}
           loading={state.loading}
         >
           <h1>Agreement details</h1>
           {state.details &&
-          <AgreementDetailsView details={state.details} />
+          <AgreementDetailsView
+          update={this.update.bind(this)}
+          details={state.details}
+          />
           }
+          <Link href="/admin/agreements">
+            <Button
+              type="button"
+              variant="contained"
+              color="primary"
+            >
+              Back to list
+            </Button>
+          </Link>
         </Panel>
-        <Link href="/admin/agreements">
-          <Button
-            type="button"
-            variant="contained"
-            color="primary"
-          >
-            Back to list
-          </Button>
-        </Link>
       </Layout>
     )
   }

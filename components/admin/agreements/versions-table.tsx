@@ -1,8 +1,10 @@
 import formatDate from "../../format-date";
 import Star from "@material-ui/icons/Star";
 import StarBorder from "@material-ui/icons/StarBorder";
+import DescriptionOutlined from "@material-ui/icons/DescriptionOutlined";
 import { AgreementVersion } from "./contracts";
 import { Component, ReactElement } from "react";
+import Link from "next/link";
 
 
 export interface VersionsTableProps {
@@ -42,6 +44,13 @@ export class VersionsTable extends Component<VersionsTableProps> {
             {item.number}
           </td>
           <td>{formatDate(item.creationTime)}</td>
+          <th>
+            <div title="Edit texts">
+              <Link href="/foo">
+                <DescriptionOutlined />
+              </Link>
+            </div>
+          </th>
         </tr>
       })
       }

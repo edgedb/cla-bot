@@ -36,6 +36,10 @@ CREATE MIGRATION structure TO {
                 default := datetime_current();
             }
 
+            required property update_time -> datetime {
+                default := datetime_current();
+            }
+
             multi link versions -> AgreementVersion;
         }
 
@@ -64,7 +68,9 @@ CREATE MIGRATION structure TO {
 
             required property culture -> str;
 
-            required property update_time -> datetime;
+            required property update_time -> datetime {
+                default := datetime_current();
+            }
 
             required property creation_time -> datetime {
                 default := datetime_current();

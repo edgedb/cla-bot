@@ -139,4 +139,10 @@ export interface AgreementsRepository {
   getCurrentAgreementVersionForRepository(
     fullRepositoryName: string
   ): Promise<RepositoryAgreementInfo | null>;
+
+  updateAgreement(
+    id: string,
+    name: string,
+    description: string
+  ): Promise<void>;
 }

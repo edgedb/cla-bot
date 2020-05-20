@@ -62,6 +62,15 @@ export class NotFoundError extends SafeError {
 }
 
 
+export class InvalidArgumentError extends SafeError {
+  constructor(
+    message: string = "Invalid argument"
+  ) {
+    super(message, 400, undefined, "Invalid Argument")
+  }
+}
+
+
 export class ConflictError extends SafeError {
   constructor(
     message: string = "Conflict",

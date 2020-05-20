@@ -21,7 +21,7 @@ export default class ErrorPanel extends Component<ErrorProps> {
     const props = this.props;
     const title = props.title || "Technical error";
     const message = props.message || "An unexpected error has occurred. " +
-      "Please contact service administrators if the problem persists.";
+      "Please contact the service administrators if the problem persists.";
 
     const retry = props.retry;
     const className = props.className ? props.className : "error-panel";

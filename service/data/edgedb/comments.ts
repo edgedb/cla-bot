@@ -12,10 +12,10 @@ extends EdgeDBRepository implements CommentsRepository {
   ): Promise<CommentInfo | null> {
     const items = await this.run(async (connection) => {
       return await connection.fetchAll(
-        `select CommentInfo {
+        `SELECT CommentInfo {
           comment_id,
           creation_time
-        } filter .pull_request_id = <int64>$0 limit 1;`,
+        } FILTER .pull_request_id = <int64>$0 limit 1;`,
         [pullRequestId]
       );
     })
