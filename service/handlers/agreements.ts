@@ -1,11 +1,12 @@
-import { inject, injectable } from "inversify";
 import {
-  AgreementsRepository,
-  AgreementListItem,
   Agreement,
-  AgreementText
-} from "../domain/agreements";
-import { NotFoundError, InvalidArgumentError } from "../../service/common/web";
+  AgreementListItem,
+  AgreementsRepository,
+  AgreementText,
+  AgreementVersion
+  } from "../domain/agreements";
+import { inject, injectable } from "inversify";
+import { InvalidArgumentError, NotFoundError } from "../../service/common/web";
 import { TYPES } from "../../constants/types";
 
 
@@ -19,8 +20,14 @@ export class AgreementsHandler
     return await this._agreementsRepository.getAgreements();
   }
 
-  async getAgreementDetails(id: string): Promise<Agreement | null> {
+  async getAgreement(id: string): Promise<Agreement | null> {
     return await this._agreementsRepository.getAgreement(id)
+  }
+
+  async getAgreementVersion(
+    id: string
+  ): Promise<AgreementVersion | null> {
+    return await this._agreementsRepository.getAgreementVersion(id)
   }
 
   async updateAgreement(

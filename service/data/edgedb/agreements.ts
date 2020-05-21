@@ -11,11 +11,49 @@ import {
 } from "../../domain/agreements";
 
 
-interface IVersion {
+// The following interfaces describe the shape of DB entities,
+
+interface TextEntity {
+  id: string
+  title: string
+  text: string
+  culture: string
+  update_time: string
+  creation_time: string
+}
+
+
+interface VersionEntity {
   id: string
   number: string
   current: boolean
+  draft: boolean
   creation_time: string
+  texts: TextEntity[]
+}
+
+
+function mapTextEntity(entity: TextEntity): AgreementText
+{
+  return new AgreementText(
+    entity.id,
+    entity.text,
+    entity.culture,
+    "", // TODO: is version id needed?
+    new Date(entity.update_time),
+    new Date(entity.creation_time)
+  )
+}
+
+function mapVersionEntity(entity: VersionEntity): AgreementVersion
+{
+  return new AgreementVersion(
+    entity.id,
+    entity.number,
+    entity.current,
+    new Date(entity.creation_time),
+    []
+  )
 }
 
 
@@ -43,24 +81,52 @@ export class EdgeDBAgreementsRepository
     })
 
     if (!items.length)
-      // agreement not found
       return null;
 
     const agreement = items[0];
-    const versions = agreement.versions as IVersion[];
+    const versions = agreement.versions as VersionEntity[];
 
     return new Agreement(
       agreement.id,
       agreement.name,
       agreement.description,
       agreement.creation_time,
-      versions.map(entity => new AgreementVersion(
-        entity.id,
-        entity.number,
-        entity.current,
-        new Date(entity.creation_time),
-        []
-      ))
+      versions.map(mapVersionEntity)
+    )
+  }
+
+  async getAgreementVersion(
+    versionId: string
+  ): Promise<AgreementVersion | null> {
+    const items = await this.run(async (connection) => {
+      return await connection.fetchAll(
+        `SELECT AgreementVersion {
+          number,
+          current,
+          creation_time,
+          texts: {
+            text,
+            culture,
+            update_time,
+            creation_time
+          }
+        }  FILTER .id = <uuid>$id;`,
+        {
+          id: versionId
+        }
+      )
+    })
+
+    if (!items.length)
+      return null;
+
+    const version = items[0] as VersionEntity;
+    return new AgreementVersion(
+      version.id,
+      version.number,
+      version.current,
+      new Date(version.creation_time),
+      version.texts.map(mapTextEntity)
     )
   }
 
@@ -132,7 +198,9 @@ export class EdgeDBAgreementsRepository
               texts: {
                 text,
                 title,
-                culture
+                culture,
+                update_time,
+                creation_time
               } FILTER .culture = <str>$culture LIMIT 1
             } FILTER .current = True LIMIT 1
           }
@@ -148,13 +216,8 @@ export class EdgeDBAgreementsRepository
       return null;
 
     const currentVersion = items[0].license?.versions[0];
-    const versionText = currentVersion.texts[0];
-    return new AgreementText(
-      versionText.title,
-      versionText.text,
-      cultureCode,
-      currentVersion.id
-    )
+    const versionText = currentVersion.texts[0] as TextEntity;
+    return mapTextEntity(versionText)
   }
 
   async getAgreementText(
@@ -181,13 +244,8 @@ export class EdgeDBAgreementsRepository
       return null;
 
     const version = items[0];
-    const text = version.texts[0];
-    return new AgreementText(
-      text.title,
-      text.text,
-      text.culture,
-      version.id
-    )
+    const versionText = version.texts[0] as TextEntity;
+    return mapTextEntity(versionText)
   }
 
   async getLicenseForRepository(

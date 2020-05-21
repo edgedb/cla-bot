@@ -1,5 +1,5 @@
 import { container } from "../../../../service/di";
-import { AgreementListItem } from "../../../../service/domain/agreements";
+import { AgreementListItem, AgreementVersion } from "../../../../service/domain/agreements";
 import { AgreementsHandler } from "../../../../service/handlers/agreements";
 import { NextApiRequest, NextApiResponse } from "next";
 import { TYPES } from "../../../../constants/types";
@@ -13,7 +13,7 @@ const agreementsHandler = container
 
 export default async (
   req: NextApiRequest,
-  res: NextApiResponse<AgreementListItem | ErrorDetails | void>
+  res: NextApiResponse<AgreementVersion | ErrorDetails | void>
 ) => {
   const { query: { id }} = req;
 
@@ -24,29 +24,13 @@ export default async (
 
   switch (req.method) {
     case "GET":
-      const data = await agreementsHandler.getAgreement(id)
+      const data = await agreementsHandler.getAgreementVersion(id)
 
       if (!data) {
-        return res.status(404).end("Agreement not found.")
+        return res.status(404).end("Agreement version not found.")
       }
 
       return res.status(200).json(data)
-    case "PATCH":
-      // update an existing agreement
-      await handleExceptions(res, async () => {
-        const body = req.body;
-
-        await agreementsHandler.updateAgreement(
-          id,
-          body.name,
-          body.description
-        )
-
-        return res.status(204).end()
-      });
-
-    case "DELETE":
-      break
   }
 
   res.status(405).end(`${req.method} not allowed`)

@@ -2,7 +2,7 @@ import { ReactElement } from "react";
 import { withRouter } from 'next/router'
 import { WithRouterProps } from "next/dist/client/with-router";
 import Preloader from "../../../components/common/preloader";
-import AgreementDetailsPage from "../../../components/admin/agreements/agreement-details";
+import AgreementDetailsPage from "../../../components/admin/agreements/agreement-page";
 
 
 function Page({ router }: WithRouterProps): ReactElement {

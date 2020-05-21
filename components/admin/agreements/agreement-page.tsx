@@ -1,5 +1,5 @@
 import fetch from "cross-fetch";
-import Layout from "../../../components/admin/layout";
+import Layout from "../layout";
 import Link from "next/link";
 import { Button } from "@material-ui/core";
 import {
@@ -7,7 +7,7 @@ import {
 } from "./contracts"
 
 import {
-  AgreementDetailsView
+  AgreementView
 } from "./agreement"
 import { ErrorProps } from "../../common/error";
 import { Component, ReactElement } from "react";
@@ -97,11 +97,12 @@ extends Component<AgreementDetailsPageProps, AgreementDetailsState> {
         >
           <h1>Agreement details</h1>
           {state.details &&
-          <AgreementDetailsView
+          <AgreementView
           update={this.update.bind(this)}
           details={state.details}
           />
           }
+          {/*
           <Link href="/admin/agreements">
             <Button
               type="button"
@@ -110,7 +111,7 @@ extends Component<AgreementDetailsPageProps, AgreementDetailsState> {
             >
               Back to list
             </Button>
-          </Link>
+          </Link>*/}
         </Panel>
       </Layout>
     )

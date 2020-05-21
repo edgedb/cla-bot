@@ -70,17 +70,23 @@ export class AgreementText {
   text: string
   culture: string
   versionId: string
+  updateTime: Date
+  creationTime: Date
 
   constructor(
     title: string,
     text: string,
     culture: string,
-    versionId: string
+    versionId: string,
+    updateTime: Date,
+    creationTime: Date
   ) {
     this.text = text
     this.title = title
     this.culture = culture
     this.versionId = versionId
+    this.updateTime = updateTime
+    this.creationTime = creationTime
   }
 }
 
@@ -120,6 +126,8 @@ export interface AgreementsRepository {
   getAgreements(): Promise<AgreementListItem[]>;
 
   getAgreement(agreementId: string): Promise<Agreement | null>;
+
+  getAgreementVersion(versionId: string): Promise<AgreementVersion | null>;
 
   getAgreementTextForRepository(
     repositoryFullName: string,

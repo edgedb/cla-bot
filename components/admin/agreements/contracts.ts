@@ -8,10 +8,21 @@ export interface AgreementsTableItem {
 }
 
 
+export interface AgreementText {
+  id: string
+  title: string
+  text: string
+  culture: string
+  updateTime: string
+  creationTime: string
+}
+
+
 export interface AgreementVersion {
   id: string
   number: string
   current: boolean
+  updateTime: string
   creationTime: string
 }
 

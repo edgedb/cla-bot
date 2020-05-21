@@ -34,7 +34,6 @@ export class VersionsTable extends Component<VersionsTableProps> {
           <th>Current</th>
           <th>Number</th>
           <th>Created at</th>
-          <th></th>
         </tr>
       </thead>
       <tbody>
@@ -52,13 +51,6 @@ export class VersionsTable extends Component<VersionsTableProps> {
             {item.number}
           </td>
           <td>{formatDate(item.creationTime)}</td>
-          <th>
-            <div title="Edit texts">
-              <Link href="/foo">
-                <DescriptionOutlined />
-              </Link>
-            </div>
-          </th>
         </tr>
       })
       }

@@ -22,7 +22,7 @@ export interface AgreementDetailsState {
 }
 
 
-export class AgreementDetailsView
+export class AgreementView
 extends Component<AgreementDetailsProps, AgreementDetailsState> {
 
   constructor(props: AgreementDetailsProps) {

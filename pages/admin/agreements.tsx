@@ -1,4 +1,4 @@
-import fetch from "cross-fetch";
+import ifetch from "../../components/fetch";
 import Layout from "../../components/admin/layout";
 import Panel from "../../components/common/panel";
 import { ErrorProps } from "../../components/common/error";
@@ -39,14 +39,12 @@ extends Component<{}, AgreementsState> {
       })
     }
 
-    fetch("/api/agreements").then((response => {
-      response.json().then(data => {
-        this.setState({
-          loading: false,
-          items: data as AgreementsTableItem[]
-        })
+    ifetch<AgreementsTableItem[]>("/api/agreements").then(data => {
+      this.setState({
+        loading: false,
+        items: data
       })
-    })).catch(reason => {
+    }, (error) => {
       this.setState({
         loading: false,
         error: {
