@@ -1,18 +1,11 @@
 import formatDate from "../../format-date";
-import Star from "@material-ui/icons/Star";
-import StarBorder from "@material-ui/icons/StarBorder";
-import DescriptionOutlined from "@material-ui/icons/DescriptionOutlined";
 import { AgreementVersion } from "./contracts";
 import { Component, ReactElement } from "react";
-import Link from "next/link";
-import Panel from "../../common/panel";
-import { ErrorProps } from "../../common/error";
-import { DetailsView } from "../details-view";
 import ifetch from "../../fetch";
 
 
 export interface VersionProps {
-  versionId: string
+  details: AgreementVersion
 }
 
 
@@ -33,7 +26,7 @@ export class Version extends Component<VersionProps, VersionState> {
 
   async fetchData(): Promise<void> {
     const data = await ifetch<AgreementVersion>(
-      `/api/agreement-version/${this.props.versionId}`
+      `/api/agreement-version/${this.props.details.id}`
     )
 
     this.setState({
@@ -42,16 +35,16 @@ export class Version extends Component<VersionProps, VersionState> {
   }
 
   render(): ReactElement {
-    const details = this.state.details;
+    const details = this.props.details;
     return <div>
-      <DetailsView fetchData={async () => await this.fetchData()}>
-        {details &&
-        <dl className="inline">
-          <dt>Id</dt>
-          <dd>{details.id}</dd>
-        </dl>
-        }
-      </DetailsView>
+      <dl className="inline">
+        <dt>Id</dt>
+        <dd>{details.id}</dd>
+        <dt>Number</dt>
+        <dd>{details.number}</dd>
+        <dt>Created at</dt>
+        <dd>{formatDate(details.creationTime)}</dd>
+      </dl>
     </div>
   }
 }

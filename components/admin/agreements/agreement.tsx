@@ -157,16 +157,16 @@ extends Component<AgreementDetailsProps, AgreementDetailsState> {
       <div className="versions-region region">
         <h2>Versions</h2>
         <VersionsTable
-        items={details.versions}
-        selectedItem={state.selectedVersion}
-        onRowClick={(version) => this.selectVersion(version)}
+          items={details.versions}
+          selectedItem={state.selectedVersion}
+          onRowClick={(version) => this.selectVersion(version)}
         />
       </div>
       {state.selectedVersion !== undefined &&
         <div className="version-region region">
           <h2>Selected version</h2>
           <Version
-            versionId={state.selectedVersion?.id}
+            details={state.selectedVersion}
           />
         </div>
        }
