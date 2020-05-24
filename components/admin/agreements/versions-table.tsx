@@ -1,14 +1,14 @@
 import formatDate from "../../format-date";
 import Star from "@material-ui/icons/Star";
 import StarBorder from "@material-ui/icons/StarBorder";
-import DescriptionOutlined from "@material-ui/icons/DescriptionOutlined";
 import { AgreementVersion } from "./contracts";
 import { Component, ReactElement } from "react";
-import Link from "next/link";
 
 
 export interface VersionsTableProps {
   items: AgreementVersion[]
+  selectedItem?: AgreementVersion
+  onRowClick: (item: AgreementVersion) => void
 }
 
 
@@ -18,39 +18,58 @@ export class VersionsTable extends Component<VersionsTableProps> {
     super(props);
   }
 
+  renderStatusInformation(isDraft: boolean): ReactElement {
+    if (isDraft) {
+      return <span
+              title="This version is still a draft: its texts can be edited"
+              className="help">
+        Draft
+      </span>
+    }
+
+    return <span
+            title="The texts of this version are no more editable, but it is
+            possible to create a copy in draft status."
+            className="help">
+        Done
+    </span>
+  }
+
   render(): ReactElement {
     const items = this.props.items;
 
     if (items.length === 0)
       return <p>There are no configured versions.</p>
 
+    const selectedItem: AgreementVersion = this.props.selectedItem || items[0]
+
     return <table>
       <thead>
         <tr>
           <th>Current</th>
+          <th>Status</th>
           <th>Number</th>
           <th>Created at</th>
-          <th></th>
         </tr>
       </thead>
       <tbody>
       {
       items.map((item) => {
-        return <tr key={item.id}>
+        return <tr
+        key={item.id}
+        className={item === selectedItem ? "selected-item" : ""}
+        onClick={() => this.props.onRowClick(item)}
+        >
           <td className="current-version-icon-wrapper">
             {item.current ? <Star /> : <StarBorder />}
+          </td>
+          <td>
+            {this.renderStatusInformation(item.draft)}
           </td>
           <td>
             {item.number}
           </td>
           <td>{formatDate(item.creationTime)}</td>
-          <th>
-            <div title="Edit texts">
-              <Link href="/foo">
-                <DescriptionOutlined />
-              </Link>
-            </div>
-          </th>
         </tr>
       })
       }

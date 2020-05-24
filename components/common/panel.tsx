@@ -12,7 +12,6 @@ export interface PanelProps {
   loading: boolean
   error?: ErrorProps
   load?: () => void
-  retry?: () => void
 }
 
 
@@ -22,23 +21,30 @@ export default class Panel extends Component<PanelProps> {
     super(props);
   }
 
+  componentDidMount(): void {
+    const props = this.props;
+    if (props.loading && !props.error)
+    {
+      // enable automatic loading
+      if (props.load) {
+        props.load();
+      }
+    }
+  }
+
   render(): ReactElement {
     const props = this.props
     const error = props.error
 
     if (props.loading && !error) {
-      // enable automatic loading
-      if (props.load) {
-        props.load();
-      }
       return <Preloader />;
     }
 
     if (error) {
       return <ErrorPanel
-      title={error.title}
-      message={error.message}
-      retry={props.retry || props.load}
+        title={error.title}
+        message={error.message}
+        retry={error.retry}
       />;
     }
 

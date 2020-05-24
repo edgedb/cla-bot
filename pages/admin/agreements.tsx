@@ -1,4 +1,4 @@
-import fetch from "cross-fetch";
+import { get } from "../../components/fetch";
 import Layout from "../../components/admin/layout";
 import Panel from "../../components/common/panel";
 import { ErrorProps } from "../../components/common/error";
@@ -39,14 +39,12 @@ extends Component<{}, AgreementsState> {
       })
     }
 
-    fetch("/api/agreements").then((response => {
-      response.json().then(data => {
-        this.setState({
-          loading: false,
-          items: data as AgreementsTableItem[]
-        })
+    get<AgreementsTableItem[]>("/api/agreements").then(data => {
+      this.setState({
+        loading: false,
+        items: data
       })
-    })).catch(reason => {
+    }, (error) => {
       this.setState({
         loading: false,
         error: {
@@ -74,10 +72,10 @@ extends Component<{}, AgreementsState> {
           <AgreementsTable items={state.items} />
           }
           <div className="buttons-area">
-            <Link href="/admin/new-agreement">
+            <Link href="/admin/agreements/new">
               <Button
                 type="button"
-                variant="contained"
+                variant="outlined"
                 color="primary"
               >
                 Create new agreement

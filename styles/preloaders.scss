@@ -51,11 +51,16 @@
   }
 
   &.overlay {
-    position: absolute;
+    position: fixed;
     background-color: rgba(255,255,255,.8);
-    z-index: 100;
+    z-index: 10000;
     top: 0;
     left: 0;
+    height: 100%;
+
+    &.preloader-icon {
+      height: 100vw;
+    }
   }
 
   &.modal-preloader {

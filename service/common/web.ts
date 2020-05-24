@@ -1,8 +1,3 @@
-
-
-export class WebRequestError extends Error {}
-
-
 export interface ErrorDetails {
   statusCode: number,
   error: string,
@@ -11,6 +6,9 @@ export interface ErrorDetails {
 
 /**
  * Represents an error whose details can be safely shared with the client.
+ * In this context, it can be seen as the base class for errors related to
+ * incoming web requests. That is, errors we throw intentionally to provide
+ * useful information to our clients.
  */
 export class SafeError extends Error {
 
@@ -62,6 +60,13 @@ export class NotFoundError extends SafeError {
 }
 
 
+export class InvalidOperationError extends SafeError {
+  constructor(message: string) {
+    super(message, 400)
+  }
+}
+
+
 export class InvalidArgumentError extends SafeError {
   constructor(
     message: string = "Invalid argument"
@@ -79,6 +84,13 @@ export class ConflictError extends SafeError {
     super(message, 409, internalError, "Conflict")
   }
 }
+
+
+/**
+ * Base class for outgoing web requests errors.
+ * That is, errors we throw when we do a web request and it fails.
+ */
+export class WebRequestError extends Error {}
 
 
 export class FailedHttpRequestError extends WebRequestError {

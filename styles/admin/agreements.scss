@@ -1,4 +1,20 @@
 
 .current-version-icon-wrapper {
   color: orange;
+  padding-top: 4px !important;
+  padding-left: 4px !important;
+}
+
+.version-region {
+  // pictures that a user might link in a Markdown text
+  img {
+    max-width: 99%;
+  }
+
+  .edit-view {
+    .buttons-area {
+      margin-left: 20%;
+      padding-top: 0;
+    }
+  }
 }

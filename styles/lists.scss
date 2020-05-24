@@ -14,6 +14,11 @@ dl {
       overflow: hidden;
       border-bottom: 1px dotted #eee;
       padding: 10px 0;
+
+      &:after {
+        content: ":";
+        display: inline;
+      }
     }
 
     dd {

@@ -52,6 +52,10 @@ CREATE MIGRATION structure TO {
                 default := False;
             }
 
+            required property draft -> bool {
+                default := true;
+            }
+
             multi link texts -> AgreementText;
 
             required property creation_time -> datetime {

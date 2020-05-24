@@ -8,6 +8,14 @@ table {
 
 tr {
   border-bottom: 1px solid #ddd;
+
+  &.selected-item {
+    background: #eee;
+
+    &:hover {
+      background-color: #eee;
+    }
+  }
 }
 
 tbody tr {

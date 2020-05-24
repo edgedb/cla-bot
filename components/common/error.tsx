@@ -1,3 +1,5 @@
+import ErrorOutline from "@material-ui/icons/ErrorOutline";
+import HighlightOff from "@material-ui/icons/HighlightOff";
 import { Button } from "@material-ui/core";
 import { Component, ReactElement } from "react";
 
@@ -8,6 +10,7 @@ export interface ErrorProps {
   className?: string
   status?: string
   retry?: () => void
+  dismiss?: () => void
 }
 
 
@@ -15,6 +18,12 @@ export default class ErrorPanel extends Component<ErrorProps> {
 
   constructor(props: ErrorProps) {
     super(props);
+  }
+
+  dismiss(): void {
+    if (this.props.dismiss) {
+      this.props.dismiss();
+    }
   }
 
   render(): ReactElement {
@@ -29,14 +38,25 @@ export default class ErrorPanel extends Component<ErrorProps> {
 
     return (<div className={className}>
               <div className={"alert alert-" + status}>
+                <div className="icon-wrapper">
+                  <ErrorOutline />
+                </div>
                 <h2>{title}</h2>
+                {props.dismiss !== undefined &&
+                <Button
+                  title="Dismiss"
+                  onClick={() => this.dismiss()}
+                  className="dismiss-btn"
+                >
+                  <HighlightOff />
+                </Button>
+                }
                 <p>{message}</p>
                 {retry !== undefined
                   ? <Button
                   className="btn btn-default"
                   onClick={() => retry()}
-                  variant="contained"
-                  color="primary"
+                  color="secondary"
                   >Try again</Button>
                   : null}
               </div>

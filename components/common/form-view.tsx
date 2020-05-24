@@ -9,6 +9,7 @@ interface FormViewProps {
   edit: () => void
   cancel: () => void
   editing: boolean
+  className?: string
 }
 
 
@@ -51,17 +52,34 @@ extends Component<FormViewProps, FormViewState> {
       })
     }, () => {
       this.setState({
-        error: {},
+        error: {
+          dismiss: () => this.setState({error: undefined})
+        },
         submitting: false
       })
     }).catch(error => {
       this.setState({
         error: {
-          message: `${error}`
+          message: `${error}`,
+          dismiss: () => this.setState({error: undefined})
         },
         submitting: false
       })
     })
+  }
+
+  handleKeyDown(e: React.KeyboardEvent<HTMLDivElement>): boolean {
+    if (e.ctrlKey) {
+      if (e.which === 83) {
+        // CTRL + S
+        e.preventDefault();
+        this.submit();
+
+        return false
+      }
+    }
+
+    return true;
   }
 
   cancel(): void {
@@ -78,8 +96,6 @@ extends Component<FormViewProps, FormViewState> {
       elements.push(
         <Button
           key="submit-button"
-          variant="contained"
-          color="primary"
           onClick={() => this.submit()}
         >
           Submit
@@ -88,18 +104,18 @@ extends Component<FormViewProps, FormViewState> {
       elements.push(
         <Button
           key="cancel-button"
-          variant="contained"
+          variant="outlined"
           color="primary"
           onClick={() => this.cancel()}
         >
-          Cancel
+          Done
         </Button>
       )
     } else {
       elements.push(
         <Button
           key="edit-button"
-          variant="contained"
+          variant="outlined"
           color="primary"
           onClick={() => this.edit()}
         >
@@ -114,7 +130,11 @@ extends Component<FormViewProps, FormViewState> {
     const state = this.state;
     const props = this.props;
 
-    return <div className="edit-view">
+    return <div
+     onKeyDown={this.handleKeyDown.bind(this)}
+     className={
+      "edit-view" + (props.className ? ` ${props.className}` : "")
+    }>
       {state.submitting && <Preloader className="overlay" />}
       {props.children}
       {state.error && <ErrorPanel {...state.error} />}

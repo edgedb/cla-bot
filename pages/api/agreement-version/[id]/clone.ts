@@ -21,36 +21,14 @@ export default async (
   }
 
   switch (req.method) {
-    case "GET":
+    case "POST":
+      // updates the text of an existing agreement version
+      // id is a version id;
       await handleExceptions(res, async () => {
-        const data = await agreementsHandler.getAgreement(id)
-
-        if (data === null) {
-          return res.status(404).json({
-            error: "Agreement not found",
-            errorCode: "NotFound"
-          })
-        }
-
-        res.status(200).json(data)
-      });
-      return;
-    case "PATCH":
-      // update an existing agreement
-      await handleExceptions(res, async () => {
-        const body = req.body;
-
-        await agreementsHandler.updateAgreement(
-          id,
-          body.name,
-          body.description
-        )
-
+        // TODO: set parameters
+        await agreementsHandler.cloneAgreementVersion(id, "TODO")
         return res.status(204).end()
       });
-
-    case "DELETE":
-      break
   }
 
   res.status(405).end(`${req.method} not allowed`)

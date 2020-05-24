@@ -6,6 +6,7 @@ import { AppProps } from "next/app";
 import { ThemeProvider } from "@material-ui/core/styles";
 import "normalize.css";
 import "../styles/global.scss";
+import "react-markdown-editor-lite/lib/index.css";
 
 
 export default function App(props: AppProps): ReactElement {

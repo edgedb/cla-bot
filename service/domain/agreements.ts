@@ -44,43 +44,58 @@ export class AgreementListItem {
 
 export class AgreementVersion {
   id: string
+  agreementId?: string
   number: string
   current: boolean
-  texts: AgreementText[]
+  draft: boolean
+  texts?: AgreementText[]
   creationTime: Date
 
   constructor(
     id: string,
     number: string,
     current: boolean,
+    draft: boolean,
+    agreementId: string | undefined,
     creationTime: Date,
-    texts: AgreementText[]
+    texts?: AgreementText[],
   ) {
     this.id = id
     this.number = number
     this.current = current
+    this.draft = draft
     this.texts = texts
+    this.agreementId = agreementId
     this.creationTime = creationTime
   }
 }
 
 
 export class AgreementText {
+  id: string
   title: string
   text: string
   culture: string
   versionId: string
+  updateTime: Date
+  creationTime: Date
 
   constructor(
+    id: string,
     title: string,
     text: string,
     culture: string,
-    versionId: string
+    versionId: string,
+    updateTime: Date,
+    creationTime: Date
   ) {
+    this.id = id
     this.text = text
     this.title = title
     this.culture = culture
     this.versionId = versionId
+    this.updateTime = updateTime
+    this.creationTime = creationTime
   }
 }
 
@@ -121,6 +136,8 @@ export interface AgreementsRepository {
 
   getAgreement(agreementId: string): Promise<Agreement | null>;
 
+  getAgreementVersion(versionId: string): Promise<AgreementVersion | null>;
+
   getAgreementTextForRepository(
     repositoryFullName: string,
     cultureCode: string
@@ -144,5 +161,22 @@ export interface AgreementsRepository {
     id: string,
     name: string,
     description: string
+  ): Promise<void>;
+
+  updateAgreementText(
+    id: string,
+    title: string,
+    body: string
+  ): Promise<void>;
+
+  updateAgreementVersion(
+    id: string,
+    number: string,
+    draft: boolean
+  ): Promise<void>;
+
+  setCurrentAgreementVersion(
+    agreementId: string,
+    versionId: string
   ): Promise<void>;
 }
