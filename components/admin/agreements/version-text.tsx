@@ -8,6 +8,8 @@ import { ErrorProps } from "../../common/error";
 import { get, put } from "../../fetch";
 import FormView from "../../common/form-view";
 import formatDate from "../../format-date";
+import { changeHandler } from "../../forms";
+import { TextField } from "@material-ui/core";
 
 
 export interface VersionTextProps {
@@ -19,13 +21,17 @@ export interface VersionTextProps {
 
 export interface VersionTextState {
   title: string
+  titleError: boolean
+  titleHelperText: string
   body: string
+  bodyError: boolean
+  bodyHelperText: string
   text_id: string
   error?: ErrorProps
-  loading: boolean,
+  loading: boolean
   mod_title: string
   mod_body: string
-  editing: boolean,
+  editing: boolean
   draft: boolean
   lastUpdateTime?: Date
 }
@@ -63,7 +69,11 @@ extends Component<VersionTextProps, VersionTextState> {
       editing: false,
       text_id: "",
       draft: true,
-      lastUpdateTime: undefined
+      lastUpdateTime: undefined,
+      titleError: false,
+      titleHelperText: "",
+      bodyError: false,
+      bodyHelperText: ""
     }
   }
 
@@ -111,7 +121,33 @@ extends Component<VersionTextProps, VersionTextState> {
     })
   }
 
+  validate(): boolean {
+    let anyError = false;
+    const {mod_title, mod_body} = this.state;
+
+    if (!mod_title.trim()) {
+      this.setState({
+        titleError: true,
+        titleHelperText: "Please insert a valid value"
+      })
+      anyError = true;
+    }
+
+    if (!mod_body.trim()) {
+      this.setState({
+        bodyError: true,
+        bodyHelperText: "Please insert a valid value"
+      })
+      anyError = true;
+    }
+
+    return !anyError;
+  }
+
   async update(): Promise<void> {
+    if (!this.validate())
+      return;
+
     // TODO: add ETAG to entity, verify if ETAG matches on the server
     await put(this.URL, {
       title: this.state.mod_title,
@@ -159,28 +195,26 @@ extends Component<VersionTextProps, VersionTextState> {
 
     const editing = state.editing;
 
-    return <FormView
-      submit={async () => await this.update()}
-      edit={() => this.edit()}
-      cancel={() => this.cancel()}
-      editing={editing}
-    >
-      {editing ?
-      <MdEditor
-        value={state.mod_body}
-        style={{ height: "500px" }}
-        renderHTML={(text) => mdParser.render(text)}
-        onChange={this.handleEditorChange.bind(this)}
-      />
+    return editing ?
+      <div>
+        <MdEditor
+          value={state.mod_body}
+          style={{ height: "500px" }}
+          renderHTML={(text) => mdParser.render(text)}
+          onChange={this.handleEditorChange.bind(this)}
+        />
+        {state.bodyError &&
+        <i className="error-info">{state.bodyHelperText}</i>
+        }
+      </div>
       : <div dangerouslySetInnerHTML={{
         __html: mdParser.render(state.body)
-      }}></div>
-      }
-    </FormView>;
+      }}></div>;
   }
 
   render(): ReactElement {
     const state = this.state;
+    const editing = state.editing;
 
     return <div>
       <Panel
@@ -188,7 +222,12 @@ extends Component<VersionTextProps, VersionTextState> {
         load={() => this.load()}
         loading={state.loading}
       >
-        <div>
+        <FormView
+          submit={async () => await this.update()}
+          edit={() => this.edit()}
+          cancel={() => this.cancel()}
+          editing={editing}
+        >
           <dl className="inline">
             {state.lastUpdateTime !== undefined &&
             <React.Fragment>
@@ -197,11 +236,26 @@ extends Component<VersionTextProps, VersionTextState> {
             </React.Fragment>
             }
             <dt>Title</dt>
-            <dd>{state.title}</dd>
+            <dd>
+              {state.editing
+              ?
+              <TextField
+                error={state.titleError}
+                helperText={state.titleHelperText}
+                name="mod_title"
+                variant="outlined"
+                autoComplete="off"
+                autoFocus
+                value={state.mod_title}
+                onChange={changeHandler.bind(this)}
+              />
+              : state.title
+              }
+            </dd>
             <dt>Body</dt>
             <dd>{this.renderTextView()}</dd>
           </dl>
-        </div>
+        </FormView>
       </Panel>
     </div>
   }

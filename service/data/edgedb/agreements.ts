@@ -368,6 +368,7 @@ export class EdgeDBAgreementsRepository
                   current := False,
                   texts := (
                       (INSERT AgreementText {
+                          title := <str>$initial_title,
                           text := <str>$initial_text,
                           culture := <str>$initial_culture,
                           update_time := datetime_current()
@@ -381,7 +382,8 @@ export class EdgeDBAgreementsRepository
           name: name,
           description: description || "",
           creation_time: creationTime,
-          initial_text: "Lorem ipsum dolor sit amet",
+          initial_title: name,
+          initial_text: "# Lorem ipsum dolor sit amet",
           initial_culture: "en",
           initial_version_number: getDefaultVersionNumber()
         }

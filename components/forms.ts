@@ -16,8 +16,25 @@ export function changeHandler(
       "Add a name attribute matching a property in the state."
     );
   }
-  const update: {[key: string]: string} = {};
+  const update: {[key: string]: string | false} = {};
   update[name] = target.value;
+
   // @ts-ignore
-  this.setState(update)
+  const self = this;
+
+  // if the state contains properties like "<field_name>Error",
+  // update automatically to remove error while the user is typing
+  const fieldName = name.replace(/^mod_/, "");
+  const fieldNameError = `${fieldName}Error`;
+  const fieldNameHelperText = `${fieldName}HelperText`;
+
+  if (self.state.hasOwnProperty(fieldNameError)) {
+    update[fieldNameError] = false;
+  }
+
+  if (self.state.hasOwnProperty(fieldNameHelperText)) {
+    update[fieldNameHelperText] = "";
+  }
+
+  self.setState(update)
 }

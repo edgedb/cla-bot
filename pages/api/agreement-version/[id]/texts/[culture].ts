@@ -41,7 +41,7 @@ export default async (
         return res.status(200).json(data)
       })
 
-      return
+      break;
     case "PUT":
       // inserts or updates the text of an existing agreement version
       // by id and culture: id is a version id
@@ -57,8 +57,9 @@ export default async (
         return res.status(204).end()
       });
 
-      return
+      break;
+    default:
+      res.status(405).end(`${req.method} not allowed`)
+      break;
   }
-
-  res.status(405).end(`${req.method} not allowed`)
 }
