@@ -1,3 +1,12 @@
+// TODO:
+// if we modify the `appFetch` wrapper to automatically parse date strings
+// into dates, we can remove the following classes, and reuse the same objects
+// defined in domain namespace.
+
+// The difference is that objects defined in domain, are handled by the
+// server side and returned serialized in JSON
+// While the following contract interfaces are the objects how they look like
+// when received and deserialized on the client (e.g. Dates are strings!)
 
 
 export interface AgreementsTableItem {
@@ -22,8 +31,10 @@ export interface AgreementVersion {
   id: string
   number: string
   current: boolean
+  draft: boolean
   updateTime: string
   creationTime: string
+  texts?: AgreementText[]
 }
 
 

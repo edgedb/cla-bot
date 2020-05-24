@@ -1,0 +1,28 @@
+.error-panel {
+  color: rgb(97, 26, 21);
+  background-color: rgb(253, 236, 234);
+  padding: 10px 16px;
+  margin: 20px 0;
+
+  .icon-wrapper {
+    font-size: 22px;
+    margin-right: 12px;
+    float: left;
+
+    .alert-danger {
+      .icon-wrapper {
+        color: red;
+      }
+    }
+  }
+}
+
+.alert {
+  position: relative;
+
+  .dismiss-btn {
+    position: absolute;
+    top: -6px;
+    right: 0;
+  }
+}

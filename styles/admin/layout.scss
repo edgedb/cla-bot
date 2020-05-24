@@ -5,6 +5,12 @@
 
   min-width: 320px;
 
+  header {
+    // otherwise Firefox doesn't display properly
+    // when editing Markdown full screen
+    z-index: 0;
+  }
+
   .drawer > div {
     overflow: hidden;
   }
@@ -21,9 +27,24 @@
     height: 55px;
   }
 
+  .rc-md-editor.full {
+    width: calc(100% - 60px);
+    left: 60px;
+  }
+
   &.ui-drawer-open {
     > header, > main {
       padding-left: 195px;
+    }
+
+    .rc-md-editor.full {
+      width: calc(100% - 186px);
+      left: 186px;
+
+      + .error-panel {
+        left: 230px;
+        width: calc(100% - 280px);
+      }
     }
   }
 
@@ -62,4 +83,62 @@
 
 .description-cell {
   max-width: 200px;
+}
+
+body.compact {
+  #admin-layout {
+    .edit-view.flex {
+      display: flex;
+      flex-flow: row;
+      flex-wrap: wrap;
+      overflow: visible;
+
+      > .inline {
+        flex: 0 0 80%;
+      }
+
+      > .buttons-area {
+        flex: 0 0 20%;
+      }
+    }
+
+    #content-area h1 {
+      margin: 0 0 1rem 0;
+      padding: 0;
+      font-size: 1.4em;
+    }
+
+    #content-area h2 {
+      font-size: 1.2em;
+    }
+
+    .region {
+      margin-top: 0;
+    }
+  }
+
+  table, dl {
+    font-size: 1rem;
+  }
+
+  th, td {
+    padding: 0;
+  }
+
+  .region {
+    margin-top: 0;
+  }
+}
+
+
+// Only when the markdown text editor is in full screen, display
+// the following error panel with absolute position
+.rc-md-editor.full + .error-panel {
+  position: fixed;
+  z-index: 1000;
+  top: 100px;
+  left: 100px;
+  padding: 20px;
+  width: calc(100% - 150px);
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
 }

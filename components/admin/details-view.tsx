@@ -50,7 +50,8 @@ extends Component<DetailsViewProps, DetailsViewState> {
       error: {
         retry: () => {
           this.load();
-        }
+        },
+        dismiss: () => this.setState({error: undefined})
       }
     })
   }

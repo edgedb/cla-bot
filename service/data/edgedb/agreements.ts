@@ -29,7 +29,7 @@ interface VersionEntity {
   current: boolean
   draft: boolean
   creation_time: string
-  texts: TextEntity[]
+  texts?: TextEntity[]
 }
 
 
@@ -37,6 +37,7 @@ function mapTextEntity(entity: TextEntity): AgreementText
 {
   return new AgreementText(
     entity.id,
+    entity.title,
     entity.text,
     entity.culture,
     "", // TODO: is version id needed?
@@ -51,8 +52,9 @@ function mapVersionEntity(entity: VersionEntity): AgreementVersion
     entity.id,
     entity.number,
     entity.current,
+    entity.draft,
     new Date(entity.creation_time),
-    []
+    entity.texts ? entity.texts.map(mapTextEntity) : undefined
   )
 }
 
@@ -71,6 +73,7 @@ export class EdgeDBAgreementsRepository
           versions: {
             number,
             current,
+            draft,
             creation_time
           }
         }  FILTER .id = <uuid>$id;`,
@@ -103,9 +106,11 @@ export class EdgeDBAgreementsRepository
         `SELECT AgreementVersion {
           number,
           current,
+          draft,
           creation_time,
           texts: {
             text,
+            title,
             culture,
             update_time,
             creation_time
@@ -125,8 +130,9 @@ export class EdgeDBAgreementsRepository
       version.id,
       version.number,
       version.current,
+      version.draft,
       new Date(version.creation_time),
-      version.texts.map(mapTextEntity)
+      version.texts ? version.texts.map(mapTextEntity) : undefined
     )
   }
 
@@ -150,6 +156,32 @@ export class EdgeDBAgreementsRepository
           id,
           name,
           description,
+          update_time: new Date()
+        }
+      )
+    })
+  }
+
+  async updateAgreementText(
+    id: string,
+    title: string,
+    body: string
+  ): Promise<void> {
+    await this.run(async (connection) => {
+      await connection.fetchOne(
+        `
+        UPDATE AgreementText
+        FILTER .id = <uuid>$id
+        SET {
+          title := <str>$title,
+          text := <str>$body,
+          update_time := <datetime>$update_time,
+        }
+        `,
+        {
+          id,
+          title,
+          body,
           update_time: new Date()
         }
       )

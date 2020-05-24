@@ -1,10 +1,8 @@
 import { container } from "../../../../service/di";
-import { AgreementListItem } from "../../../../service/domain/agreements";
 import { AgreementsHandler } from "../../../../service/handlers/agreements";
 import { NextApiRequest, NextApiResponse } from "next";
 import { TYPES } from "../../../../constants/types";
 import { handleExceptions } from "../..";
-import { ErrorDetails } from "../../../../service/common/web";
 
 
 const agreementsHandler = container
@@ -13,7 +11,7 @@ const agreementsHandler = container
 
 export default async (
   req: NextApiRequest,
-  res: NextApiResponse<AgreementListItem | ErrorDetails | void>
+  res: NextApiResponse<any>
 ) => {
   const { query: { id }} = req;
 
@@ -24,13 +22,19 @@ export default async (
 
   switch (req.method) {
     case "GET":
-      const data = await agreementsHandler.getAgreement(id)
+      await handleExceptions(res, async () => {
+        const data = await agreementsHandler.getAgreement(id)
 
-      if (!data) {
-        return res.status(404).end("Agreement not found.")
-      }
+        if (data === null) {
+          return res.status(404).json({
+            error: "Agreement not found",
+            errorCode: "NotFound"
+          })
+        }
 
-      return res.status(200).json(data)
+        res.status(200).json(data)
+      });
+      return;
     case "PATCH":
       // update an existing agreement
       await handleExceptions(res, async () => {

@@ -46,19 +46,22 @@ export class AgreementVersion {
   id: string
   number: string
   current: boolean
-  texts: AgreementText[]
+  draft: boolean
+  texts?: AgreementText[]
   creationTime: Date
 
   constructor(
     id: string,
     number: string,
     current: boolean,
+    draft: boolean,
     creationTime: Date,
-    texts: AgreementText[]
+    texts?: AgreementText[]
   ) {
     this.id = id
     this.number = number
     this.current = current
+    this.draft = draft
     this.texts = texts
     this.creationTime = creationTime
   }
@@ -66,6 +69,7 @@ export class AgreementVersion {
 
 
 export class AgreementText {
+  id: string
   title: string
   text: string
   culture: string
@@ -74,6 +78,7 @@ export class AgreementText {
   creationTime: Date
 
   constructor(
+    id: string,
     title: string,
     text: string,
     culture: string,
@@ -81,6 +86,7 @@ export class AgreementText {
     updateTime: Date,
     creationTime: Date
   ) {
+    this.id = id
     this.text = text
     this.title = title
     this.culture = culture
@@ -152,5 +158,11 @@ export interface AgreementsRepository {
     id: string,
     name: string,
     description: string
+  ): Promise<void>;
+
+  updateAgreementText(
+    id: string,
+    title: string,
+    body: string
   ): Promise<void>;
 }

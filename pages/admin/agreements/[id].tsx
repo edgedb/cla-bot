@@ -1,8 +1,8 @@
-import { ReactElement } from "react";
-import { withRouter } from 'next/router'
-import { WithRouterProps } from "next/dist/client/with-router";
-import Preloader from "../../../components/common/preloader";
 import AgreementDetailsPage from "../../../components/admin/agreements/agreement-page";
+import Preloader from "../../../components/common/preloader";
+import { ReactElement } from "react";
+import { withRouter } from "next/router";
+import { WithRouterProps } from "next/dist/client/with-router";
 
 
 function Page({ router }: WithRouterProps): ReactElement {

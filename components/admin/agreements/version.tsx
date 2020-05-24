@@ -1,7 +1,6 @@
-import formatDate from "../../format-date";
 import { AgreementVersion } from "./contracts";
 import { Component, ReactElement } from "react";
-import ifetch from "../../fetch";
+import { VersionText } from "./version-text";
 
 
 export interface VersionProps {
@@ -10,7 +9,7 @@ export interface VersionProps {
 
 
 export interface VersionState {
-  details?: AgreementVersion
+  editing: boolean
 }
 
 
@@ -18,33 +17,17 @@ export class Version extends Component<VersionProps, VersionState> {
 
   constructor(props: VersionProps) {
     super(props);
-
-    this.state = {
-      details: undefined
-    }
-  }
-
-  async fetchData(): Promise<void> {
-    const data = await ifetch<AgreementVersion>(
-      `/api/agreement-version/${this.props.details.id}`
-    )
-
-    this.setState({
-      details: data
-    })
   }
 
   render(): ReactElement {
     const details = this.props.details;
+    // TODO: add buttons to confirm this version
     return <div>
-      <dl className="inline">
-        <dt>Id</dt>
-        <dd>{details.id}</dd>
-        <dt>Number</dt>
-        <dd>{details.number}</dd>
-        <dt>Created at</dt>
-        <dd>{formatDate(details.creationTime)}</dd>
-      </dl>
+      <VersionText
+        id={details.id}
+        culture="en"
+        draft={details.draft}
+        />
     </div>
   }
 }

@@ -1,10 +1,8 @@
 import formatDate from "../../format-date";
 import Star from "@material-ui/icons/Star";
 import StarBorder from "@material-ui/icons/StarBorder";
-import DescriptionOutlined from "@material-ui/icons/DescriptionOutlined";
 import { AgreementVersion } from "./contracts";
 import { Component, ReactElement } from "react";
-import Link from "next/link";
 
 
 export interface VersionsTableProps {
@@ -20,6 +18,23 @@ export class VersionsTable extends Component<VersionsTableProps> {
     super(props);
   }
 
+  renderStatusInformation(isDraft: boolean): ReactElement {
+    if (isDraft) {
+      return <span
+              title="This version is still a draft: its texts can be edited"
+              className="help">
+        Draft
+      </span>
+    }
+
+    return <span
+            title="The texts of this version are no more editable, but it is
+            possible to create a copy in draft status."
+            className="help">
+        Done
+    </span>
+  }
+
   render(): ReactElement {
     const items = this.props.items;
 
@@ -32,6 +47,7 @@ export class VersionsTable extends Component<VersionsTableProps> {
       <thead>
         <tr>
           <th>Current</th>
+          <th>Status</th>
           <th>Number</th>
           <th>Created at</th>
         </tr>
@@ -46,6 +62,9 @@ export class VersionsTable extends Component<VersionsTableProps> {
         >
           <td className="current-version-icon-wrapper">
             {item.current ? <Star /> : <StarBorder />}
+          </td>
+          <td>
+            {this.renderStatusInformation(item.draft)}
           </td>
           <td>
             {item.number}

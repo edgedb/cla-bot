@@ -1,4 +1,4 @@
-import ifetch from "../../components/fetch";
+import { get } from "../../components/fetch";
 import Layout from "../../components/admin/layout";
 import Panel from "../../components/common/panel";
 import { ErrorProps } from "../../components/common/error";
@@ -39,7 +39,7 @@ extends Component<{}, AgreementsState> {
       })
     }
 
-    ifetch<AgreementsTableItem[]>("/api/agreements").then(data => {
+    get<AgreementsTableItem[]>("/api/agreements").then(data => {
       this.setState({
         loading: false,
         items: data

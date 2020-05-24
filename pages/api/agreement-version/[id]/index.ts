@@ -1,5 +1,5 @@
 import { container } from "../../../../service/di";
-import { AgreementListItem, AgreementVersion } from "../../../../service/domain/agreements";
+import { AgreementVersion } from "../../../../service/domain/agreements";
 import { AgreementsHandler } from "../../../../service/handlers/agreements";
 import { NextApiRequest, NextApiResponse } from "next";
 import { TYPES } from "../../../../constants/types";
@@ -31,6 +31,20 @@ export default async (
       }
 
       return res.status(200).json(data)
+    case "PATCH":
+      // updates the text of an existing agreement version
+      // id is a version id;
+      await handleExceptions(res, async () => {
+        const body = req.body;
+
+        await agreementsHandler.updateAgreementTextByVersionId(
+          id,
+          body.culture,
+          body.title,
+          body.text
+        )
+        return res.status(204).end()
+      });
   }
 
   res.status(405).end(`${req.method} not allowed`)

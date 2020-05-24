@@ -1,4 +1,4 @@
-import fetch from "cross-fetch";
+import { get, ApplicationError } from "../../fetch"
 import Layout from "../layout";
 import Link from "next/link";
 import { Button } from "@material-ui/core";
@@ -47,32 +47,33 @@ extends Component<AgreementDetailsPageProps, AgreementDetailsState> {
       })
     }
 
-    fetch(`/api/agreements/${this.props.id}`).then((response => {
-      response.json().then(data => {
-        this.setState({
-          loading: false,
-          details: data as AgreementDetails
-        })
+    get<AgreementDetails>(`/api/agreements/${this.props.id}`)
+    .then((data => {
+      this.setState({
+        loading: false,
+        details: data
       })
-    }), () => {
-      this.handleError();
-    }).catch(reason => {
-      this.handleError();
+    }), (error: ApplicationError) => {
+      this.handleError(error);
     });
   }
 
-  handleError(): void {
+  handleError(error: ApplicationError): void {
     this.setState({
       loading: false,
       error: {
-        retry: () => {
+        // TODO: how to handle user friendly error titles and messages?
+        // title: error.message,
+        // message: error.message,
+        retry: error.allowRetry() ? () => {
           this.load();
-        }
+        } : undefined,
+        dismiss: () => this.setState({error: undefined})
       }
     })
   }
 
-  update(name: string, description: string): void {
+  onUpdate(name: string, description: string): void {
     const details = this.state.details;
 
     if (details === null)
@@ -98,20 +99,10 @@ extends Component<AgreementDetailsPageProps, AgreementDetailsState> {
           <h1>Agreement details</h1>
           {state.details &&
           <AgreementView
-          update={this.update.bind(this)}
-          details={state.details}
+            onUpdate={this.onUpdate.bind(this)}
+            details={state.details}
           />
           }
-          {/*
-          <Link href="/admin/agreements">
-            <Button
-              type="button"
-              variant="contained"
-              color="primary"
-            >
-              Back to list
-            </Button>
-          </Link>*/}
         </Panel>
       </Layout>
     )
