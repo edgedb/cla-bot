@@ -4,7 +4,7 @@ import {
   AgreementsRepository,
   AgreementText,
   AgreementVersion
-  } from "../domain/agreements";
+} from "../domain/agreements";
 import { inject, injectable } from "inversify";
 import {
   InvalidArgumentError,
@@ -48,30 +48,38 @@ export class AgreementsHandler
     await this._agreementsRepository.updateAgreement(id, name, description)
   }
 
-  async getAgreementTextByVersionAndCulture(
+  private getAgreementTextByVersionAndCulture(
+    version: AgreementVersion,
+    culture: string
+  ): AgreementText
+  {
+    const texts = version.texts;
+
+    if (texts === undefined) {
+      // Expected populated texts here: this must not happen here
+      throw new ServerError(
+        "Missing texts property in agreement context."
+      );
+    }
+
+    const text = texts.filter(item => item.culture === culture)[0];
+    return text || null;
+  }
+
+  async getAgreementTextByVersionIdAndCulture(
     versionId: string,
     culture: string
   ): Promise<AgreementText | null> {
-    const agreementVersion = await this._agreementsRepository
+    const version = await this._agreementsRepository
       .getAgreementVersion(versionId)
 
-    if (agreementVersion === null)
+    if (version === null)
       throw new NotFoundError()
 
-      const texts = agreementVersion.texts;
-
-      if (texts === undefined) {
-        // Expected populated texts here: this must not happen here
-        throw new ServerError(
-          "Missing texts property in agreement context."
-        );
-      }
-
-      const text = texts.filter(item => item.culture === culture)[0];
-      return text || null;
+    return this.getAgreementTextByVersionAndCulture(version, culture)
   }
 
-  async updateAgreementTextByVersionId(
+  async updateAgreementTextByVersionIdAndCulture(
     versionId: string,
     culture: string,
     title: string,
@@ -87,27 +95,18 @@ export class AgreementsHandler
     if (!body)
       throw new InvalidArgumentError("Missing `body` input parameter.")
 
-    const agreementVersion = await this._agreementsRepository
+    const version = await this._agreementsRepository
       .getAgreementVersion(versionId)
 
-    if (agreementVersion === null)
+    if (version === null)
       throw new NotFoundError()
 
-    if (agreementVersion.draft === false)
+    if (version.draft === false)
       throw new InvalidOperationError(
         "Cannot update an agreement version that is no more a draft."
       )
 
-    const texts = agreementVersion.texts;
-
-    if (texts === undefined) {
-      // Expected populated texts here: this must not happen here
-      throw new ServerError(
-        "Missing texts property in agreement context."
-      );
-    }
-
-    const text = texts.filter(item => item.culture === culture)[0];
+    const text = this.getAgreementTextByVersionAndCulture(version, culture)
 
     if (text === null) {
       // TODO: create an agreement text entity associated with
@@ -170,5 +169,68 @@ export class AgreementsHandler
     }
 
     return licenseText
+  }
+
+  /**
+   * Marks an agreement version with the given id as DONE
+   * (non draft). Its texts cannot be edited after this operation.
+   */
+  async completeAgreementVersion(
+    versionId: string
+  ): Promise<void> {
+    const agreementVersion = await this._agreementsRepository
+      .getAgreementVersion(versionId);
+
+    if (agreementVersion === null)
+      throw new NotFoundError();
+
+    await this._agreementsRepository.updateAgreementVersion(
+      versionId,
+      agreementVersion.number,
+      false
+    )
+  }
+
+  /**
+   * Sets the agreement version with the given id as current.
+   * All other versions for the parent agreement object become non-current.
+   *
+   * When an agreement version is set as current, its text
+   * is displayed in CLA checks for repositories bound to the parent
+   * agreement object.
+   */
+  async makeAgreementVersionCurrent(
+    versionId: string
+  ): Promise<void> {
+    const version = await this._agreementsRepository
+      .getAgreementVersion(versionId)
+
+    if (version === null)
+      throw new NotFoundError()
+
+    if (version.draft)
+      throw new InvalidOperationError("Cannot set a draft version as current.")
+
+    const agreementId = version.agreementId
+
+    if (agreementId === undefined)
+      throw new ServerError("Missing parent id in version context.")
+
+    await this._agreementsRepository
+      .setCurrentAgreementVersion(agreementId, versionId)
+  }
+
+  /**
+   * Clones an existing agreement version with the given id,
+   * copying all its texts.
+   *
+   * @param versionId id of the version to copy
+   * @param newVersionNumber number to associate with the cloned version
+   */
+  async cloneAgreementVersion(
+    versionId: string,
+    newVersionNumber: string
+  ): Promise<void> {
+    throw new Error("Not implemented")
   }
 }

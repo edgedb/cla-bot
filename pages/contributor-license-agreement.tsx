@@ -86,7 +86,7 @@ export default class AgreementPage extends Component<AgreementPageProps> {
 
         <main>
           <div dangerouslySetInnerHTML={{ __html: text }}></div>
-          <Button variant="contained" color="primary">
+          <Button>
             <a {...signInAnchorOps}>Sign in with GitHub to agree</a>
           </Button>
         </main>

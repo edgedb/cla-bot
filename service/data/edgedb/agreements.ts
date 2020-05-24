@@ -29,6 +29,7 @@ interface VersionEntity {
   current: boolean
   draft: boolean
   creation_time: string
+  agreement_id?: string[]
   texts?: TextEntity[]
 }
 
@@ -53,6 +54,7 @@ function mapVersionEntity(entity: VersionEntity): AgreementVersion
     entity.number,
     entity.current,
     entity.draft,
+    entity.agreement_id ? entity.agreement_id[0] : undefined,
     new Date(entity.creation_time),
     entity.texts ? entity.texts.map(mapTextEntity) : undefined
   )
@@ -75,7 +77,7 @@ export class EdgeDBAgreementsRepository
             current,
             draft,
             creation_time
-          }
+          } ORDER BY .current DESC
         }  FILTER .id = <uuid>$id;`,
         {
           id: agreementId
@@ -108,6 +110,7 @@ export class EdgeDBAgreementsRepository
           current,
           draft,
           creation_time,
+          agreement_id := .<versions[IS Agreement].id,
           texts: {
             text,
             title,
@@ -125,15 +128,7 @@ export class EdgeDBAgreementsRepository
     if (!items.length)
       return null;
 
-    const version = items[0] as VersionEntity;
-    return new AgreementVersion(
-      version.id,
-      version.number,
-      version.current,
-      version.draft,
-      new Date(version.creation_time),
-      version.texts ? version.texts.map(mapTextEntity) : undefined
-    )
+    return mapVersionEntity(items[0] as VersionEntity)
   }
 
   async updateAgreement(
@@ -183,6 +178,30 @@ export class EdgeDBAgreementsRepository
           title,
           body,
           update_time: new Date()
+        }
+      )
+    })
+  }
+
+  async updateAgreementVersion(
+    id: string,
+    number: string,
+    draft: boolean
+  ): Promise<void> {
+    await this.run(async (connection) => {
+      await connection.fetchOne(
+        `
+        UPDATE AgreementVersion
+        FILTER .id = <uuid>$id
+        SET {
+          number := <str>$number,
+          draft := <bool>$draft
+        }
+        `,
+        {
+          id,
+          number,
+          draft
         }
       )
     })
@@ -375,5 +394,27 @@ export class EdgeDBAgreementsRepository
         creationTime
       );
     });
+  }
+
+  async setCurrentAgreementVersion(
+    agreementId: string,
+    versionId: string
+  ): Promise<void> {
+    await this.run(async connection => {
+      await connection.fetchAll(`
+      WITH X := (SELECT AgreementVersion {
+        id,
+        agreement_id := .<versions[IS Agreement].id
+      }
+      FILTER .agreement_id = <uuid>$agreement_id)
+      UPDATE X
+      SET {
+          current := (.id = <uuid>$version_id)
+      };
+      `, {
+        agreement_id: agreementId,
+        version_id: versionId
+      })
+    })
   }
 }

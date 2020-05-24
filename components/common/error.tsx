@@ -56,8 +56,7 @@ export default class ErrorPanel extends Component<ErrorProps> {
                   ? <Button
                   className="btn btn-default"
                   onClick={() => retry()}
-                  variant="contained"
-                  color="primary"
+                  color="secondary"
                   >Try again</Button>
                   : null}
               </div>

@@ -5,14 +5,13 @@ import Panel from "../../common/panel";
 import { AgreementText } from "./contracts";
 import { Component, ReactElement } from "react";
 import { ErrorProps } from "../../common/error";
-import { get, patch } from "../../fetch";
+import { get, put } from "../../fetch";
 import FormView from "../../common/form-view";
-import { AgreementVersion } from "../../../service/domain/agreements";
+import formatDate from "../../format-date";
 
 
-// TODO: id should be a Text id, not version id!
 export interface VersionTextProps {
-  id: string
+  versionId: string
   draft: boolean
   culture: string
 }
@@ -28,6 +27,7 @@ export interface VersionTextState {
   mod_body: string
   editing: boolean,
   draft: boolean
+  lastUpdateTime?: Date
 }
 
 const mdParser = new MarkdownIt();
@@ -62,8 +62,13 @@ extends Component<VersionTextProps, VersionTextState> {
       loading: true,
       editing: false,
       text_id: "",
-      draft: true
+      draft: true,
+      lastUpdateTime: undefined
     }
+  }
+
+  get URL(): string {
+    return `/api/agreement-version/${this.props.versionId}/texts/${this.props.culture}`
   }
 
   load(): void {
@@ -72,29 +77,17 @@ extends Component<VersionTextProps, VersionTextState> {
       loading: true
     })
 
-    // TODO: get texts of this agreement version by culture?
-    // /texts/${this.props.culture}
-    get<AgreementVersion>(
-      `/api/agreement-version/${this.props.id}`
-    )
+    get<AgreementText>(this.URL)
     .then(data => {
-      const texts = data.texts;
-
-      if (texts === undefined) {
-        throw new Error("Missing texts")
-      }
-      const text = texts.filter(
-        item => item.culture === this.props.culture
-      )[0];
-
       this.setState({
         error: undefined,
         loading: false,
-        title: text.title,
-        body: text.text,
-        mod_title: text.title,
-        mod_body: text.text,
-        text_id: text.id
+        title: data.title,
+        body: data.text,
+        mod_title: data.title,
+        mod_body: data.text,
+        text_id: data.id,
+        lastUpdateTime: new Date(data.updateTime)
       })
     }, () => {
       this.setState({
@@ -107,7 +100,7 @@ extends Component<VersionTextProps, VersionTextState> {
   }
 
   componentDidUpdate(prevProps: VersionTextProps): void {
-    if (this.props.id !== prevProps.id) {
+    if (this.props.versionId !== prevProps.versionId) {
       this.load();
     }
   }
@@ -120,8 +113,7 @@ extends Component<VersionTextProps, VersionTextState> {
 
   async update(): Promise<void> {
     // TODO: add ETAG to entity, verify if ETAG matches on the server
-    await patch(`/api/agreement-version/${this.props.id}`, {
-      culture: this.props.culture,
+    await put(this.URL, {
       title: this.state.mod_title,
       text: this.state.mod_body
     })
@@ -198,6 +190,12 @@ extends Component<VersionTextProps, VersionTextState> {
       >
         <div>
           <dl className="inline">
+            {state.lastUpdateTime !== undefined &&
+            <React.Fragment>
+              <dt>Last updated at</dt>
+              <dd>{formatDate(state.lastUpdateTime)}</dd>
+            </React.Fragment>
+            }
             <dt>Title</dt>
             <dd>{state.title}</dd>
             <dt>Body</dt>

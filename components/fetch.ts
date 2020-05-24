@@ -72,8 +72,14 @@ export async function get<T>(url: string): Promise<T>
 }
 
 
-export async function post<T>(url: string, data: any): Promise<T>
+export async function post<T>(url: string, data: any = null): Promise<T>
 {
+  if (!data) {
+    return await appFetch(url, {
+      method: "POST"
+    })
+  }
+
   return await appFetch(url, {
     method: "POST",
     body: JSON.stringify(data),
@@ -88,6 +94,18 @@ export async function patch<T>(url: string, data: any): Promise<T>
 {
   return await appFetch(url, {
     method: "PATCH",
+    body: JSON.stringify(data),
+    headers: {
+      "Content-Type": JSON_ContentType
+    }
+  })
+}
+
+
+export async function put<T>(url: string, data: any): Promise<T>
+{
+  return await appFetch(url, {
+    method: "PUT",
     body: JSON.stringify(data),
     headers: {
       "Content-Type": JSON_ContentType

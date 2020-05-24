@@ -1,17 +1,15 @@
 import { get, ApplicationError } from "../../fetch"
 import Layout from "../layout";
-import Link from "next/link";
-import { Button } from "@material-ui/core";
 import {
   AgreementDetails,
 } from "./contracts"
-
 import {
   AgreementView
 } from "./agreement"
 import { ErrorProps } from "../../common/error";
 import { Component, ReactElement } from "react";
 import Panel from "../../common/panel";
+import { AgreementVersion } from "../../../service/domain/agreements";
 
 
 interface AgreementDetailsPageProps {
@@ -67,8 +65,7 @@ extends Component<AgreementDetailsPageProps, AgreementDetailsState> {
         // message: error.message,
         retry: error.allowRetry() ? () => {
           this.load();
-        } : undefined,
-        dismiss: () => this.setState({error: undefined})
+        } : undefined
       }
     })
   }
@@ -84,6 +81,14 @@ extends Component<AgreementDetailsPageProps, AgreementDetailsState> {
     this.setState({
       details
     })
+  }
+
+  onNewCurrentVersion(versionId: string): void {
+    // TODO: find and update, sort again
+  }
+
+  onNewVersion(version: AgreementVersion): void {
+    // TODO: push!
   }
 
   render(): ReactElement {

@@ -44,6 +44,7 @@ export class AgreementListItem {
 
 export class AgreementVersion {
   id: string
+  agreementId?: string
   number: string
   current: boolean
   draft: boolean
@@ -55,14 +56,16 @@ export class AgreementVersion {
     number: string,
     current: boolean,
     draft: boolean,
+    agreementId: string | undefined,
     creationTime: Date,
-    texts?: AgreementText[]
+    texts?: AgreementText[],
   ) {
     this.id = id
     this.number = number
     this.current = current
     this.draft = draft
     this.texts = texts
+    this.agreementId = agreementId
     this.creationTime = creationTime
   }
 }
@@ -164,5 +167,16 @@ export interface AgreementsRepository {
     id: string,
     title: string,
     body: string
+  ): Promise<void>;
+
+  updateAgreementVersion(
+    id: string,
+    number: string,
+    draft: boolean
+  ): Promise<void>;
+
+  setCurrentAgreementVersion(
+    agreementId: string,
+    versionId: string
   ): Promise<void>;
 }

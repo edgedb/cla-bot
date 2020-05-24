@@ -1,10 +1,8 @@
 import { container } from "../../../../service/di";
-import { AgreementVersion } from "../../../../service/domain/agreements";
 import { AgreementsHandler } from "../../../../service/handlers/agreements";
 import { NextApiRequest, NextApiResponse } from "next";
 import { TYPES } from "../../../../constants/types";
 import { handleExceptions } from "../..";
-import { ErrorDetails } from "../../../../service/common/web";
 
 
 const agreementsHandler = container
@@ -13,7 +11,7 @@ const agreementsHandler = container
 
 export default async (
   req: NextApiRequest,
-  res: NextApiResponse<AgreementVersion | ErrorDetails | void>
+  res: NextApiResponse<any>
 ) => {
   const { query: { id }} = req;
 
@@ -23,15 +21,13 @@ export default async (
   }
 
   switch (req.method) {
-    case "GET":
-      const data = await agreementsHandler.getAgreementVersion(id)
-
-      if (!data) {
-        return res.status(404).end("Agreement version not found.")
-      }
-
-      res.status(200).json(data)
-      return
+    case "POST":
+      // updates the text of an existing agreement version
+      // id is a version id;
+      await handleExceptions(res, async () => {
+        await agreementsHandler.makeAgreementVersionCurrent(id)
+        return res.status(204).end()
+      });
   }
 
   res.status(405).end(`${req.method} not allowed`)

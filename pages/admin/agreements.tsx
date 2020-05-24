@@ -72,10 +72,10 @@ extends Component<{}, AgreementsState> {
           <AgreementsTable items={state.items} />
           }
           <div className="buttons-area">
-            <Link href="/admin/new-agreement">
+            <Link href="/admin/agreements/new">
               <Button
                 type="button"
-                variant="contained"
+                variant="outlined"
                 color="primary"
               >
                 Create new agreement

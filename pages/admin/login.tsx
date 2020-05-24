@@ -29,7 +29,7 @@ export default class AdminLoginPage extends Component {
               </Avatar>
             </Grid>
             <Grid item xs={6} sm={3}>
-              <Button variant="contained" color="primary">
+              <Button>
                 <i className="fab fa-github"></i>
                 <a href="/api/admins/auth/github">Sign in with GitHub</a>
               </Button>

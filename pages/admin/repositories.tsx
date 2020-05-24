@@ -137,7 +137,7 @@ extends Component<{}, RepositoriesState> {
           <h1>Configured Repositories</h1>
           {this.renderList()}
           <div className="buttons-area">
-            <Button variant="contained" color="primary">
+            <Button>
               Add new configuration
             </Button>
           </div>

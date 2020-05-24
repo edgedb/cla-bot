@@ -96,8 +96,6 @@ extends Component<FormViewProps, FormViewState> {
       elements.push(
         <Button
           key="submit-button"
-          variant="contained"
-          color="primary"
           onClick={() => this.submit()}
         >
           Submit
@@ -106,7 +104,7 @@ extends Component<FormViewProps, FormViewState> {
       elements.push(
         <Button
           key="cancel-button"
-          variant="contained"
+          variant="outlined"
           color="primary"
           onClick={() => this.cancel()}
         >
@@ -117,7 +115,7 @@ extends Component<FormViewProps, FormViewState> {
       elements.push(
         <Button
           key="edit-button"
-          variant="contained"
+          variant="outlined"
           color="primary"
           onClick={() => this.edit()}
         >

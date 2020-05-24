@@ -45,7 +45,6 @@ export default class Panel extends Component<PanelProps> {
         title={error.title}
         message={error.message}
         retry={error.retry}
-        dismiss={() => this.setState({error: undefined})}
       />;
     }
 

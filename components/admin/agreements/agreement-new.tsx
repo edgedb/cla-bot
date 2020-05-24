@@ -1,11 +1,11 @@
 import Grid from "@material-ui/core/Grid";
-import Layout from "../../components/admin/layout";
+import Layout from "../layout"
 import Link from "next/link";
 import { Button, TextField } from "@material-ui/core";
-import { ChangeEvent, Component, ReactElement } from "react";
-import ErrorPanel, { ErrorProps } from "../../components/common/error";
-import Preloader from "../../components/common/preloader";
-import { changeHandler } from "../../components/forms"
+import { Component, ReactElement } from "react";
+import ErrorPanel, { ErrorProps } from "../../common/error"
+import Preloader from "../../common/preloader";
+import { changeHandler } from "../../forms"
 
 
 interface NewAgreementFormState {
@@ -115,7 +115,6 @@ extends Component<{}, NewAgreementFormState> {
               error={state.nameError}
               helperText={state.nameHelperText}
               name="name"
-              variant="outlined"
               required
               fullWidth
               label="Name"
@@ -140,20 +139,11 @@ extends Component<{}, NewAgreementFormState> {
           </Grid>
         </Grid>
         <div className="buttons-area">
-          <Button
-            type="button"
-            variant="contained"
-            color="primary"
-            onClick={() => this.submit()}
-          >
+          <Button onClick={() => this.submit()}>
             Confirm
           </Button>
           <Link href="/admin/agreements">
-            <Button
-              type="button"
-              variant="contained"
-              color="primary"
-            >
+            <Button>
               Cancel
             </Button>
           </Link>
