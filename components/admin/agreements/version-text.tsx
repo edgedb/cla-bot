@@ -32,11 +32,12 @@ export interface VersionTextState {
   mod_title: string
   mod_body: string
   editing: boolean
-  draft: boolean
   lastUpdateTime?: Date
 }
 
+
 const mdParser = new MarkdownIt();
+const FullScreenEditingBodyClass = "fullscreen-editing";
 
 const MdEditor = dynamic(() => import('react-markdown-editor-lite'), {
   ssr: false
@@ -68,7 +69,6 @@ extends Component<VersionTextProps, VersionTextState> {
       loading: true,
       editing: false,
       text_id: "",
-      draft: true,
       lastUpdateTime: undefined,
       titleError: false,
       titleHelperText: "",
@@ -97,7 +97,8 @@ extends Component<VersionTextProps, VersionTextState> {
         mod_title: data.title,
         mod_body: data.text,
         text_id: data.id,
-        lastUpdateTime: new Date(data.updateTime)
+        lastUpdateTime: new Date(data.updateTime),
+        editing: false
       })
     }, () => {
       this.setState({
@@ -183,6 +184,45 @@ extends Component<VersionTextProps, VersionTextState> {
     })
   }
 
+  toggleBodyFullScreenEditingClass(): void {
+    const bodyClasses = document.body.classList;
+    if (bodyClasses.contains(FullScreenEditingBodyClass)) {
+      bodyClasses.remove(FullScreenEditingBodyClass);
+    } else {
+      bodyClasses.add(FullScreenEditingBodyClass);
+    }
+  }
+
+  private removeBodyFullScreenEditingClass(): void {
+    document.body.classList.remove(FullScreenEditingBodyClass);
+  }
+
+  componentDidMount(): void {
+    this.removeBodyFullScreenEditingClass();
+  }
+
+  componentWillUnmount(): void {
+    this.removeBodyFullScreenEditingClass();
+  }
+
+  handleOnClick(e: React.MouseEvent<HTMLDivElement>): void {
+    // NB: MdEditor doesn't offer an API to react on full screen view change.
+    // If an error happens while saving during full screen editing,
+    // we need to display the error message on top of the page (fixed position)
+    // and above the Markdown editor.
+    // This code applies a class to the body, depending whether the editor
+    // is in full screen.
+
+    // @ts-ignore
+    const targetClassList: DOMTokenList = e.target.classList;
+
+    if (targetClassList.contains("button-type-fullscreen") ||
+        targetClassList.contains("rmel-icon-fullscreen") ||
+        targetClassList.contains("rmel-icon-fullscreen-exit")) {
+        this.toggleBodyFullScreenEditingClass();
+    }
+  }
+
   renderTextView(): ReactElement {
     const state = this.state;
 
@@ -196,7 +236,7 @@ extends Component<VersionTextProps, VersionTextState> {
     const editing = state.editing;
 
     return editing ?
-      <div>
+      <div onClick={this.handleOnClick.bind(this)}>
         <MdEditor
           value={state.mod_body}
           style={{ height: "500px" }}
@@ -227,6 +267,7 @@ extends Component<VersionTextProps, VersionTextState> {
           edit={() => this.edit()}
           cancel={() => this.cancel()}
           editing={editing}
+          readonly={!this.props.draft}
         >
           <dl className="inline">
             {state.lastUpdateTime !== undefined &&

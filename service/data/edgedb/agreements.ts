@@ -383,7 +383,7 @@ export class EdgeDBAgreementsRepository
           description: description || "",
           creation_time: creationTime,
           initial_title: name,
-          initial_text: "# Lorem ipsum dolor sit amet",
+          initial_text: "# Modify this markdown",
           initial_culture: "en",
           initial_version_number: getDefaultVersionNumber()
         }

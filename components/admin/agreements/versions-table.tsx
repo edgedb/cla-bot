@@ -20,19 +20,25 @@ export class VersionsTable extends Component<VersionsTableProps> {
 
   renderStatusInformation(isDraft: boolean): ReactElement {
     if (isDraft) {
-      return <span
-              title="This version is still a draft: its texts can be edited"
-              className="help">
-        Draft
-      </span>
+      return (
+        <span
+          title="This version is still a draft: its texts can be edited"
+          className="help"
+        >
+          Draft
+        </span>
+      );
     }
 
-    return <span
-            title="The texts of this version are no more editable, but it is
-            possible to create a copy in draft status."
-            className="help">
-        Done
-    </span>
+    return (
+      <span
+        title="The texts of this version are no more editable, but it is
+        possible to create a copy in draft status."
+        className="help"
+      >
+          Done
+      </span>
+    );
   }
 
   render(): ReactElement {

@@ -10,6 +10,7 @@ interface FormViewProps {
   cancel: () => void
   editing: boolean
   className?: string
+  readonly?: boolean
 }
 
 
@@ -138,9 +139,11 @@ extends Component<FormViewProps, FormViewState> {
       {state.submitting && <Preloader className="overlay" />}
       {props.children}
       {state.error && <ErrorPanel {...state.error} />}
+      {(!props.readonly) &&
       <div className="buttons-area">
         {this.renderButtons()}
       </div>
+      }
     </div>
   }
 }

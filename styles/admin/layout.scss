@@ -40,11 +40,6 @@
     .rc-md-editor.full {
       width: calc(100% - 186px);
       left: 186px;
-
-      + .error-panel {
-        left: 230px;
-        width: calc(100% - 280px);
-      }
     }
   }
 
@@ -134,11 +129,26 @@ body.compact {
 // Only when the markdown text editor is in full screen, display
 // the following error panel with absolute position
 .rc-md-editor.full + .error-panel {
-  position: fixed;
-  z-index: 1000;
-  top: 100px;
-  left: 100px;
-  padding: 20px;
-  width: calc(100% - 150px);
-  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+
+}
+
+
+body.fullscreen-editing {
+
+  .error-panel {
+    position: fixed;
+    z-index: 1000;
+    top: 100px;
+    left: 100px;
+    padding: 12px 20px;
+    width: calc(100% - 150px);
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  }
+
+  #admin-layout.ui-drawer-open {
+    .error-panel {
+      left: 230px;
+      width: calc(100% - 280px);
+    }
+  }
 }

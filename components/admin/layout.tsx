@@ -91,7 +91,7 @@ extends React.Component<AdminLayoutProps, AdminLayoutState> {
             variant="h6"
             color="inherit"
             noWrap>
-              Dashboard
+              CLA-Bot
             </Typography>
           </Toolbar>
         </AppBar>
