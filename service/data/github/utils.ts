@@ -1,5 +1,6 @@
 import fetch from "cross-fetch";
 import { expectSuccessfulResponse } from "../../common/web";
+import { ServerError } from "../../common/app";
 
 
 export function hasMoreItems(response: Response): boolean {
@@ -23,8 +24,16 @@ export async function fetchAllItems<T>(
   let pageNumber = 1;
   let items: T[] = []
 
+  if (url.indexOf("?") > -1) {
+    // Throw exception: feature not implemented, due to missing time.
+    // To support a query string in URL, proper query handling must be done.
+    throw new ServerError(
+      "Feature not implemented. This method does not implement handling of " +
+      "query string in `url` parameter."
+    );
+  }
+
   while (true) {
-    // TODO: better query string concatenation
     const response = await fetch(`${url}?page=${pageNumber}`, init);
 
     await expectSuccessfulResponse(response);

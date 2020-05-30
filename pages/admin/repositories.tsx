@@ -4,6 +4,7 @@ import Panel from "../../components/common/panel";
 import { ErrorProps } from "../../components/common/error";
 import { Component, ReactElement } from "react";
 import { Button } from "@material-ui/core";
+import Link from "next/link";
 
 
 interface RepositoryInfo {
@@ -137,9 +138,13 @@ extends Component<{}, RepositoriesState> {
           <h1>Configured Repositories</h1>
           {this.renderList()}
           <div className="buttons-area">
-            <Button>
-              Add new configuration
-            </Button>
+            <Link href="/admin/repositories/new">
+              <Button
+                type="button"
+              >
+                Add new configuration
+              </Button>
+            </Link>
           </div>
         </Panel>
       </Layout>

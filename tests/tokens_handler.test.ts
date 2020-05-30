@@ -29,7 +29,8 @@ class TestServiceSettings extends ServiceSettings {
   constructor(testUrl?: string, testSecret?: string) {
     super(
       testUrl || "https://localhost:8080",
-      testSecret || "LOREM_IPSUM_DOLOR_SIT_AMET"
+      testSecret || "LOREM_IPSUM_DOLOR_SIT_AMET",
+      "TEST_ORG"
     );
   }
 }

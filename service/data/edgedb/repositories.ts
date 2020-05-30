@@ -24,4 +24,23 @@ export class EdgeDBRepositoriesRepository
     ));
   }
 
+  async createRepositoryConfiguration(
+    agreementId: string,
+    repositoryId: string
+  ): Promise<void> {
+    await this.run(async connection => {
+      await connection.fetchAll(
+        `
+        INSERT Repository {
+          full_name := <str>$repository_id,
+          agreement := (SELECT Agreement FILTER .id = <uuid>$agreement_id)
+        }
+        `,
+        {
+          repository_id: repositoryId,
+          agreement_id: agreementId
+        }
+      )
+    });
+  }
 }

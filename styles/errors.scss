@@ -1,15 +1,20 @@
-.error-panel {
+.alert-panel {
   color: rgb(97, 26, 21);
   background-color: rgb(253, 236, 234);
   padding: 10px 16px;
   margin: 20px 0;
+
+  &.alert-info {
+    color: #153d61;
+    background-color: #ebeafd;
+  }
 
   .icon-wrapper {
     font-size: 22px;
     margin-right: 12px;
     float: left;
 
-    .alert-danger {
+    .alert-error {
       .icon-wrapper {
         color: red;
       }

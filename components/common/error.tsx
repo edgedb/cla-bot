@@ -33,33 +33,35 @@ export default class ErrorPanel extends Component<ErrorProps> {
       "Please contact the service administrators if the problem persists.";
 
     const retry = props.retry;
-    const className = props.className ? props.className : "error-panel";
-    const status = props.status || "danger";
+    const className = props.className ? props.className : "alert-panel";
+    const status = props.status || "error";
 
-    return (<div className={className}>
-              <div className={"alert alert-" + status}>
-                <div className="icon-wrapper">
-                  <ErrorOutline />
-                </div>
-                <h2>{title}</h2>
-                {props.dismiss !== undefined &&
-                <Button
-                  title="Dismiss"
-                  onClick={() => this.dismiss()}
-                  className="dismiss-btn"
-                >
-                  <HighlightOff />
-                </Button>
-                }
-                <p>{message}</p>
-                {retry !== undefined
-                  ? <Button
-                  className="btn btn-default"
-                  onClick={() => retry()}
-                  color="secondary"
-                  >Try again</Button>
-                  : null}
-              </div>
-            </div>);
+    return (
+      <div className={className + " alert-" + status}>
+        <div className={"alert"}>
+          <div className="icon-wrapper">
+            <ErrorOutline />
+          </div>
+          <h2>{title}</h2>
+          {props.dismiss !== undefined &&
+          <Button
+            title="Dismiss"
+            onClick={() => this.dismiss()}
+            className="dismiss-btn"
+          >
+            <HighlightOff />
+          </Button>
+          }
+          <p>{message}</p>
+          {retry !== undefined
+            ? <Button
+            className="btn btn-default"
+            onClick={() => retry()}
+            color="secondary"
+            >Try again</Button>
+            : null}
+        </div>
+      </div>
+    );
   }
 }

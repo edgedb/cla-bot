@@ -5,15 +5,15 @@ const JSON_ContentType = "application/json; charset=utf-8";
 
 
 export class ApplicationError extends Error {
-  statusCode: number
+  status: number
 
   constructor(message: string, statusCode: number) {
     super(message)
-    this.statusCode = statusCode
+    this.status = statusCode
   }
 
   allowRetry(): boolean {
-    return this.statusCode === 500;
+    return this.status === 500;
   }
 }
 

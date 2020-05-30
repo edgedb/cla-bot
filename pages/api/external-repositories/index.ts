@@ -19,10 +19,8 @@ export default async (
 
   switch (method) {
     case "GET":
-      // TODO: configurable organization
-      // TODO: support personal repositories
       const repositories = await repositoriesHandler
-        .getAvailableRepositories("edgedb", 1)
+        .getAvailableRepositories()
       res.status(200).json(repositories)
       return
   }

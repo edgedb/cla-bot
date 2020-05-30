@@ -14,6 +14,11 @@ dl {
       overflow: hidden;
       border-bottom: 1px dotted #eee;
       padding: 10px 0;
+      white-space: nowrap;
+
+      label {
+        display: inline-block;
+      }
 
       &:after {
         content: ":";
@@ -28,6 +33,14 @@ dl {
       text-overflow: ellipsis;
       overflow: hidden;
       padding: 10px 0;
+
+      &.select-parent {
+        padding: 5px 0;
+
+        > div {
+          min-width: 300px;
+        }
+      }
     }
 
     input {

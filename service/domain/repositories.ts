@@ -40,8 +40,7 @@ export class Repository {
 export interface RepositoriesService {
 
   getRepositories(
-    organization: string,
-    pageNumber: number
+    organization: string
   ): Promise<ExternalRepository[]>
 
 }
@@ -55,4 +54,8 @@ export interface RepositoriesRepository {
 
   getConfiguredRepositories(): Promise<Repository[]>
 
+  createRepositoryConfiguration(
+    agreementId: string,
+    repositoryId: string
+  ): Promise<void>
 }

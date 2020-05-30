@@ -41,11 +41,7 @@ export default class Panel extends Component<PanelProps> {
     }
 
     if (error) {
-      return <ErrorPanel
-        title={error.title}
-        message={error.message}
-        retry={error.retry}
-      />;
+      return <ErrorPanel {...error} />;
     }
 
     return (<div id={props.id}>{props.children}</div>);

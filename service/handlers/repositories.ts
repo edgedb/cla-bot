@@ -6,25 +6,25 @@ import {
   RepositoriesRepository,
   Repository
 } from "../../service/domain/repositories";
+import { ServiceSettings } from "../settings";
+import { BadRequestError } from "../common/web";
 
 
 @injectable()
 export class RepositoriesHandler
 {
+  @inject(TYPES.ServiceSettings)
+  private _settings: ServiceSettings
+
   @inject(TYPES.RepositoriesService)
   private _repositoriesService: RepositoriesService
 
   @inject(TYPES.RepositoriesRepository)
   private _repositoriesRepository: RepositoriesRepository
 
-  async getAvailableRepositories(
-    organization: string,
-    pageNumber: number = 1
-  ): Promise<ExternalRepository[]> {
-
+  async getAvailableRepositories(): Promise<ExternalRepository[]> {
     return await this._repositoriesService.getRepositories(
-      organization,
-      pageNumber
+      this._settings.organizationName
     )
   }
 
@@ -32,7 +32,20 @@ export class RepositoriesHandler
     return await this._repositoriesRepository.getConfiguredRepositories()
   }
 
-  async bindRepositoryToLicenseAgreement(): Promise<void> {
-    //
+  async createRepositoryConfiguration(
+    agreementId: string,
+    repositoryId: string
+  ): Promise<void> {
+
+    if (!agreementId)
+      throw new BadRequestError("Missing agreement id");
+
+    if (!repositoryId)
+      throw new BadRequestError("Missing repository id");
+
+    await this._repositoriesRepository.createRepositoryConfiguration(
+      agreementId,
+      repositoryId
+    )
   }
 }

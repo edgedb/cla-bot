@@ -149,6 +149,9 @@ extends Component<VersionTextProps, VersionTextState> {
     if (!this.validate())
       return;
 
+    // NB: errors are handled inside FormView, so here we let
+    // the exception happen if something goes wrong when putting.
+
     // TODO: add ETAG to entity, verify if ETAG matches on the server
     await put(this.URL, {
       title: this.state.mod_title,
@@ -163,7 +166,8 @@ extends Component<VersionTextProps, VersionTextState> {
 
     this.setState({
       title: mod_title,
-      body: mod_body
+      body: mod_body,
+      lastUpdateTime: new Date()  // TODO: retrieve from server
     })
   }
 
