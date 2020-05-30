@@ -223,14 +223,21 @@ extends Component<VersionTextProps, VersionTextState> {
     }
   }
 
+  renderReadOnlyTextView(): ReactElement {
+    return (
+      <div id="read-only-preview">
+        <div dangerouslySetInnerHTML={{
+          __html: mdParser.render(this.state.body)
+        }}></div>
+      </div>
+    );
+  }
+
   renderTextView(): ReactElement {
     const state = this.state;
 
     if (false === this.props.draft) {
-      // return a read-only view of the existing text
-      return <div dangerouslySetInnerHTML={{
-        __html: mdParser.render(state.body)
-      }}></div>;
+      return this.renderReadOnlyTextView();
     }
 
     const editing = state.editing;
@@ -247,9 +254,7 @@ extends Component<VersionTextProps, VersionTextState> {
         <i className="error-info">{state.bodyHelperText}</i>
         }
       </div>
-      : <div dangerouslySetInnerHTML={{
-        __html: mdParser.render(state.body)
-      }}></div>;
+      : this.renderReadOnlyTextView();
   }
 
   render(): ReactElement {

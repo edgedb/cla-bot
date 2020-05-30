@@ -54,7 +54,7 @@ export class VersionsTable extends Component<VersionsTableProps> {
         <tr>
           <th>Current</th>
           <th>Status</th>
-          <th>Number</th>
+          <th>Id</th>
           <th>Created at</th>
         </tr>
       </thead>
@@ -72,9 +72,7 @@ export class VersionsTable extends Component<VersionsTableProps> {
           <td>
             {this.renderStatusInformation(item.draft)}
           </td>
-          <td>
-            {item.number}
-          </td>
+          <td>{item.id}</td>
           <td>{formatDate(item.creationTime)}</td>
         </tr>
       })

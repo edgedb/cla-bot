@@ -44,9 +44,6 @@ CREATE MIGRATION structure TO {
         }
 
         type AgreementVersion {
-            required property number -> str {
-                constraint exclusive;
-            }
 
             required property current -> bool {
                 default := False;

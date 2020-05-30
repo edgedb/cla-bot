@@ -18,3 +18,10 @@
     }
   }
 }
+
+#read-only-preview {
+  border: 1px solid #ddd;
+  overflow-y: scroll;
+  padding: 1rem;
+  max-height: 500px;
+}

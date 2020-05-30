@@ -25,9 +25,8 @@ export default async (
       // updates the text of an existing agreement version
       // id is a version id;
       await handleExceptions(res, async () => {
-        // TODO: set parameters
-        await agreementsHandler.cloneAgreementVersion(id, "TODO")
-        return res.status(204).end()
+        const newAgreement = await agreementsHandler.cloneAgreementVersion(id);
+        return res.status(200).json(newAgreement);
       });
   }
 

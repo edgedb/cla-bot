@@ -97,7 +97,7 @@ extends Component<{}, RepositoriesState> {
       return null;
 
     if (items.length === 0)
-      return <p>There are no configured repositories.</p>
+      return <p>There are no configured agreements for repositories.</p>
 
     return <table>
       <thead>

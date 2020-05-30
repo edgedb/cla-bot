@@ -126,13 +126,6 @@ body.compact {
 }
 
 
-// Only when the markdown text editor is in full screen, display
-// the following error panel with absolute position
-.rc-md-editor.full + .error-panel {
-
-}
-
-
 body.fullscreen-editing {
 
   .error-panel {

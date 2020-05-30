@@ -109,8 +109,13 @@ export class AgreementsHandler
     const text = this.getAgreementTextByVersionAndCulture(version, culture)
 
     if (text === null) {
-      // TODO: create an agreement text entity associated with
-      // the given version
+      // TODO: create an agreement text entity associated with the
+      // given version.
+
+      // This feature is not necessary for the first version of the CLA-Bot,
+      // since every new agreement and new clone is initialized with a text
+      // for English language, and the first version of the application
+      // only supports English.
       throw new Error("Not implemented")
     } else {
       // update existing
@@ -154,7 +159,7 @@ export class AgreementsHandler
     return licenseText
   }
 
-  async getLicenseText(
+  async getAgreementText(
     versionId: string,
     cultureCode: string
   ): Promise<AgreementText> {
@@ -186,9 +191,17 @@ export class AgreementsHandler
 
     await this._agreementsRepository.updateAgreementVersion(
       versionId,
-      agreementVersion.number,
       false
     )
+  }
+
+  private readAgreementVersionParentId(version: AgreementVersion): string {
+    const agreementId = version.agreementId
+
+    if (agreementId === undefined)
+      throw new ServerError("Missing parent id in version context.")
+
+    return agreementId;
   }
 
   /**
@@ -211,10 +224,7 @@ export class AgreementsHandler
     if (version.draft)
       throw new InvalidOperationError("Cannot set a draft version as current.")
 
-    const agreementId = version.agreementId
-
-    if (agreementId === undefined)
-      throw new ServerError("Missing parent id in version context.")
+    const agreementId = this.readAgreementVersionParentId(version);
 
     await this._agreementsRepository
       .setCurrentAgreementVersion(agreementId, versionId)
@@ -228,9 +238,32 @@ export class AgreementsHandler
    * @param newVersionNumber number to associate with the cloned version
    */
   async cloneAgreementVersion(
-    versionId: string,
-    newVersionNumber: string
-  ): Promise<void> {
-    throw new Error("Not implemented")
+    versionId: string
+  ): Promise<AgreementVersion> {
+    const version = await this._agreementsRepository
+      .getAgreementVersion(versionId)
+
+    if (version === null)
+      throw new NotFoundError()
+
+    const agreementId = this.readAgreementVersionParentId(version);
+
+    if (version.texts === undefined) {
+      // TODO: improve the code: AgreementVersion details always has
+      // texts and agreementId populated.
+      throw new ServerError("Missing texts information");
+    }
+
+    return await this._agreementsRepository
+      .createAgreementVersion(
+        agreementId,
+        version.texts.map(existingText => {
+          return {
+            title: existingText.title,
+            text: existingText.text,
+            culture: existingText.culture
+          };
+        })
+      );
   }
 }

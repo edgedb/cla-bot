@@ -1,27 +1,5 @@
 
 
-export function getDefaultVersionNumber(): string {
-  const dateTimeFormat = new Intl.DateTimeFormat('en', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit'
-  })
-  const [
-    { value: month },,
-    { value: day },,
-    { value: year },,
-    { value: hour },,
-    { value: minute },,
-    { value: second }
-  ] = dateTimeFormat .formatToParts(new Date())
-
-  return(`${year}-${month}-${day}-${hour}-${minute}-${second}`)
-}
-
-
 export class AgreementListItem {
   id: string | null
   name: string
@@ -45,7 +23,6 @@ export class AgreementListItem {
 export class AgreementVersion {
   id: string
   agreementId?: string
-  number: string
   current: boolean
   draft: boolean
   texts?: AgreementText[]
@@ -53,7 +30,6 @@ export class AgreementVersion {
 
   constructor(
     id: string,
-    number: string,
     current: boolean,
     draft: boolean,
     agreementId: string | undefined,
@@ -61,7 +37,6 @@ export class AgreementVersion {
     texts?: AgreementText[],
   ) {
     this.id = id
-    this.number = number
     this.current = current
     this.draft = draft
     this.texts = texts
@@ -100,16 +75,21 @@ export class AgreementText {
 }
 
 
+export interface AgreementTextInput {
+  title: string
+  text: string
+  culture: string
+}
+
+
 /**
  * Basic information about a configured agreement for a repository.
  */
 export class RepositoryAgreementInfo {
   versionId: string
-  versionNumber: string
 
-  constructor(versionId: string, versionNumber: string) {
+  constructor(versionId: string) {
     this.versionId = versionId
-    this.versionNumber = versionNumber
   }
 }
 
@@ -171,9 +151,13 @@ export interface AgreementsRepository {
 
   updateAgreementVersion(
     id: string,
-    number: string,
     draft: boolean
   ): Promise<void>;
+
+  createAgreementVersion(
+    agreementId: string,
+    texts: AgreementTextInput[]
+  ): Promise<AgreementVersion>;
 
   setCurrentAgreementVersion(
     agreementId: string,
