@@ -4,7 +4,7 @@ import ErrorPanel, { ErrorProps } from "../../common/error"
 import Preloader from "../../common/preloader";
 import { changeHandler } from "../../forms"
 import { post, ApplicationError } from "../../fetch";
-import { Administrator } from "./contracts";
+import { validateEmail } from "../../../service/common/emails";
 
 
 interface NewAdministratorFormProps {
@@ -54,7 +54,14 @@ extends Component<NewAdministratorFormProps, NewAdministratorFormState> {
       anyError = true;
     }
 
-    // TODO: validate the value
+    if (!validateEmail(email.trim())) {
+      this.setState({
+        emailError: true,
+        emailHelperText: "The value is not a valid email address. " +
+          "A single address is supported."
+      })
+      anyError = true;
+    }
 
     return !anyError;
   }
@@ -73,8 +80,6 @@ extends Component<NewAdministratorFormProps, NewAdministratorFormState> {
       email
     } = this.state;
 
-    // TODO: support adding more administrators using more emails separated
-    // by comma or semi-colon
     post("/api/administrators", {
       email: email.trim()
     }).then(() => {
@@ -110,6 +115,7 @@ extends Component<NewAdministratorFormProps, NewAdministratorFormState> {
       {state.submitting && <Preloader className="overlay" />}
       <h1>Add new administrator</h1>
       <TextField
+        value={state.email}
         error={state.emailError}
         helperText={state.emailHelperText}
         name="email"

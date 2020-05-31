@@ -25,11 +25,11 @@ export default async (
       return
     case "POST":
       await handleExceptions(res, async () => {
-        const { agreementId, repositoryId } = req.body;
+        const { agreementId, repositoryFullName } = req.body;
 
         await repositoriesHandler.createRepositoryConfiguration(
           agreementId,
-          repositoryId
+          repositoryFullName
         )
         return res.status(204).end()
       });

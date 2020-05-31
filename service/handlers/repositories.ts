@@ -34,18 +34,18 @@ export class RepositoriesHandler
 
   async createRepositoryConfiguration(
     agreementId: string,
-    repositoryId: string
+    repositoryFullName: string
   ): Promise<void> {
 
     if (!agreementId)
       throw new BadRequestError("Missing agreement id");
 
-    if (!repositoryId)
+    if (!repositoryFullName)
       throw new BadRequestError("Missing repository id");
 
     await this._repositoriesRepository.createRepositoryConfiguration(
       agreementId,
-      repositoryId
+      repositoryFullName
     )
   }
 

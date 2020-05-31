@@ -59,7 +59,7 @@ export interface RepositoriesRepository {
 
   createRepositoryConfiguration(
     agreementId: string,
-    repositoryId: string
+    repositoryFullName: string
   ): Promise<void>
 
   deleteRepositoryConfiguration(

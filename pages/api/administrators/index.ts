@@ -26,10 +26,8 @@ export default async (
       await handleExceptions(res, async () => {
         const { email } = req.body;
 
-        await administratorsHandler.addAdministrator(
-          email
-        )
-        return res.status(204).end()
+        await administratorsHandler.addAdministrator(email);
+        return res.status(204).end();
       });
       return
   }

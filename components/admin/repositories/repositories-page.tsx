@@ -1,16 +1,16 @@
-import ConfirmDialog, { ConfirmDialogProps, closedDialog }
+import ArrayUtils from "../../array";
+import ConfirmDialog, { closedDialog, ConfirmDialogProps }
 from "../../common/confirm-dialog";
 import Layout from "../layout";
-import Link from "next/link";
+import NewRepositoryForm from "./repository-new";
 import Panel from "../../common/panel";
+import Preloader from "../../common/preloader";
 import { Button } from "@material-ui/core";
 import { Component, ReactElement } from "react";
+import { del, get } from "../../fetch";
 import { ErrorProps } from "../../common/error";
-import { get, del } from "../../fetch";
 import { RepositoriesTable } from "./repositories-table";
 import { Repository } from "./contracts";
-import ArrayUtils from "../../array";
-import Preloader from "../../common/preloader";
 
 
 interface RepositoriesState {
@@ -111,6 +111,10 @@ extends Component<{}, RepositoriesState> {
     });
   }
 
+  onNewRepository(): void {
+    this.load();
+  }
+
   render(): ReactElement {
     const state = this.state;
 
@@ -122,19 +126,16 @@ extends Component<{}, RepositoriesState> {
           load={this.load.bind(this)}
           loading={state.loading}
         >
-          <h1>Configured Repositories</h1>
+          <h1>Configured repositories</h1>
           <RepositoriesTable
             items={state.repositories}
             onRemove={this.onRemoveClick.bind(this)}
           />
-          <div className="buttons-area">
-            <Link href="/admin/repositories/new">
-              <Button
-                type="button"
-              >
-                Add new configuration
-              </Button>
-            </Link>
+          <div className="new-item-region region">
+            <NewRepositoryForm
+              repositories={this.state.repositories}
+              onNewRepository={this.onNewRepository.bind(this)}
+            />
           </div>
         </Panel>
         <ConfirmDialog {...state.confirm} />

@@ -19,7 +19,7 @@ export interface ExternalRepository {
  * that is a repository associated with an agreement.
  */
 export interface Repository {
-  id: number
+  id: string
   agreementId: string
   agreementName: string
   fullName: string

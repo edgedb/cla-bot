@@ -5,6 +5,7 @@ import {
   AdministratorsRepository,
 } from "../domain/administrators";
 import { BadRequestError } from "../common/web";
+import { validateEmail } from "../common/emails";
 
 
 @injectable()
@@ -23,7 +24,15 @@ export class AdministratorsHandler
 
     email = email.trim();
 
-    // TODO: validate emails
+    // Note: it was taken into consideration to support multiple email
+    // addresses in a single web request and comma separated,
+    // but it makes much for much more complex error handling: for example
+    // to handle partial failures, conflicts, etc.
+    // For this version of the application, administrators can be inserted
+    // one at a time.
+    if (!validateEmail(email)) {
+      throw new BadRequestError("Invalid email address");
+    }
 
     // TODO: it would be nice to send an invitation email to new
     // administrators (out of the scope of the MVP)
