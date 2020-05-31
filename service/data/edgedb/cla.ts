@@ -56,7 +56,7 @@ extends EdgeDBRepository implements ClaRepository {
         {
           email: data.email,
           version: data.versionId,
-          creation_time: data.signed_at
+          creation_time: data.signedAt
         }
       )
       data.id = result[0].id;

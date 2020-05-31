@@ -27,7 +27,7 @@ export default async (
 
   switch (req.method) {
     case "GET":
-      handleExceptions(res, async () => {
+      await handleExceptions(res, async () => {
         const data = await agreementsHandler
         .getAgreementTextByVersionIdAndCulture(
           id,
