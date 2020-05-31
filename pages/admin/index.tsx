@@ -11,7 +11,7 @@ export default class DashboardView extends Component<{}> {
   render(): ReactElement {
     return (
     <Layout title="Dashboard">
-      <h1>Welcome</h1>
+      <h1>Welcome to the CLA-Bot Admin UI.</h1>
       {/* TODO: link to user guide, for example */}
     </Layout>
     )

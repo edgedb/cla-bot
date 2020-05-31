@@ -8,6 +8,8 @@ import { AgreementsRepository } from "../../domain/agreements";
 import { EdgeDBAgreementsRepository } from "./agreements";
 import { RepositoriesRepository } from "../../domain/repositories";
 import { EdgeDBRepositoriesRepository } from "./repositories";
+import { EdgeDBAdministratorsRepository } from "./administrators";
+import { AdministratorsRepository } from "../../domain/administrators";
 
 
 export function registerEdgeDBRepositories(container: Container): void {
@@ -20,6 +22,9 @@ export function registerEdgeDBRepositories(container: Container): void {
 
   container.bind<AgreementsRepository>(TYPES.AgreementsRepository)
     .to(EdgeDBAgreementsRepository).inSingletonScope();
+
+  container.bind<AdministratorsRepository>(TYPES.AdministratorsRepository)
+    .to(EdgeDBAdministratorsRepository).inSingletonScope();
 
   container.bind<RepositoriesRepository>(TYPES.RepositoriesRepository)
     .to(EdgeDBRepositoriesRepository).inSingletonScope();

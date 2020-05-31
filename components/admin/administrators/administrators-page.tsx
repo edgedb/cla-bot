@@ -7,23 +7,23 @@ import { Button } from "@material-ui/core";
 import { Component, ReactElement } from "react";
 import { ErrorProps } from "../../common/error";
 import { get, del } from "../../fetch";
-import { RepositoriesTable } from "./repositories-table";
-import { Repository } from "./contracts";
+import { AdministratorsTable } from "./administrators-table";
+import { Administrator } from "./contracts";
 import ArrayUtils from "../../array";
 import Preloader from "../../common/preloader";
 
 
-interface RepositoriesState {
+interface AdministratorsPageProps {
   error?: ErrorProps
   loading: boolean,
   waiting: boolean,
-  repositories: Repository[]
+  administrators: Administrator[]
   confirm: ConfirmDialogProps
 }
 
 
-export default class Repositories
-extends Component<{}, RepositoriesState> {
+export default class AdministratorsPage
+extends Component<{}, AdministratorsPageProps> {
 
   constructor(props: {}) {
     super(props);
@@ -32,7 +32,7 @@ extends Component<{}, RepositoriesState> {
       loading: true,
       waiting: false,
       error: undefined,
-      repositories: [],
+      administrators: [],
       confirm: closedDialog()
     };
   }
@@ -45,11 +45,11 @@ extends Component<{}, RepositoriesState> {
       })
     }
 
-    get<Repository[]>("/api/repositories").then(
-      items => {
+    get<Administrator[]>("/api/administrators").then(
+      administrators => {
         this.setState({
           loading: false,
-          repositories: items
+          administrators
         })
       },
       () => {
@@ -83,28 +83,27 @@ extends Component<{}, RepositoriesState> {
     })
   }
 
-  onRemoveClick(item: Repository): void {
+  onRemoveClick(item: Administrator): void {
     this.setState({
       confirm: {
         open: true,
-        title: `Remove the binding for "${item.fullName}"?`,
+        title: `Remove administrator "${item.email}"?`,
         description:
-        "If confirmed, this repository - agreement binding will be removed. " +
-        `Later it is possible to create a new binding for "${item.fullName}".`,
+        "If confirmed, this administrator won`t be able to login anymore. ",
         close: () => this.dismissDialog(),
         confirm: () => this.remove(item)
       }
     })
   }
 
-  remove(item: Repository): void {
+  remove(item: Administrator): void {
     this.setState({
       waiting: true
     });
 
-    del(`/api/repositories/${item.id}`)
+    del(`/api/administrators/${item.id}`)
     .then(() => {
-      ArrayUtils.remove(this.state.repositories, item);
+      ArrayUtils.remove(this.state.administrators, item);
       this.dismissDialog();
     }, () => {
       this.addErrorToDialog();
@@ -123,16 +122,16 @@ extends Component<{}, RepositoriesState> {
           loading={state.loading}
         >
           <h1>Configured Repositories</h1>
-          <RepositoriesTable
-            items={state.repositories}
+          <AdministratorsTable
+            items={state.administrators}
             onRemove={this.onRemoveClick.bind(this)}
           />
           <div className="buttons-area">
-            <Link href="/admin/repositories/new">
+            <Link href="/admin/administratos/new">
               <Button
                 type="button"
               >
-                Add new configuration
+                Add new administrator
               </Button>
             </Link>
           </div>

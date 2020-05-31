@@ -17,9 +17,7 @@ CREATE MIGRATION structure TO {
             index on (.pull_request_id);
         }
 
-        type Admin {
-            property name -> str;
-
+        type Administrator {
             required property email -> str {
                 constraint exclusive;
             }
