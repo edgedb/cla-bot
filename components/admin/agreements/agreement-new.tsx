@@ -6,9 +6,10 @@ import { Component, ReactElement } from "react";
 import ErrorPanel, { ErrorProps } from "../../common/error"
 import Preloader from "../../common/preloader";
 import { changeHandler } from "../../forms"
+import { post, ApplicationError } from "../../fetch";
 
 
-interface NewAgreementFormState {
+interface NewAgreementPageState {
   error?: ErrorProps
   loading: boolean,
   name: string,
@@ -19,8 +20,13 @@ interface NewAgreementFormState {
 }
 
 
-export default class NewAgreement
-extends Component<{}, NewAgreementFormState> {
+interface NewAgreementResponse {
+  id: string
+}
+
+
+export default class NewAgreementPage
+extends Component<{}, NewAgreementPageState> {
 
   constructor(props: {}) {
     super(props)
@@ -56,49 +62,27 @@ extends Component<{}, NewAgreementFormState> {
       submitting: true
     })
 
-    // TODO: create common code that handles headers and errors in a single
-    // place
-    fetch("/api/agreements", {
-      method: "POST",
-      body: JSON.stringify({
-        name,
-        description: this.state.description
-      }),
-      headers: {
-        "Content-Type": "application/json; charset=utf-8"
-      }
-    }).then(response => {
-      if (response.status === 201) {
-        // everything's good
-        response.json().then(data => {
-          location.replace(`/admin/agreements/${data.id}`)
+    post<NewAgreementResponse>("/api/agreements", {
+      name,
+      description: this.state.description
+    }).then((data: NewAgreementResponse) => {
+      location.replace(`/admin/agreements/${data.id}`)
+    }, (error: ApplicationError) => {
+
+      if (error.status === 409) {
+        // name already taken
+        this.setState({
+          nameError: true,
+          nameHelperText: "There is already an agreement with this name",
+          submitting: false
         })
       } else {
-
-        if (response.status === 409) {
-          // name already taken
-          response.json().then(data => {
-            this.setState({
-              nameError: true,
-              nameHelperText: "There is already an agreement with this name",
-              submitting: false
-            })
-          });
-        } else {
-          this.setState({
-            error: undefined,
-            submitting: false
-          })
-        }
+        this.setState({
+          error: undefined,
+          submitting: false
+        })
       }
-    }).catch(error => {
-      this.setState({
-        error: {
-          message: `${error}`
-        },
-        submitting: false
-      })
-    })
+    });
   }
 
   render(): ReactElement {

@@ -11,6 +11,9 @@ import { Version } from "./version";
 
 export interface AgreementDetailsProps {
   onUpdate: (name: string, description: string) => void
+  onNewVersion: () => void
+  onCompleted: (version: AgreementVersion) => void
+  onMakeCurrent: (version: AgreementVersion) => void
   details: AgreementDetails
 }
 
@@ -157,6 +160,9 @@ extends Component<AgreementDetailsProps, AgreementDetailsState> {
         <div className="version-region region">
           <Version
             details={state.selectedVersion}
+            onNewVersion={this.props.onNewVersion.bind(this)}
+            onCompleted={this.props.onCompleted.bind(this)}
+            onMakeCurrent={this.props.onMakeCurrent.bind(this)}
           />
         </div>
        }

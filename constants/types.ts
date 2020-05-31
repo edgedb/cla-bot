@@ -13,6 +13,8 @@ const TYPES = {
   RepositoriesHandler: Symbol.for("RepositoriesHandler"),
   RepositoriesService: Symbol.for("RepositoriesService"),
   RepositoriesRepository: Symbol.for("RepositoriesRepository"),
+  AdministratorsHandler: Symbol.for("AdministratorsHandler"),
+  AdministratorsRepository: Symbol.for("AdministratorsRepository"),
 };
 
 export { TYPES };

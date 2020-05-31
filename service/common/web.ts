@@ -76,6 +76,13 @@ export class InvalidArgumentError extends SafeError {
 }
 
 
+export class BadRequestError extends SafeError {
+  constructor(message: string = "Bad Request") {
+    super(message, 400)
+  }
+}
+
+
 export class ConflictError extends SafeError {
   constructor(
     message: string = "Conflict",
@@ -114,6 +121,11 @@ export async function expectSuccessfulResponse(
   response: Response
 ): Promise<void> {
   if (response.status < 200 || response.status > 299) {
+
+    if (response.status === 404) {
+      throw new NotFoundError();
+    }
+
     throw new FailedHttpRequestError(response, await response.text());
   }
 }

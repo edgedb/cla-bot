@@ -20,15 +20,18 @@ export class Repository {
   id: string
   fullName: string
   agreementId: string
+  agreementName: string
 
   constructor(
     id: string,
     fullName: string,
-    agreementId: string
+    agreementId: string,
+    agreementName: string
   ) {
     this.id = id
     this.fullName = fullName
     this.agreementId = agreementId
+    this.agreementName = agreementName
   }
 }
 
@@ -40,8 +43,7 @@ export class Repository {
 export interface RepositoriesService {
 
   getRepositories(
-    organization: string,
-    pageNumber: number
+    organization: string
   ): Promise<ExternalRepository[]>
 
 }
@@ -55,4 +57,12 @@ export interface RepositoriesRepository {
 
   getConfiguredRepositories(): Promise<Repository[]>
 
+  createRepositoryConfiguration(
+    agreementId: string,
+    repositoryFullName: string
+  ): Promise<void>
+
+  deleteRepositoryConfiguration(
+    id: string
+  ): Promise<void>
 }

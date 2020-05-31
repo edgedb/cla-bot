@@ -38,7 +38,7 @@ export async function getServerSideProps(
   // but data model supports localization
   const cultureCode = "en";
 
-  const licenseText = await licensesHandler.getLicenseText(
+  const licenseText = await licensesHandler.getAgreementText(
     versionId,
     cultureCode
   )

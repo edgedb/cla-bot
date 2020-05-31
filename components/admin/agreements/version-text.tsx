@@ -32,11 +32,12 @@ export interface VersionTextState {
   mod_title: string
   mod_body: string
   editing: boolean
-  draft: boolean
   lastUpdateTime?: Date
 }
 
+
 const mdParser = new MarkdownIt();
+const FullScreenEditingBodyClass = "fullscreen-editing";
 
 const MdEditor = dynamic(() => import('react-markdown-editor-lite'), {
   ssr: false
@@ -68,7 +69,6 @@ extends Component<VersionTextProps, VersionTextState> {
       loading: true,
       editing: false,
       text_id: "",
-      draft: true,
       lastUpdateTime: undefined,
       titleError: false,
       titleHelperText: "",
@@ -97,7 +97,8 @@ extends Component<VersionTextProps, VersionTextState> {
         mod_title: data.title,
         mod_body: data.text,
         text_id: data.id,
-        lastUpdateTime: new Date(data.updateTime)
+        lastUpdateTime: new Date(data.updateTime),
+        editing: false
       })
     }, () => {
       this.setState({
@@ -148,6 +149,9 @@ extends Component<VersionTextProps, VersionTextState> {
     if (!this.validate())
       return;
 
+    // NB: errors are handled inside FormView, so here we let
+    // the exception happen if something goes wrong when putting.
+
     // TODO: add ETAG to entity, verify if ETAG matches on the server
     await put(this.URL, {
       title: this.state.mod_title,
@@ -162,7 +166,8 @@ extends Component<VersionTextProps, VersionTextState> {
 
     this.setState({
       title: mod_title,
-      body: mod_body
+      body: mod_body,
+      lastUpdateTime: new Date()  // TODO: retrieve from server
     })
   }
 
@@ -183,20 +188,66 @@ extends Component<VersionTextProps, VersionTextState> {
     })
   }
 
+  toggleBodyFullScreenEditingClass(): void {
+    const bodyClasses = document.body.classList;
+    if (bodyClasses.contains(FullScreenEditingBodyClass)) {
+      bodyClasses.remove(FullScreenEditingBodyClass);
+    } else {
+      bodyClasses.add(FullScreenEditingBodyClass);
+    }
+  }
+
+  private removeBodyFullScreenEditingClass(): void {
+    document.body.classList.remove(FullScreenEditingBodyClass);
+  }
+
+  componentDidMount(): void {
+    this.removeBodyFullScreenEditingClass();
+  }
+
+  componentWillUnmount(): void {
+    this.removeBodyFullScreenEditingClass();
+  }
+
+  handleOnClick(e: React.MouseEvent<HTMLDivElement>): void {
+    // NB: MdEditor doesn't offer an API to react on full screen view change.
+    // If an error happens while saving during full screen editing,
+    // we need to display the error message on top of the page (fixed position)
+    // and above the Markdown editor.
+    // This code applies a class to the body, depending whether the editor
+    // is in full screen.
+
+    // @ts-ignore
+    const targetClassList: DOMTokenList = e.target.classList;
+
+    if (targetClassList.contains("button-type-fullscreen") ||
+        targetClassList.contains("rmel-icon-fullscreen") ||
+        targetClassList.contains("rmel-icon-fullscreen-exit")) {
+        this.toggleBodyFullScreenEditingClass();
+    }
+  }
+
+  renderReadOnlyTextView(): ReactElement {
+    return (
+      <div id="read-only-preview">
+        <div dangerouslySetInnerHTML={{
+          __html: mdParser.render(this.state.body)
+        }}></div>
+      </div>
+    );
+  }
+
   renderTextView(): ReactElement {
     const state = this.state;
 
     if (false === this.props.draft) {
-      // return a read-only view of the existing text
-      return <div dangerouslySetInnerHTML={{
-        __html: mdParser.render(state.body)
-      }}></div>;
+      return this.renderReadOnlyTextView();
     }
 
     const editing = state.editing;
 
     return editing ?
-      <div>
+      <div onClick={this.handleOnClick.bind(this)}>
         <MdEditor
           value={state.mod_body}
           style={{ height: "500px" }}
@@ -207,9 +258,7 @@ extends Component<VersionTextProps, VersionTextState> {
         <i className="error-info">{state.bodyHelperText}</i>
         }
       </div>
-      : <div dangerouslySetInnerHTML={{
-        __html: mdParser.render(state.body)
-      }}></div>;
+      : this.renderReadOnlyTextView();
   }
 
   render(): ReactElement {
@@ -227,6 +276,7 @@ extends Component<VersionTextProps, VersionTextState> {
           edit={() => this.edit()}
           cancel={() => this.cancel()}
           editing={editing}
+          readonly={!this.props.draft}
         >
           <dl className="inline">
             {state.lastUpdateTime !== undefined &&

@@ -23,7 +23,7 @@ export interface ClaCheckInput {
   pullRequest: ClaCheckPullRequest
 }
 
-export interface CLACheckState extends ClaCheckInput {
+export interface ClaCheckState extends ClaCheckInput {
   commentId: string
 }
 
@@ -31,18 +31,18 @@ export class ContributorLicenseAgreement {
   id: string | null
   email: string
   versionId: string
-  signed_at: Date
+  signedAt: Date
 
   constructor(
     id: string | null,
     email: string,
     licenseVersionId: string,
-    signed_at: Date
+    signedAt: Date
   ) {
     this.id = id;
     this.email = email
     this.versionId = licenseVersionId
-    this.signed_at = signed_at
+    this.signedAt = signedAt
   }
 }
 

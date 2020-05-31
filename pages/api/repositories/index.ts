@@ -2,7 +2,7 @@ import { container } from "../../../service/di";
 import { NextApiRequest, NextApiResponse } from "next";
 import { TYPES } from "../../../constants/types";
 import { RepositoriesHandler } from "../../../service/handlers/repositories";
-import { Repository } from "../../../service/domain/repositories";
+import { handleExceptions } from "..";
 
 
 const repositoriesHandler = container
@@ -11,7 +11,7 @@ const repositoriesHandler = container
 
 export default async (
   req: NextApiRequest,
-  res: NextApiResponse<Repository[]>
+  res: NextApiResponse<any>
 ) => {
   const {
     method
@@ -23,6 +23,17 @@ export default async (
         .getConfiguredRepositories()
       res.status(200).json(repositories)
       return
+    case "POST":
+      await handleExceptions(res, async () => {
+        const { agreementId, repositoryFullName } = req.body;
+
+        await repositoriesHandler.createRepositoryConfiguration(
+          agreementId,
+          repositoryFullName
+        )
+        return res.status(204).end()
+      });
+        return
   }
 
   res.status(405).end(`${method} not allowed`)

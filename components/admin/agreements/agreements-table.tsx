@@ -1,19 +1,15 @@
 import formatDate from "../../format-date";
 import Link from "next/link";
-import { AgreementsTableItem } from "./contracts";
+import { AgreementListItem } from "./contracts";
 import { Component, ReactElement } from "react";
 
 
 export interface AgreementsTableProps {
-  items: AgreementsTableItem[]
+  items: AgreementListItem[]
 }
 
 
 export class AgreementsTable extends Component<AgreementsTableProps> {
-
-  constructor(props: AgreementsTableProps) {
-    super(props);
-  }
 
   render(): ReactElement {
     const items = this.props.items;

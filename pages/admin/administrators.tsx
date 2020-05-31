@@ -1,12 +1,8 @@
-import Grid from "@material-ui/core/Grid";
-import Layout from "../../components/admin/layout";
-import Paper from "@material-ui/core/Paper";
+import AdministratorsPage
+from "../../components/admin/administrators/administrators-page";
+import { ReactElement } from "react";
 
 
-export default () => (
-  <Layout title="Administrators">
-    <Paper>
-      <p>Administrators</p>
-    </Paper>
-  </Layout>
-)
+export default function Page(): ReactElement {
+  return <AdministratorsPage />
+}

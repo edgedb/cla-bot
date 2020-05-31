@@ -12,7 +12,8 @@ export class EdgeDBRepositoriesRepository
       return await connection.fetchAll(
         `SELECT Repository {
           full_name,
-          agreementId := .agreement.id
+          agreementId := .agreement.id,
+          agreementName := .agreement.name
         };`
       );
     })
@@ -20,8 +21,43 @@ export class EdgeDBRepositoriesRepository
     return items.map(entity => new Repository(
       entity.id,
       entity.full_name,
-      entity.agreementId
+      entity.agreementId,
+      entity.agreementName
     ));
   }
 
+  async createRepositoryConfiguration(
+    agreementId: string,
+    repositoryId: string
+  ): Promise<void> {
+    await this.run(async connection => {
+      await connection.fetchAll(
+        `
+        INSERT Repository {
+          full_name := <str>$repository_id,
+          agreement := (SELECT Agreement FILTER .id = <uuid>$agreement_id)
+        }
+        `,
+        {
+          repository_id: repositoryId,
+          agreement_id: agreementId
+        }
+      )
+    });
+  }
+
+  async deleteRepositoryConfiguration(
+    id: string
+  ): Promise<void> {
+    await this.run(async connection => {
+      await connection.fetchOne(
+        `
+        DELETE Repository FILTER .id = <uuid>$id
+        `,
+        {
+          id
+        }
+      )
+    });
+  }
 }

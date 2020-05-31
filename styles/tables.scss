@@ -34,4 +34,21 @@ th, td {
   &:first-child {
     padding-left: 10px;
   }
+
+  &.actions {
+    text-align: right;
+
+    button {
+      padding: 2px;
+      width: 30px;
+      min-width: auto;
+      border-radius: 100%;
+      border-color: #fff;
+      outline: none;
+
+      &:hover, &:focus {
+        border: 1px solid #eee;
+      }
+    }
+  }
 }

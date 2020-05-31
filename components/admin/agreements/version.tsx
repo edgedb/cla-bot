@@ -1,4 +1,4 @@
-import ConfirmDialog, { ConfirmDialogProps }
+import ConfirmDialog, { ConfirmDialogProps, closedDialog }
 from "../../common/confirm-dialog";
 import { AgreementVersion } from "./contracts";
 import { Button } from "@material-ui/core";
@@ -10,23 +10,15 @@ import Preloader from "../../common/preloader";
 
 export interface VersionProps {
   details: AgreementVersion
+  onNewVersion: () => void
+  onCompleted: (version: AgreementVersion) => void
+  onMakeCurrent: (version: AgreementVersion) => void
 }
 
 
 export interface VersionState {
   waiting: boolean
   confirm: ConfirmDialogProps
-}
-
-
-function closedDialog(): ConfirmDialogProps {
-  return {
-    open: false,
-    title: "",
-    description: "",
-    close: () => false,
-    confirm: () => false
-  }
 }
 
 
@@ -64,29 +56,38 @@ export class Version extends Component<VersionProps, VersionState> {
     })
   }
 
-  private execute(action: () => Promise<void>): void {
+  private execute(
+    action: () => Promise<void>,
+    callback: () => void
+  ): void {
     this.setState({
       waiting: true
     })
 
     action().then(() => {
       this.dismissDialog()
-      // TODO: callback, what happens afterwards?
+      callback();
     }, (error: ApplicationError) => {
       this.addErrorToDialog(error);
     })
   }
 
   complete(): void {
-    this.execute(async () => post(`${this.URL}/complete`))
+    this.execute(async () => post(`${this.URL}/complete`), () => {
+      this.props.onCompleted(this.props.details);
+    });
   }
 
   makeCurrent(): void {
-    this.execute(async () => post(`${this.URL}/make-current`))
+    this.execute(async () => post(`${this.URL}/make-current`), () => {
+      this.props.onMakeCurrent(this.props.details);
+    });
   }
 
   clone(): void {
-    this.execute(async () => post(`${this.URL}/clone`))
+    this.execute(async () => post(`${this.URL}/clone`), () => {
+      this.props.onNewVersion();
+    });
   }
 
   onCompleteClick(): void {
@@ -113,14 +114,7 @@ export class Version extends Component<VersionProps, VersionState> {
         "A new draft version of this agreement will be created, " +
         " with a copy of its texts.",
         close: () => this.dismissDialog(),
-        confirm: () => this.clone(),
-        fragment: <div>
-          <input
-          type="text"
-          name="number"
-          placeholder="Cloned version number"
-          />
-        </div>
+        confirm: () => this.clone()
       }
     })
   }

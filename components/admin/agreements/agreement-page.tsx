@@ -9,7 +9,7 @@ import {
 import { ErrorProps } from "../../common/error";
 import { Component, ReactElement } from "react";
 import Panel from "../../common/panel";
-import { AgreementVersion } from "../../../service/domain/agreements";
+import { AgreementVersion } from "./contracts";
 
 
 interface AgreementDetailsPageProps {
@@ -47,12 +47,24 @@ extends Component<AgreementDetailsPageProps, AgreementDetailsState> {
 
     get<AgreementDetails>(`/api/agreements/${this.props.id}`)
     .then((data => {
+      this.sortVersions(data);
+
       this.setState({
         loading: false,
         details: data
       })
     }), (error: ApplicationError) => {
       this.handleError(error);
+    });
+  }
+
+  sortVersions(data: AgreementDetails): void {
+    data.versions.sort((a, b) => {
+      // Always display the current version on the top
+      if (a.current) return -1;
+      if (b.current) return 1;
+
+      return new Date(a.creationTime) < new Date(b.creationTime) ? 1 : -1;
     });
   }
 
@@ -78,17 +90,42 @@ extends Component<AgreementDetailsPageProps, AgreementDetailsState> {
 
     details.name = name;
     details.description = description
-    this.setState({
-      details
+    this.setState({ details })
+  }
+
+  onCompleted(version: AgreementVersion): void {
+    const details = this.state.details;
+
+    if (details === undefined) {
+      // should never happen
+      return;
+    }
+
+    version.draft = false;
+    this.setState({ details });
+  }
+
+  onMakeCurrent(version: AgreementVersion): void {
+    const details = this.state.details;
+
+    if (details === undefined) {
+      // should never happen
+      return;
+    }
+
+    details?.versions.forEach(item => {
+      item.current = (version === item);
     })
+
+    this.setState({ details });
   }
 
-  onNewCurrentVersion(versionId: string): void {
-    // TODO: find and update, sort again
-  }
-
-  onNewVersion(version: AgreementVersion): void {
-    // TODO: push!
+  onNewVersion(): void {
+    // For simplicity, when a new agreement version is created,
+    // we force a reload of the whole Agreement object.
+    // It would also be possible to return information from the server,
+    // and append this information to the existing items (???)
+    this.load();
   }
 
   render(): ReactElement {
@@ -105,6 +142,9 @@ extends Component<AgreementDetailsPageProps, AgreementDetailsState> {
           {state.details &&
           <AgreementView
             onUpdate={this.onUpdate.bind(this)}
+            onNewVersion={this.onNewVersion.bind(this)}
+            onCompleted={this.onCompleted.bind(this)}
+            onMakeCurrent={this.onMakeCurrent.bind(this)}
             details={state.details}
           />
           }

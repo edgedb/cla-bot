@@ -20,19 +20,25 @@ export class VersionsTable extends Component<VersionsTableProps> {
 
   renderStatusInformation(isDraft: boolean): ReactElement {
     if (isDraft) {
-      return <span
-              title="This version is still a draft: its texts can be edited"
-              className="help">
-        Draft
-      </span>
+      return (
+        <span
+          title="This version is still a draft: its texts can be edited"
+          className="help"
+        >
+          Draft
+        </span>
+      );
     }
 
-    return <span
-            title="The texts of this version are no more editable, but it is
-            possible to create a copy in draft status."
-            className="help">
-        Done
-    </span>
+    return (
+      <span
+        title="The texts of this version are no more editable, but it is
+        possible to create a copy in draft status."
+        className="help"
+      >
+          Done
+      </span>
+    );
   }
 
   render(): ReactElement {
@@ -48,7 +54,7 @@ export class VersionsTable extends Component<VersionsTableProps> {
         <tr>
           <th>Current</th>
           <th>Status</th>
-          <th>Number</th>
+          <th>Id</th>
           <th>Created at</th>
         </tr>
       </thead>
@@ -66,9 +72,7 @@ export class VersionsTable extends Component<VersionsTableProps> {
           <td>
             {this.renderStatusInformation(item.draft)}
           </td>
-          <td>
-            {item.number}
-          </td>
+          <td>{item.id}</td>
           <td>{formatDate(item.creationTime)}</td>
         </tr>
       })

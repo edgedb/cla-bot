@@ -6,7 +6,11 @@ import { ChangeEvent } from "react";
  * by input field name attribute.
  */
 export function changeHandler(
-  event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  event: ChangeEvent<
+      HTMLInputElement
+    | HTMLTextAreaElement
+    | { name?: string; value: unknown }
+  >
 ): void {
   const target = event.target;
   const name = target.name;
@@ -17,7 +21,7 @@ export function changeHandler(
     );
   }
   const update: {[key: string]: string | false} = {};
-  update[name] = target.value;
+  update[name] = target.value as string;
 
   // @ts-ignore
   const self = this;

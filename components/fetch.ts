@@ -5,15 +5,15 @@ const JSON_ContentType = "application/json; charset=utf-8";
 
 
 export class ApplicationError extends Error {
-  statusCode: number
+  status: number
 
   constructor(message: string, statusCode: number) {
     super(message)
-    this.statusCode = statusCode
+    this.status = statusCode
   }
 
   allowRetry(): boolean {
-    return this.statusCode === 500;
+    return this.status === 500;
   }
 }
 
@@ -114,7 +114,7 @@ export async function put<T>(url: string, data: any): Promise<T>
 }
 
 
-export async function _delete<T>(url: string, data: any = null): Promise<T>
+export async function del<T>(url: string, data: any = null): Promise<T>
 {
   if (!data) {
     return await appFetch(url, {

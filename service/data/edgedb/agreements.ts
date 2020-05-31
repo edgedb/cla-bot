@@ -7,8 +7,9 @@ import {
   RepositoryAgreementInfo,
   Agreement,
   AgreementVersion,
-  getDefaultVersionNumber
+  AgreementTextInput
 } from "../../domain/agreements";
+import { ServerError } from "../../common/app";
 
 
 // The following interfaces describe the shape of DB entities,
@@ -25,7 +26,6 @@ interface TextEntity {
 
 interface VersionEntity {
   id: string
-  number: string
   current: boolean
   draft: boolean
   creation_time: string
@@ -51,7 +51,6 @@ function mapVersionEntity(entity: VersionEntity): AgreementVersion
 {
   return new AgreementVersion(
     entity.id,
-    entity.number,
     entity.current,
     entity.draft,
     entity.agreement_id ? entity.agreement_id[0] : undefined,
@@ -73,7 +72,6 @@ export class EdgeDBAgreementsRepository
           description,
           creation_time,
           versions: {
-            number,
             current,
             draft,
             creation_time
@@ -106,7 +104,6 @@ export class EdgeDBAgreementsRepository
     const items = await this.run(async (connection) => {
       return await connection.fetchAll(
         `SELECT AgreementVersion {
-          number,
           current,
           draft,
           creation_time,
@@ -185,7 +182,6 @@ export class EdgeDBAgreementsRepository
 
   async updateAgreementVersion(
     id: string,
-    number: string,
     draft: boolean
   ): Promise<void> {
     await this.run(async (connection) => {
@@ -194,13 +190,11 @@ export class EdgeDBAgreementsRepository
         UPDATE AgreementVersion
         FILTER .id = <uuid>$id
         SET {
-          number := <str>$number,
           draft := <bool>$draft
         }
         `,
         {
           id,
-          number,
           draft
         }
       )
@@ -215,7 +209,7 @@ export class EdgeDBAgreementsRepository
         `SELECT Repository {
           agreement: {
             versions: {
-              number
+              id
             } FILTER .current = True and .texts.culture = <str>$culture LIMIT 1
           }
         } FILTER .full_name = <str>$full_name;`,
@@ -231,8 +225,7 @@ export class EdgeDBAgreementsRepository
 
     const currentVersion = items[0].license?.versions[0];
     return new RepositoryAgreementInfo(
-      currentVersion.id,
-      currentVersion.number.toString()
+      currentVersion.id
     )
   }
 
@@ -245,7 +238,6 @@ export class EdgeDBAgreementsRepository
         `SELECT Repository {
           agreement: {
             versions: {
-              number,
               texts: {
                 text,
                 title,
@@ -257,7 +249,7 @@ export class EdgeDBAgreementsRepository
           }
         } FILTER .full_name = <str>$full_name;`,
         {
-          culture: "en",
+          culture: cultureCode,
           full_name: repositoryFullName
         }
       )
@@ -364,7 +356,6 @@ export class EdgeDBAgreementsRepository
           creation_time := <datetime>$creation_time,
           versions := {
               (INSERT AgreementVersion {
-                  number := <str>$initial_version_number,
                   current := False,
                   texts := (
                       (INSERT AgreementText {
@@ -376,16 +367,15 @@ export class EdgeDBAgreementsRepository
                   )
               })
           }
-      };
+        };
         `,
         {
           name: name,
           description: description || "",
           creation_time: creationTime,
           initial_title: name,
-          initial_text: "# Lorem ipsum dolor sit amet",
-          initial_culture: "en",
-          initial_version_number: getDefaultVersionNumber()
+          initial_text: "# Modify this markdown",
+          initial_culture: "en"
         }
       )
       const item = result[0];
@@ -418,5 +408,55 @@ export class EdgeDBAgreementsRepository
         version_id: versionId
       })
     })
+  }
+
+  async createAgreementVersion(
+    agreementId: string,
+    texts: AgreementTextInput[]
+  ): Promise<AgreementVersion> {
+    //
+    // TODO: implement support for more than one text;
+    // This is not necessary for now, because the application supports only
+    // English language.
+
+    const { title, text, culture } = texts[0];
+
+    return await this.run(async connection => {
+      const items = await connection.fetchAll(
+        `
+        UPDATE Agreement
+        FILTER
+            .id = <uuid>$agreementId
+        SET {
+            versions := .versions UNION (
+              INSERT AgreementVersion {
+                current := False,
+                texts := (
+                    (INSERT AgreementText {
+                        title := <str>$title,
+                        text := <str>$text,
+                        culture := <str>$culture,
+                        update_time := datetime_current()
+                    })
+                )
+              }
+            )
+        }
+        `,
+        {
+          agreementId,
+          title,
+          text,
+          culture
+        }
+      )
+
+      if (!items.length)
+        throw new ServerError("Expected a result.");
+
+      // TODO: how to get the new item id?
+      // I would like to return it
+      return mapVersionEntity(items[0] as VersionEntity)
+    });
   }
 }
