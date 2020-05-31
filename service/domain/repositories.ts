@@ -20,15 +20,18 @@ export class Repository {
   id: string
   fullName: string
   agreementId: string
+  agreementName: string
 
   constructor(
     id: string,
     fullName: string,
-    agreementId: string
+    agreementId: string,
+    agreementName: string
   ) {
     this.id = id
     this.fullName = fullName
     this.agreementId = agreementId
+    this.agreementName = agreementName
   }
 }
 
@@ -57,5 +60,9 @@ export interface RepositoriesRepository {
   createRepositoryConfiguration(
     agreementId: string,
     repositoryId: string
+  ): Promise<void>
+
+  deleteRepositoryConfiguration(
+    id: string
   ): Promise<void>
 }

@@ -56,3 +56,14 @@ export default class ConfirmDialog extends Component<ConfirmDialogProps> {
     </Dialog>
   }
 }
+
+
+export function closedDialog(): ConfirmDialogProps {
+  return {
+    open: false,
+    title: "",
+    description: "",
+    close: () => false,
+    confirm: () => false
+  }
+};

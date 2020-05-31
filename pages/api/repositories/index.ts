@@ -2,7 +2,6 @@ import { container } from "../../../service/di";
 import { NextApiRequest, NextApiResponse } from "next";
 import { TYPES } from "../../../constants/types";
 import { RepositoriesHandler } from "../../../service/handlers/repositories";
-import { Repository } from "../../../service/domain/repositories";
 import { handleExceptions } from "..";
 
 

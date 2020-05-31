@@ -4,7 +4,7 @@
 // Objects defined in domain namespace are different as they represent
 // higher level objects as they are handled by the server side.
 
-export interface AgreementsTableItem {
+export interface AgreementListItem {
   id: string
   name: string,
   description: string,

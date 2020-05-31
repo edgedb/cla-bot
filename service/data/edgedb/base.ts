@@ -28,7 +28,7 @@ export class EdgeDBRepository {
       }
 
       throw error
-    }finally {
+    } finally {
       await connection.close();
     }
   }

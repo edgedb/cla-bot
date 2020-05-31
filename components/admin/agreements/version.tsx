@@ -1,4 +1,4 @@
-import ConfirmDialog, { ConfirmDialogProps }
+import ConfirmDialog, { ConfirmDialogProps, closedDialog }
 from "../../common/confirm-dialog";
 import { AgreementVersion } from "./contracts";
 import { Button } from "@material-ui/core";
@@ -19,17 +19,6 @@ export interface VersionProps {
 export interface VersionState {
   waiting: boolean
   confirm: ConfirmDialogProps
-}
-
-
-function closedDialog(): ConfirmDialogProps {
-  return {
-    open: false,
-    title: "",
-    description: "",
-    close: () => false,
-    confirm: () => false
-  }
 }
 
 

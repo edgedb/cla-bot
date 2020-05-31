@@ -9,8 +9,8 @@
  * Data about a GitHub repository.
  */
 export interface ExternalRepository {
-  id: number,
-  name: string,
+  id: number
+  name: string
   fullName: string
 }
 
@@ -19,7 +19,8 @@ export interface ExternalRepository {
  * that is a repository associated with an agreement.
  */
 export interface Repository {
-  id: number,
-  name: string,
+  id: number
+  agreementId: string
+  agreementName: string
   fullName: string
 }

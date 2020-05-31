@@ -114,7 +114,7 @@ export async function put<T>(url: string, data: any): Promise<T>
 }
 
 
-export async function _delete<T>(url: string, data: any = null): Promise<T>
+export async function del<T>(url: string, data: any = null): Promise<T>
 {
   if (!data) {
     return await appFetch(url, {

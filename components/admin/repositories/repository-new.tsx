@@ -6,7 +6,7 @@ import Preloader from "../../common/preloader";
 import { changeHandler } from "../../forms"
 import Panel from "../../common/panel";
 import { get, post, ApplicationError } from "../../fetch";
-import { AgreementsTableItem } from "../agreements/contracts";
+import { AgreementListItem } from "../agreements/contracts";
 import { Repository, ExternalRepository } from "./contracts";
 
 
@@ -15,7 +15,7 @@ interface NewRepositoryFormState {
   submitError?: ErrorProps
   loading: boolean
   submitting: boolean
-  agreements: AgreementsTableItem[]
+  agreements: AgreementListItem[]
   repositories: ExternalRepository[]
   selectedAgreementId: string
   selectedRepositoryId: string,
@@ -66,7 +66,7 @@ extends Component<{}, NewRepositoryFormState> {
   }
 
   private checkAvailableItems(
-    agreements: AgreementsTableItem[],
+    agreements: AgreementListItem[],
     repositories: ExternalRepository[]
   ): ErrorProps | undefined {
     const hasAgreements = agreements.length > 0;
@@ -95,7 +95,7 @@ extends Component<{}, NewRepositoryFormState> {
   load(): void {
 
     Promise.all([
-      get<AgreementsTableItem[]>("/api/agreements"),
+      get<AgreementListItem[]>("/api/agreements"),
       get<ExternalRepository[]>("/api/external-repositories"),
       get<Repository[]>("/api/repositories")
     ]).then(([agreements, repositories, configuredRepositories]) => {

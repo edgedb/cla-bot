@@ -48,4 +48,16 @@ export class RepositoriesHandler
       repositoryId
     )
   }
+
+  async deleteRepositoryConfiguration(
+    bindingId: string
+  ): Promise<void> {
+
+    if (!bindingId)
+      throw new BadRequestError("Missing binding id");
+
+    await this._repositoriesRepository.deleteRepositoryConfiguration(
+      bindingId
+    )
+  }
 }

@@ -12,7 +12,8 @@ export class EdgeDBRepositoriesRepository
       return await connection.fetchAll(
         `SELECT Repository {
           full_name,
-          agreementId := .agreement.id
+          agreementId := .agreement.id,
+          agreementName := .agreement.name
         };`
       );
     })
@@ -20,7 +21,8 @@ export class EdgeDBRepositoriesRepository
     return items.map(entity => new Repository(
       entity.id,
       entity.full_name,
-      entity.agreementId
+      entity.agreementId,
+      entity.agreementName
     ));
   }
 
@@ -39,6 +41,21 @@ export class EdgeDBRepositoriesRepository
         {
           repository_id: repositoryId,
           agreement_id: agreementId
+        }
+      )
+    });
+  }
+
+  async deleteRepositoryConfiguration(
+    id: string
+  ): Promise<void> {
+    await this.run(async connection => {
+      await connection.fetchOne(
+        `
+        DELETE Repository FILTER .id = <uuid>$id
+        `,
+        {
+          id
         }
       )
     });
