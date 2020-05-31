@@ -31,9 +31,8 @@ extends Component<{}, NewRepositoryFormState> {
 
   constructor(props: {}) {
     super(props)
-    //
-    // TODO: make repository select multiple!
-    //
+    // TODO: would be nice to make repository select multiple!
+    // (out of the scope of the MVP)
     this.state = {
       error: undefined,
       submitError: undefined,
@@ -173,7 +172,7 @@ extends Component<{}, NewRepositoryFormState> {
         submitting: false
       });
       location.replace("/admin/repositories");
-    }, (error: ApplicationError) => {
+    }, () => {
       this.setState({
         submitting: false,
         submitError: {}

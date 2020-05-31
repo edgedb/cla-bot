@@ -9,7 +9,7 @@ import { changeHandler } from "../../forms"
 import { post, ApplicationError } from "../../fetch";
 
 
-interface NewAgreementFormState {
+interface NewAgreementPageState {
   error?: ErrorProps
   loading: boolean,
   name: string,
@@ -25,8 +25,8 @@ interface NewAgreementResponse {
 }
 
 
-export default class NewAgreement
-extends Component<{}, NewAgreementFormState> {
+export default class NewAgreementPage
+extends Component<{}, NewAgreementPageState> {
 
   constructor(props: {}) {
     super(props)

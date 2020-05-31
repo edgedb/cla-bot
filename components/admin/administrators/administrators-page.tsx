@@ -1,9 +1,7 @@
 import ConfirmDialog, { ConfirmDialogProps, closedDialog }
 from "../../common/confirm-dialog";
 import Layout from "../layout";
-import Link from "next/link";
 import Panel from "../../common/panel";
-import { Button } from "@material-ui/core";
 import { Component, ReactElement } from "react";
 import { ErrorProps } from "../../common/error";
 import { get, del } from "../../fetch";
@@ -11,6 +9,7 @@ import { AdministratorsTable } from "./administrators-table";
 import { Administrator } from "./contracts";
 import ArrayUtils from "../../array";
 import Preloader from "../../common/preloader";
+import NewAdministratorForm from "./administrator-new";
 
 
 interface AdministratorsPageProps {
@@ -19,6 +18,7 @@ interface AdministratorsPageProps {
   waiting: boolean,
   administrators: Administrator[]
   confirm: ConfirmDialogProps
+  showNewAdministratorForm: boolean
 }
 
 
@@ -33,7 +33,8 @@ extends Component<{}, AdministratorsPageProps> {
       waiting: false,
       error: undefined,
       administrators: [],
-      confirm: closedDialog()
+      confirm: closedDialog(),
+      showNewAdministratorForm: false
     };
   }
 
@@ -110,30 +111,30 @@ extends Component<{}, AdministratorsPageProps> {
     });
   }
 
+  onNewAdministrator(): void {
+    this.load();
+  }
+
   render(): ReactElement {
     const state = this.state;
 
     return (
-      <Layout title="Repositories">
+      <Layout title="Administrators">
         {state.waiting && <Preloader className="overlay" />}
         <Panel
           error={state.error}
           load={this.load.bind(this)}
           loading={state.loading}
         >
-          <h1>Configured Repositories</h1>
+          <h1>Administrators</h1>
           <AdministratorsTable
             items={state.administrators}
             onRemove={this.onRemoveClick.bind(this)}
           />
-          <div className="buttons-area">
-            <Link href="/admin/administratos/new">
-              <Button
-                type="button"
-              >
-                Add new administrator
-              </Button>
-            </Link>
+          <div className="new-item-region region">
+            <NewAdministratorForm
+              onNewAdministrator={this.onNewAdministrator.bind(this)}
+            />
           </div>
         </Panel>
         <ConfirmDialog {...state.confirm} />

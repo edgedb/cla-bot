@@ -21,6 +21,10 @@ export class AdministratorsHandler
     if (!email || !email.trim())
       throw new BadRequestError("Missing email");
 
+    email = email.trim();
+
+    // TODO: validate emails
+
     // TODO: it would be nice to send an invitation email to new
     // administrators (out of the scope of the MVP)
 
