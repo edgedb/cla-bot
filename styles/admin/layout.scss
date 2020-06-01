@@ -61,7 +61,7 @@
     }
   }
 
-  .region {
+  section, .region {
     margin-top: 40px;
     border-top: 1px dotted #dedede;
   }
@@ -148,4 +148,8 @@ body.fullscreen-editing {
       width: calc(100% - 280px);
     }
   }
+}
+
+.big-text {
+  font-size: 1rem;
 }

@@ -15,6 +15,7 @@ const TYPES = {
   RepositoriesRepository: Symbol.for("RepositoriesRepository"),
   AdministratorsHandler: Symbol.for("AdministratorsHandler"),
   AdministratorsRepository: Symbol.for("AdministratorsRepository"),
+  ClasHandler: Symbol.for("ClasHandler"),
 };
 
 export { TYPES };

@@ -53,6 +53,8 @@ extends Component<SignedLicenseProps> {
   render(): ReactElement {
     const { text, title } = this.props
 
+    // TODO: render markdown
+
     return (
       <Container className="contributor-agreement-area">
         <Head>

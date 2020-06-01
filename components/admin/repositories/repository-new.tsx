@@ -271,7 +271,7 @@ extends Component<NewRepositoryFormProps, NewRepositoryFormState> {
           load={() => this.load()}
           loading={state.loading}
         >
-          <h1>Create new repository configuration</h1>
+          <h1>Bind agreement to repository</h1>
           <dl className="inline">
             <dt>
               <InputLabel id="agreement-select-label">

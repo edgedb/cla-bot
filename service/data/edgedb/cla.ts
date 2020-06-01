@@ -23,7 +23,7 @@ extends EdgeDBRepository implements ClaRepository {
         `SELECT ContributorLicenseAgreement {
           email,
           creation_time,
-          versionId := .licenseVersion.id
+          versionId := .agreement_version.id
         }
         FILTER .email = <str>$0;`,
         [email]
@@ -49,7 +49,7 @@ extends EdgeDBRepository implements ClaRepository {
         `
         INSERT ContributorLicenseAgreement {
           email := <str>$email,
-          licenseVersion := (SELECT LicenseVersion FILTER .id = <uuid>$version),
+          agreement_version := (SELECT AgreementVersion FILTER .id = <uuid>$version),
           creation_time := <datetime>$creation_time
         }
         `,
