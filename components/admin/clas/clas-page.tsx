@@ -7,7 +7,7 @@ export default class ClaPage extends Component {
 
   render(): ReactElement {
     return (
-      <Layout title="CLA">
+      <Layout title="Contributor License Agreements">
         <h1>Contributor License Agreements</h1>
         <ClaSearch />
       </Layout>

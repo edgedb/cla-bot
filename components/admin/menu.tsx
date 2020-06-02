@@ -8,6 +8,7 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import PeopleIcon from "@material-ui/icons/People";
 import React, { ReactElement } from "react";
+import Settings from "@material-ui/icons/Settings";
 
 
 interface MenuItem {
@@ -61,14 +62,19 @@ export const mainListItems =
       href: "/admin/clas",
       text: "Signed CLAs",
       icon: <PeopleIcon />
+    },
+    {
+      href: "/admin/administrators",
+      text: "Administrators",
+      icon: <AssignmentInd />
     }
   ]);
 
 export const secondaryListItems =
   getMenu([
     {
-      href: "/admin/administrators",
-      text: "Administrators",
-      icon: <AssignmentInd />
+      href: "/admin/preferences",
+      text: "Preferences",
+      icon: <Settings />
     }
   ]);

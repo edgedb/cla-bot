@@ -15,9 +15,13 @@ export default class Preloader extends Component<PreloaderProps> {
   render(): ReactElement {
     const props = this.props;
     const className = props.className;
-    return (<div id={props.id}
-    className={"preloader-mask" + (className ? " " + className : "")}>
-              <div className="preloader-icon"></div>
-            </div>);
+    return (
+      <div
+        id={props.id}
+        className={"preloader-mask" + (className ? " " + className : "")}
+      >
+        <div className="preloader-icon"></div>
+      </div>
+    );
   }
 }

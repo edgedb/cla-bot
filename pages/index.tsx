@@ -6,7 +6,7 @@ export default function Home(): ReactElement {
   return (
     <div className="container">
       <Head>
-        <title></title>
+        <title>CLA-bot</title>
       </Head>
     </div>
   )

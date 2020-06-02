@@ -60,12 +60,9 @@ extends Component<SignedLicenseProps> {
         <Head>
           <title>{title}</title>
         </Head>
-
         <main>
           <div dangerouslySetInnerHTML={{ __html: text }}></div>
         </main>
-        <footer>
-        </footer>
       </Container>
     )
   }
