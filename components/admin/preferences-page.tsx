@@ -49,6 +49,7 @@ export default class PreferencesPage extends Component<unknown, Preferences> {
 
     return (
       <Layout title="Preferences">
+        <h1>Preferences</h1>
         <dl className="inline">
           <dt>Dates format</dt>
           <dd>
@@ -60,7 +61,11 @@ export default class PreferencesPage extends Component<unknown, Preferences> {
             >
               {
               SupportedCultures.map(item => {
-                return <MenuItem key={item} value={item}>{item}</MenuItem>
+                return (
+                  <MenuItem key={item} value={item}>
+                    {item.toUpperCase()}
+                  </MenuItem>
+                );
               })
               }
             </Select>

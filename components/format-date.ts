@@ -1,5 +1,10 @@
 // Common code to format dates for the client
 
+// Nota bene: localStorage here works because this function is always
+// executed on the client.
+// Because the application is designed to fetch all information from API
+// requests from the client, before displaying them on page.
+
 const supportedFormats: { [key: string]: Intl.DateTimeFormat } = {
   "en-us": new Intl.DateTimeFormat("en-us", {
     year: "numeric",
@@ -21,7 +26,8 @@ const supportedFormats: { [key: string]: Intl.DateTimeFormat } = {
 
 
 function getCurrentFormat(): Intl.DateTimeFormat {
-  const preferredDateCulture = localStorage.getItem("") || "en-us";
+  const preferredDateCulture = localStorage.getItem("DATES_CULTURE")
+  || "en-us";
   return supportedFormats[preferredDateCulture] || supportedFormats["en-us"];
 }
 
