@@ -3,7 +3,7 @@
 // Nota bene: localStorage here works because this function is always
 // executed on the client.
 // Because the application is designed to fetch all information from API
-// requests from the client, before displaying them on page.
+// from the client, before displaying them on page.
 
 const supportedFormats: { [key: string]: Intl.DateTimeFormat } = {
   "en-us": new Intl.DateTimeFormat("en-us", {
