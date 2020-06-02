@@ -24,10 +24,25 @@ export class TokensHandler {
     return jwt.sign(Object.assign({}, data), this._settings.secret)
   }
 
+  createApplicationToken(data: any, maxAgeInSeconds: number = 7200): string {
+    const time = Math.round(new Date().getTime() / 1000);
+
+    return jwt.sign(Object.assign({}, data, {
+      "iat": time,
+      "exp": time + maxAgeInSeconds,
+      "iss": "CLA-Bot",
+      "aud": "CLA-Bot"
+    }), this._settings.secret);
+  }
+
+  verifyToken(rawToken: string): object {
+    return jwt.verify(rawToken, this._settings.secret) as object;
+  }
+
   parseToken(rawToken: string): object
   {
     try {
-      return jwt.verify(rawToken, this._settings.secret) as object;
+      return this.verifyToken(rawToken);
     } catch (error) {
       throw new SafeError("Token validation error.", error);
     }
