@@ -11,7 +11,7 @@ export default class AfterLoginPage extends Component {
       return null;
     }
 
-    const match = search.match(/^\?token=([^\&]+)/);
+    const match = search.match(/^\?access_token=([^\&]+)/);
 
     if (!match) {
       return null;

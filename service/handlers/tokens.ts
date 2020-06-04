@@ -24,7 +24,21 @@ export class TokensHandler {
     return jwt.sign(Object.assign({}, data), this._settings.secret)
   }
 
-  createApplicationToken(data: any, maxAgeInSeconds: number = 7200): string {
+  /**
+   * Creates an access token to be used by the application itself:
+   * here issuer and audience are the same entity.
+   * Access tokens are signed using a configured secret, therefore using
+   * symmetric encryption.
+   *
+   * Tokens by default are valid for 24 hours.
+   *
+   * This is sufficient for the current scope of the project. In the future
+   * the solution can be improved using different solutions, such as tokens
+   * issued by an identity provider (such as Auth0), or using RSA keys,
+   * thus enabling third parties to validate the tokens issued by the
+   * application.
+   */
+  createApplicationToken(data: any, maxAgeInSeconds: number = 86400): string {
     const time = Math.round(new Date().getTime() / 1000);
 
     return jwt.sign(Object.assign({}, data, {

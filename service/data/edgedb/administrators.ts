@@ -23,6 +23,32 @@ export class EdgeDBAdministratorsRepository
     ));
   }
 
+  async getAdministratorByEmail(
+    email: string
+  ): Promise<Administrator | null> {
+    const items = await this.run(async (connection) => {
+      return await connection.fetchAll(
+        `SELECT Administrator {
+          id,
+          email
+        } FILTER .email = <str>$email LIMIT 1;`, {
+          email
+        }
+      );
+    })
+
+    if (!items.length) {
+      return null;
+    }
+
+    const singleItem = items[0];
+
+    return new Administrator(
+      singleItem.id,
+      singleItem.email
+    );
+  }
+
   async addAdministrator(email: string): Promise<void> {
     await this.run(async connection => {
       await connection.fetchAll(

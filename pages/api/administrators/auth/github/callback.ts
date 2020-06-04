@@ -24,38 +24,27 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(400).end(error);
   }
 
-  try {
-    const requestUrl = req.url
+  const requestUrl = req.url
 
-    if (!requestUrl)
-      throw new Error("Missing request url.")
+  if (!requestUrl)
+    throw new Error("Missing request url.")
 
-    const token = await githubAuth.code.getToken(requestUrl);
-    const accessToken = token.accessToken;
+  const token = await githubAuth.code.getToken(requestUrl);
+  const accessToken = token.accessToken;
 
-    // Verify that the user is an administrator
-    // issue an access token for the user, to be used on the client,
-    // redirect to admin page
+  // Verify that the user is an administrator
+  // issue an access token for the user, to be used on the client,
+  // redirect to admin page
 
-    await handleExceptions(res, async () => {
-      const result = await administratorsHandler
-        .validateAdministratorLogin(accessToken);
+  await handleExceptions(res, async () => {
+    const result = await administratorsHandler
+      .validateAdministratorLogin(accessToken);
 
-      // Redirect to a page that sets the access token to the session
-      // storage, then redirects to the admin page
-      res.writeHead(302, {
-        Location: `/admin/after-login?access_token=${result}`,
-      });
-      res.end();
+    // Redirect to a page that sets the access token to the session
+    // storage, then redirects to the admin page
+    res.writeHead(302, {
+      Location: `/admin/after-login?access_token=${result}`,
     });
-
-  } catch (error) {
-
-    if (error instanceof SafeError) {
-      res.status(error.statusCode).end(error.message);
-      return;
-    }
-
-    res.status(500).end("Internal server error");
-  }
+    res.end();
+  });
 }

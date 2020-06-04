@@ -5,6 +5,14 @@
 
   min-width: 320px;
 
+  .app-toolbar {
+    display: flex;
+
+    .headline {
+      flex: 1;
+    }
+  }
+
   header {
     // otherwise Firefox doesn't display properly
     // when editing Markdown full screen

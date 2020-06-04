@@ -1,13 +1,10 @@
 import AppBar from "@material-ui/core/AppBar";
-import Box from "@material-ui/core/Box";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
-import Container from "@material-ui/core/Container";
-import Copyright from "../../components/copyrights";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Divider from "@material-ui/core/Divider";
 import Drawer from "@material-ui/core/Drawer";
-import Grid from "@material-ui/core/Grid";
+import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import Head from "next/head";
 import IconButton from "@material-ui/core/IconButton";
 import List from "@material-ui/core/List";
@@ -15,10 +12,8 @@ import MenuIcon from "@material-ui/icons/Menu";
 import React, { ReactElement } from "react";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
-import {
-  mainListItems,
-  secondaryListItems
-} from "../../components/admin/menu";
+import { mainListItems, secondaryListItems }
+from "../../components/admin/menu";
 
 
 interface AdminLayoutProps {
@@ -65,6 +60,14 @@ extends React.Component<AdminLayoutProps, AdminLayoutState> {
     this.setInitialOpen(!isOpen);
   }
 
+  signOut(): void {
+    sessionStorage.removeItem("ACCESS_TOKEN");
+
+    setTimeout(() => {
+      window.location.replace("/admin/login");
+    }, 0);
+  }
+
   render(): ReactElement {
     const open = this.state.drawerOpen;
 
@@ -77,7 +80,7 @@ extends React.Component<AdminLayoutProps, AdminLayoutState> {
         </Head>
         <CssBaseline />
         <AppBar position="static">
-          <Toolbar>
+          <Toolbar className="app-toolbar">
             <IconButton
               edge="start"
               color="inherit"
@@ -87,12 +90,22 @@ extends React.Component<AdminLayoutProps, AdminLayoutState> {
               <MenuIcon />
             </IconButton>
             <Typography
+            className="headline"
             component="h1"
             variant="h6"
             color="inherit"
             noWrap>
               CLA-Bot
             </Typography>
+            <IconButton
+              edge="end"
+              color="inherit"
+              aria-label="Sign out"
+              title="Sign out"
+              onClick={() => this.signOut()}
+            >
+              <ExitToAppIcon />
+            </IconButton>
           </Toolbar>
         </AppBar>
         <Drawer

@@ -1,9 +1,8 @@
 import { container } from "../service/di";
-import { NextApiResponse, NextApiRequest } from "next";
+import { NextApiRequest, NextApiResponse } from "next";
+import { TokenExpiredError } from "jsonwebtoken";
 import { TokensHandler } from "../service/handlers/tokens";
 import { TYPES } from "../constants/types";
-import { TokenExpiredError } from "jsonwebtoken";
-import { IncomingMessage, ServerResponse } from "http";
 
 
 export interface AuthContext {
@@ -25,7 +24,7 @@ function getMessageForError(error: Error): string {
 
 
 function readJWTBearer(
-  req: IncomingMessage
+  req: NextApiRequest
 ): Promise<object> {
   return new Promise((resolve, reject) => {
     const authorization = req.headers.authorization;
@@ -83,42 +82,3 @@ export function auth(
     });
   });
 }
-
-
-/**
- * Requires an authenticated user for a page request. Inspects request headers
- * to look for a valid JWT Bearer token. Stops request handling and returns
- * 401 for unauthorized users.
- *
- * With this approach, authentication check happens before rendering the page,
- * and the page is a serverless function,
- * which is more expensive and slower than a static page with checks done on
- * the client side.
- */
-export function page_auth(
-  req: IncomingMessage,
-  res: ServerResponse
-): Promise<void> {
-  return new Promise((resolve, reject) => {
-    readJWTBearer(req).then(user => {
-      (req as unknown as AuthContext).user = user;
-      resolve();
-    }, () => {
-      // redirect to the login page
-      res.writeHead(302, {
-        Location: `/admin/login`,
-      });
-      res.end();
-      reject();
-    });
-  });
-}
-
-// The function above can be used to require authentication in ADMIN pages,
-// in `getServerSideProps` functions, following the example from:
-// tslint:disable-next-line: max-line-length
-// https://github.com/vercel/next.js/blob/canary/examples/auth0/pages/advanced/ssr-profile.js
-//
-// See also:
-// https://github.com/vercel/next.js/issues/153
-// https://github.com/vercel/next.js/issues/153#issuecomment-473658540

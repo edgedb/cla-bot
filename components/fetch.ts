@@ -36,6 +36,13 @@ async function tryParseBodyAsJSON(response: Response): Promise<any> {
 }
 
 
+function getAuthorizationHeader(): {[key: string]: string} {
+  return {
+    "Authorization": `Bearer ${sessionStorage.getItem("ACCESS_TOKEN")}`
+  }
+}
+
+
 /**
  * Wrapper around fetch API, with common logic to handle application errors
  * and response bodies.
@@ -44,6 +51,16 @@ async function appFetch<T>(
   input: RequestInfo,
   init?: RequestInit
 ): Promise<T> {
+
+  // extend init properties with an access token
+  if (init === undefined) {
+    init = {
+      headers: getAuthorizationHeader()
+    }
+  } else {
+    init.headers = Object.assign({}, init.headers, getAuthorizationHeader());
+  }
+
   const response = await fetch(input, init);
 
   // TODO: handle data from server even when it includes error details

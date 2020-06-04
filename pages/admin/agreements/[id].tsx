@@ -3,14 +3,8 @@ import Preloader from "../../../components/common/preloader";
 import { ReactElement } from "react";
 import { withRouter } from "next/router";
 import { WithRouterProps } from "next/dist/client/with-router";
-import { GetServerSideProps } from "next";
-import { page_auth } from "../../../pages-common/auth";
+import AdminPage from "../../../components/admin/page";
 
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  await page_auth(context.req, context.res);
-  return { props: {} };
-}
 
 function Page({ router }: WithRouterProps): ReactElement {
   const agreementId = router.query.id
@@ -25,7 +19,11 @@ function Page({ router }: WithRouterProps): ReactElement {
     return <Preloader className="overlay" />
   }
 
-  return <AgreementDetailsPage id={agreementId} />
+  return (
+    <AdminPage>
+      <AgreementDetailsPage id={agreementId} />
+    </AdminPage>
+  );
 }
 
 export default withRouter(Page)
