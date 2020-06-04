@@ -1,8 +1,9 @@
-import { container } from "../../../../service/di";
+import { auth } from "../../../../pages-common/auth";
 import { AgreementsHandler } from "../../../../service/handlers/agreements";
+import { container } from "../../../../service/di";
+import { handleExceptions } from "../..";
 import { NextApiRequest, NextApiResponse } from "next";
 import { TYPES } from "../../../../constants/types";
-import { handleExceptions } from "../..";
 
 
 const agreementsHandler = container
@@ -13,6 +14,8 @@ export default async (
   req: NextApiRequest,
   res: NextApiResponse<any>
 ) => {
+  await auth(req, res);
+
   const { query: { id }} = req;
 
   if (typeof id !== "string") {

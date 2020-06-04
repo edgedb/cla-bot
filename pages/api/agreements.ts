@@ -3,8 +3,9 @@ import { AgreementListItem } from "../../service/domain/agreements";
 import { AgreementsHandler } from "../../service/handlers/agreements";
 import { NextApiRequest, NextApiResponse } from "next";
 import { TYPES } from "../../constants/types";
-import { SafeError, ErrorDetails } from "../../service/common/web";
+import { ErrorDetails } from "../../service/common/web";
 import { handleExceptions } from ".";
+import { auth } from "../../pages-common/auth";
 
 
 const agreementsHandler = container
@@ -21,13 +22,13 @@ export default async (
 
   switch (method) {
     case "GET":
-      // return a list of licenses without details
       const agreements = await agreementsHandler.getAgreements()
       res.status(200).json(agreements)
       return
 
     case "POST":
-      // create a new license: require admin authentication and authorization
+      await auth(req, res);
+
       await handleExceptions(res, async () => {
         const data = req.body;
         const result = await agreementsHandler.createAgreement(

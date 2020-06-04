@@ -3,6 +3,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { TYPES } from "../../../constants/types";
 import { RepositoriesHandler } from "../../../service/handlers/repositories";
 import { handleExceptions } from "..";
+import { auth } from "../../../pages-common/auth";
 
 
 const repositoriesHandler = container
@@ -24,6 +25,8 @@ export default async (
       res.status(200).json(repositories)
       return
     case "POST":
+      await auth(req, res);
+
       await handleExceptions(res, async () => {
         const { agreementId, repositoryFullName } = req.body;
 

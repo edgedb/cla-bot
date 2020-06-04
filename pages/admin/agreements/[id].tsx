@@ -3,7 +3,14 @@ import Preloader from "../../../components/common/preloader";
 import { ReactElement } from "react";
 import { withRouter } from "next/router";
 import { WithRouterProps } from "next/dist/client/with-router";
+import { GetServerSideProps } from "next";
+import { page_auth } from "../../../pages-common/auth";
 
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  await page_auth(context.req, context.res);
+  return { props: {} };
+}
 
 function Page({ router }: WithRouterProps): ReactElement {
   const agreementId = router.query.id

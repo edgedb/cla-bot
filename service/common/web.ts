@@ -83,6 +83,13 @@ export class BadRequestError extends SafeError {
 }
 
 
+export class UnauthorizedError extends SafeError {
+  constructor(message: string = "Unauthorized") {
+    super(message, 401)
+  }
+}
+
+
 export class ConflictError extends SafeError {
   constructor(
     message: string = "Conflict",

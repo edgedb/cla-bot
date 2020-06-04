@@ -18,7 +18,6 @@ export interface EmailInfo {
 
 
 export interface UsersService {
-  // TODO: deprecate this method
   getUserInfoFromAccessToken(accessToken: string): Promise<UserInfo>
 
   getUserEmailAddresses(accessToken: string): Promise<EmailInfo[]>

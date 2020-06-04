@@ -3,7 +3,6 @@ import { AgreementVersion } from "../../../../service/domain/agreements";
 import { AgreementsHandler } from "../../../../service/handlers/agreements";
 import { NextApiRequest, NextApiResponse } from "next";
 import { TYPES } from "../../../../constants/types";
-import { handleExceptions } from "../..";
 import { ErrorDetails } from "../../../../service/common/web";
 
 

@@ -1,3 +1,4 @@
+import { auth } from "../../../../pages-common/auth";
 import { container } from "../../../../service/di";
 import { AgreementsHandler } from "../../../../service/handlers/agreements";
 import { NextApiRequest, NextApiResponse } from "next";
@@ -13,6 +14,8 @@ export default async (
   req: NextApiRequest,
   res: NextApiResponse<any>
 ) => {
+  await auth(req, res);
+
   const { query: { id }} = req;
 
   if (typeof id !== "string") {

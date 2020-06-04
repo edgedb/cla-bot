@@ -1,3 +1,4 @@
+import { auth } from "../../../../../pages-common/auth";
 import { container } from "../../../../../service/di";
 import { AgreementsHandler } from "../../../../../service/handlers/agreements";
 import { NextApiRequest, NextApiResponse } from "next";
@@ -43,6 +44,8 @@ export default async (
 
       break;
     case "PUT":
+      await auth(req, res);
+
       // inserts or updates the text of an existing agreement version
       // by id and culture: id is a version id
       await handleExceptions(res, async () => {

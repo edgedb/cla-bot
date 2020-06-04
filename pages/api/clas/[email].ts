@@ -3,6 +3,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { TYPES } from "../../../constants/types";
 import { handleExceptions } from "..";
 import { ClasHandler } from "../../../service/handlers/clas";
+import { auth } from "../../../pages-common/auth";
 
 
 const clasHandler = container
@@ -13,6 +14,8 @@ export default async (
   req: NextApiRequest,
   res: NextApiResponse<any>
 ) => {
+  await auth(req, res);
+
   const { query: { email }} = req;
 
   if (typeof email !== "string") {

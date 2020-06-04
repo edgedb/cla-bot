@@ -1,7 +1,7 @@
+import Avatar from "@material-ui/core/Avatar";
 import Head from "next/head";
-import React, { ReactElement } from 'react';
-import Avatar from '@material-ui/core/Avatar';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
+import React, { ReactElement } from "react";
 import { Button, Container, Grid } from "@material-ui/core";
 import { Component } from "react";
 
@@ -29,9 +29,13 @@ export default class AdminLoginPage extends Component {
               </Avatar>
             </Grid>
             <Grid item xs={6} sm={3}>
-              <Button>
+              <Button
+                variant="contained"
+              >
                 <i className="fab fa-github"></i>
-                <a href="/api/admins/auth/github">Sign in with GitHub</a>
+                <a href="/api/administrators/auth/github">
+                  Sign in with GitHub
+                </a>
               </Button>
             </Grid>
           </Grid>

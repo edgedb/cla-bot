@@ -4,6 +4,7 @@ import { TYPES } from "../../../../constants/types";
 import { handleExceptions } from "../..";
 import { RepositoriesHandler }
 from "../../../../service/handlers/repositories";
+import { auth } from "../../../../pages-common/auth";
 
 
 const repositoriesHandler = container
@@ -23,9 +24,9 @@ export default async (
 
   switch (req.method) {
     case "DELETE":
-      await handleExceptions(res, async () => {
-        const body = req.body;
+      await auth(req, res);
 
+      await handleExceptions(res, async () => {
         await repositoriesHandler.deleteRepositoryConfiguration(
           id
         )

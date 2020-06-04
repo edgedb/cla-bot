@@ -1,8 +1,9 @@
-import { container } from "../../../../service/di";
+import { auth } from "../../../../pages-common/auth";
 import { AgreementsHandler } from "../../../../service/handlers/agreements";
+import { container } from "../../../../service/di";
+import { handleExceptions } from "../..";
 import { NextApiRequest, NextApiResponse } from "next";
 import { TYPES } from "../../../../constants/types";
-import { handleExceptions } from "../..";
 
 
 const agreementsHandler = container
@@ -36,6 +37,8 @@ export default async (
       });
       return;
     case "PATCH":
+      await auth(req, res);
+
       // update an existing agreement
       await handleExceptions(res, async () => {
         const body = req.body;
@@ -48,9 +51,7 @@ export default async (
 
         return res.status(204).end()
       });
-
-    case "DELETE":
-      break
+      return;
   }
 
   res.status(405).end(`${req.method} not allowed`)

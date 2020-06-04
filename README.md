@@ -35,6 +35,7 @@ This project uses onion architecture, with the following namespaces:
 * `constants` contains configuration constants
 * `components` contains reusable React components
 * `pages` is a folder handled by `Next.js`, with routes: pages and api
+* `pages-common` is a folder containing common code for pages and api used in `Next.js` front-end
 * `public` is a folder handled by `Next.js`, containing static files
 * `service.domain` contains domain objects and interfaces for external services
 * `service.data` contains concrete implementations of external services

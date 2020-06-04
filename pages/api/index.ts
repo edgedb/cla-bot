@@ -1,10 +1,15 @@
 
-// TODO: make decorator, or put in a common place (like Express.js middleware)
 import { NextApiResponse } from "next";
 import { ErrorDetails, SafeError } from "../../service/common/web";
 
 
-// having this function here is a temporary solution
+/**
+ * Executes a given function, handling any thrown SafeError to serve
+ * useful information to the client, in case of error.
+ *
+ * The error class is called "SafeError" because its purpose is to provide
+ * error details to the client, unlike unhandled exceptions.
+ */
 export async function handleExceptions<T>(
   res: NextApiResponse<T | ErrorDetails>,
   action: () => Promise<void>

@@ -1,18 +1,15 @@
 import githubAuth from "./configuration";
 import { NextApiRequest, NextApiResponse } from "next";
 import { SafeError } from "../../../../../service/common/web";
+import { readOAuthError } from "../../../../../pages-common/oauth";
+import { AdministratorsHandler } from "../../../../../service/handlers/administrators";
+import { container } from "../../../../../service/di";
+import { TYPES } from "../../../../../constants/types";
+import { handleExceptions } from "../../../";
 
 
-function readOAuthError(req: NextApiRequest): string | null {
-  const query = req.query
-  const error = query.error
-  const error_description = query.error_description
-
-  if (error) {
-    return `OAuth integration error: ${error}; description: ${error_description}`
-  }
-  return null;
-}
+const administratorsHandler = container
+  .get<AdministratorsHandler>(TYPES.AdministratorsHandler);
 
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
@@ -36,10 +33,22 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     const token = await githubAuth.code.getToken(requestUrl);
     const accessToken = token.accessToken;
 
-    // TODO: verify that the user is an administrator
-    // TODO: issue an access token for the user, to be used on the client,
+    // Verify that the user is an administrator
+    // issue an access token for the user, to be used on the client,
     // redirect to admin page
-    res.status(200).end(accessToken)
+
+    await handleExceptions(res, async () => {
+      const result = await administratorsHandler
+        .validateAdministratorLogin(accessToken);
+
+      // Redirect to a page that sets the access token to the session
+      // storage, then redirects to the admin page
+      res.writeHead(302, {
+        Location: `/admin/after-login?access_token=${result}`,
+      });
+      res.end();
+    });
+
   } catch (error) {
 
     if (error instanceof SafeError) {

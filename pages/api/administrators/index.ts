@@ -1,3 +1,4 @@
+import { auth } from "../../../pages-common/auth";
 import { container } from "../../../service/di";
 import { NextApiRequest, NextApiResponse } from "next";
 import { TYPES } from "../../../constants/types";
@@ -13,6 +14,8 @@ export default async (
   req: NextApiRequest,
   res: NextApiResponse<any>
 ) => {
+  await auth(req, res);
+
   const {
     method
   } = req

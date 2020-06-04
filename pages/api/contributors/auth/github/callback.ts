@@ -4,21 +4,9 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { SafeError } from "../../../../../service/common/web";
 import { SignClaHandler } from "../../../../../service/handlers/sign-cla";
 import { TYPES } from "../../../../../constants/types";
-
+import { readOAuthError } from "../../../../../pages-common/oauth";
 
 const signHandler = container.get<SignClaHandler>(TYPES.SignClaHandler);
-
-
-function readOAuthError(req: NextApiRequest): string | null {
-  const query = req.query
-  const error = query.error
-  const error_description = query.error_description
-
-  if (error) {
-    return `OAuth integration error: ${error}; description: ${error_description}`
-  }
-  return null;
-}
 
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {

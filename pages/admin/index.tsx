@@ -1,6 +1,14 @@
 import Layout from "../../components/admin/layout";
 import { ReactElement, Component } from "react";
 import Link from "next/link";
+import { GetServerSideProps } from "next";
+import { page_auth } from "../../pages-common/auth";
+
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  await page_auth(context.req, context.res);
+  return { props: {} };
+}
 
 
 export default class DashboardView extends Component {
