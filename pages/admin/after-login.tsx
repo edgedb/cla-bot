@@ -1,8 +1,4 @@
-import Avatar from "@material-ui/core/Avatar";
-import Head from "next/head";
-import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import React, { ReactElement } from "react";
-import { Button, Container, Grid } from "@material-ui/core";
 import { Component } from "react";
 
 
@@ -32,11 +28,12 @@ export default class AfterLoginPage extends Component {
       return;
     }
 
-    // TODO: add the token to the cookie, so it can be read in requests for
-    // pages.
-    document.cookie = `access_token=${token}; expires=Thu, 18 Dec 2013 12:00:00 UTC";
+    // NB: the access token is set in the sessionStorage,
     sessionStorage.setItem("ACCESS_TOKEN", token);
-    location.replace("/admin");
+
+    setTimeout(() => {
+      location.replace("/admin");
+    }, 200);
   }
 
   render(): ReactElement {
