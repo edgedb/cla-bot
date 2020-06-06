@@ -5,6 +5,14 @@
 
   min-width: 320px;
 
+  .app-toolbar {
+    display: flex;
+
+    .headline {
+      flex: 1;
+    }
+  }
+
   header {
     // otherwise Firefox doesn't display properly
     // when editing Markdown full screen
@@ -61,7 +69,7 @@
     }
   }
 
-  .region {
+  section, .region {
     margin-top: 40px;
     border-top: 1px dotted #dedede;
   }
@@ -148,4 +156,8 @@ body.fullscreen-editing {
       width: calc(100% - 280px);
     }
   }
+}
+
+.big-text {
+  font-size: 1rem;
 }

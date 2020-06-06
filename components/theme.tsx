@@ -1,11 +1,10 @@
-import { createMuiTheme } from "@material-ui/core/styles";
+import {createMuiTheme} from "@material-ui/core/styles";
 import red from "@material-ui/core/colors/red";
-
 
 export default createMuiTheme({
   palette: {
     primary: {
-      main: "#483d8b",
+      main: "#175080",
     },
     secondary: {
       main: "#dc004e",
@@ -15,12 +14,12 @@ export default createMuiTheme({
     },
     background: {
       default: "#fff",
-    }
+    },
   },
   props: {
     MuiButton: {
       variant: "outlined",
-      color: "primary"
-    }
-  }
+      color: "primary",
+    },
+  },
 });

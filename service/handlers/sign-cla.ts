@@ -1,72 +1,77 @@
-import { async_retry } from "../common/resiliency";
-import { CheckState, StatusCheckInput, StatusChecksService } from "../../service/domain/checks";
-import { ContributorLicenseAgreement, ClaCheckInput, ClaRepository } from "../../service/domain/cla";
-import { CLA_CHECK_CONTEXT, SUCCESS_MESSAGE } from "./check-cla";
-import { ClaCheckHandler } from "./check-cla";
-import { CommentsRepository, CommentsService } from "../../service/domain/comments";
-import { EmailInfo, UsersService } from "../../service/domain/users";
-import { inject, injectable } from "inversify";
-import { SafeError } from "../common/web";
-import { ServiceSettings } from "../settings";
-import { TokensHandler } from "./tokens";
-import { TYPES } from "../../constants/types";
-import { v4 as uuid } from "uuid";
-
+import {async_retry} from "../common/resiliency";
+import {
+  CheckState,
+  StatusCheckInput,
+  StatusChecksService,
+} from "../../service/domain/checks";
+import {
+  ContributorLicenseAgreement,
+  ClaCheckInput,
+  ClaRepository,
+} from "../../service/domain/cla";
+import {CLA_CHECK_CONTEXT, SUCCESS_MESSAGE} from "./check-cla";
+import {ClaCheckHandler} from "./check-cla";
+import {
+  CommentsRepository,
+  CommentsService,
+} from "../../service/domain/comments";
+import {EmailInfo, UsersService} from "../../service/domain/users";
+import {inject, injectable} from "inversify";
+import {SafeError} from "../common/web";
+import {ServiceSettings} from "../settings";
+import {TokensHandler} from "./tokens";
+import {TYPES} from "../../constants/types";
+import {v4 as uuid} from "uuid";
 
 export interface SignedClaOutput {
-  redirectUrl: string
+  redirectUrl: string;
 }
 
-
 @injectable()
-class SignClaHandler
-{
-  @inject(TYPES.UsersService) private _usersService: UsersService
-  @inject(TYPES.ClaRepository) private _claRepository: ClaRepository
-  @inject(TYPES.ClaCheckHandler) private _claCheckHandler: ClaCheckHandler
-  @inject(TYPES.CommentsService) private _commentsService: CommentsService
-  @inject(
-    TYPES.CommentsRepository) private _commentsRepository: CommentsRepository
-  @inject(
-    TYPES.StatusChecksService) private _statusCheckService: StatusChecksService
-  @inject(TYPES.TokensHandler) private _tokensHandler: TokensHandler
+class SignClaHandler {
+  @inject(TYPES.UsersService) private _usersService: UsersService;
+  @inject(TYPES.ClaRepository) private _claRepository: ClaRepository;
+  @inject(TYPES.ClaCheckHandler) private _claCheckHandler: ClaCheckHandler;
+  @inject(TYPES.CommentsService) private _commentsService: CommentsService;
+  @inject(TYPES.CommentsRepository)
+  private _commentsRepository: CommentsRepository;
+  @inject(TYPES.StatusChecksService)
+  private _statusCheckService: StatusChecksService;
+  @inject(TYPES.TokensHandler) private _tokensHandler: TokensHandler;
 
-  parseState(rawState: string): ClaCheckInput
-  {
+  parseState(rawState: string): ClaCheckInput {
     return this._tokensHandler.parseToken(rawState) as ClaCheckInput;
   }
 
   @async_retry()
   async createCla(
     emailInfo: EmailInfo,
-    licenseVersionId: string
+    agreementVersionId: string
   ): Promise<ContributorLicenseAgreement> {
     const cla = new ContributorLicenseAgreement(
       uuid(),
       emailInfo.email.toString(),
-      licenseVersionId,
+      agreementVersionId,
       new Date()
-    )
+    );
 
-    await this._claRepository.saveCla(cla)
-    return cla
+    await this._claRepository.saveCla(cla);
+    return cla;
   }
 
-  private getAllCommitters(data: ClaCheckInput): string[]
-  {
+  private getAllCommitters(data: ClaCheckInput): string[] {
     if (data.committers) {
-      return data.committers
+      return data.committers;
     }
 
-    throw new Error("Missing committers information in state.")
+    throw new Error("Missing committers information in state.");
   }
 
-  async completeClaCheck(
-    data: ClaCheckInput
-  ): Promise<void> {
-    const licenseVersionId = this.readLicenseVersionId(data)
-    const statusUrl = this._claCheckHandler
-      .getSuccessStatusTargetUrl(licenseVersionId)
+  async completeClaCheck(data: ClaCheckInput): Promise<void> {
+    const agreementVersionId = this.readAgreementVersionId(data);
+    const statusUrl = this._claCheckHandler.getSuccessStatusTargetUrl(
+      agreementVersionId
+    );
 
     await this._statusCheckService.createStatus(
       data.repository.ownerId,
@@ -82,7 +87,7 @@ class SignClaHandler
 
     // if a commet was created, update its text;
     const commentInfo = await this._commentsRepository
-      .getCommentInfoByPullRequestId(data.pullRequest.id)
+      .getCommentInfoByPullRequestId(data.pullRequest.id);
 
     if (commentInfo == null) {
       return;
@@ -93,7 +98,7 @@ class SignClaHandler
       data.repository.fullName,
       commentInfo.commentId,
       this._claCheckHandler.getSignedComment(statusUrl)
-    )
+    );
   }
 
   async checkIfAllSigned(
@@ -101,7 +106,7 @@ class SignClaHandler
     committers: string[]
   ): Promise<void> {
     const allSigned = await this._claCheckHandler
-      .allCommittersHaveSignedTheCla(committers)
+      .allCommittersHaveSignedTheCla(committers);
 
     if (allSigned) {
       await this.completeClaCheck(data);
@@ -112,7 +117,7 @@ class SignClaHandler
     committers: string[],
     userEmails: EmailInfo[]
   ): EmailInfo[] {
-    return userEmails.filter(emailInfo => {
+    return userEmails.filter((emailInfo) => {
       if (!emailInfo.email) {
         // this should never happen
         return false;
@@ -126,16 +131,15 @@ class SignClaHandler
     if (emailInfo.verified === false) {
       throw new SafeError(
         `Email address: ${emailInfo.email} is not verified. ` +
-        `Please verify your email address and try again.`
+          `Please verify your email address and try again.`
       );
     }
   }
 
   private async handleAllMatchingEmails(
     matchingEmails: EmailInfo[],
-    licenseVersionId: string
+    agreementVersionId: string
   ): Promise<void> {
-
     for (let i = 0; i < matchingEmails.length; i++) {
       const matchingEmail = matchingEmails[i];
 
@@ -147,16 +151,16 @@ class SignClaHandler
       );
 
       if (existingCla == null) {
-        await this.createCla(matchingEmail, licenseVersionId)
+        await this.createCla(matchingEmail, agreementVersionId);
       }
     }
   }
 
-  readLicenseVersionId(data: ClaCheckInput): string {
-    if (!data.licenseVersionId) {
+  readAgreementVersionId(data: ClaCheckInput): string {
+    if (!data.agreementVersionId) {
       throw new Error("Missing license version id in state");
     }
-    return data.licenseVersionId
+    return data.agreementVersionId;
   }
 
   async signCla(
@@ -172,8 +176,9 @@ class SignClaHandler
     //
     const data = this.parseState(rawState);
     const committers = this.getAllCommitters(data);
-    const userEmails = await this._usersService
-      .getUserEmailAddresses(accessToken);
+    const userEmails = await this._usersService.getUserEmailAddresses(
+      accessToken
+    );
 
     const matchingEmails = this.getAllMatchingEmails(committers, userEmails);
 
@@ -185,27 +190,27 @@ class SignClaHandler
       //
       throw new SafeError(
         `Thank you for authorizing our application, but the CLA must be signed ` +
-        `by the users who contributed to the PR. ` +
-        `Committers emails are: ${committers}.`
-      )
+          `by the users who contributed to the PR. ` +
+          `Committers emails are: ${committers}.`
+      );
     }
 
     await this.handleAllMatchingEmails(
       matchingEmails,
-      this.readLicenseVersionId(data)
+      this.readAgreementVersionId(data)
     );
 
     if (committers.length === 1) {
       // single committer: the CLA is signed
       await this.completeClaCheck(data);
     } else {
-      await this.checkIfAllSigned(data, committers)
+      await this.checkIfAllSigned(data, committers);
     }
 
     return {
-      redirectUrl: data.pullRequest.url
-    }
+      redirectUrl: data.pullRequest.url,
+    };
   }
 }
 
-export { SignClaHandler }
+export {SignClaHandler};

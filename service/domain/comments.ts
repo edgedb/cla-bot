@@ -1,10 +1,7 @@
-
-
 export interface Comment {
-  id: string
-  body: string
+  id: string;
+  body: string;
 }
-
 
 export interface CommentsService {
   createComment(
@@ -12,27 +9,24 @@ export interface CommentsService {
     targetRepoFullName: string,
     issueId: number,
     body: string
-  ): Promise<string>
+  ): Promise<string>;
 
   updateComment(
     targetAccountId: number,
     targetRepoFullName: string,
     commentId: string,
     body: string
-  ): Promise<void>
+  ): Promise<void>;
 }
-
 
 export interface CommentInfo {
-  id: string
-  commentId: string
-  pullRequestId: number
-  createdAt: Date
+  id: string;
+  commentId: string;
+  pullRequestId: number;
+  createdAt: Date;
 }
 
-
 export interface CommentsRepository {
-
   getCommentInfoByPullRequestId(
     pullRequestId: number
   ): Promise<CommentInfo | null>;
@@ -41,5 +35,5 @@ export interface CommentsRepository {
     commentId: string,
     pullRequestId: number,
     createdAt: Date
-  ): Promise<void>
+  ): Promise<void>;
 }

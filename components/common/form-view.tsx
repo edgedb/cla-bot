@@ -1,72 +1,72 @@
-import ErrorPanel, { ErrorProps } from "./error";
-import { Component, ReactElement } from "react";
-import { Button } from "@material-ui/core";
+import ErrorPanel, {ErrorProps} from "./error";
+import {Component, ReactElement} from "react";
+import {Button} from "@material-ui/core";
 import Preloader from "./preloader";
 
-
 interface FormViewProps {
-  submit: () => Promise<void>
-  edit: () => void
-  cancel: () => void
-  editing: boolean
-  className?: string
-  readonly?: boolean
+  submit: () => Promise<void>;
+  edit: () => void;
+  cancel: () => void;
+  editing: boolean;
+  className?: string;
+  readonly?: boolean;
 }
-
 
 interface FormViewState {
-  error?: ErrorProps,
-  loading: boolean,
-  submitting: boolean
+  error?: ErrorProps;
+  loading: boolean;
+  submitting: boolean;
 }
-
 
 /**
  * Generic component to handle views of editable objects.
  * This component handles error views, loaders, cancel buttons to revert
  * changes in a centralized way.
  */
-export default class FormView
-extends Component<FormViewProps, FormViewState> {
-
+export default class FormView extends Component<FormViewProps, FormViewState> {
   constructor(props: FormViewProps) {
-    super(props)
+    super(props);
 
     this.state = {
       error: undefined,
       loading: false,
-      submitting: false
-    }
+      submitting: false,
+    };
   }
 
   submit(): void {
     this.setState({
       error: undefined,
-      submitting: true
-    })
+      submitting: true,
+    });
 
-    this.props.submit()
-    .then(() => {
-      this.setState({
-        error: undefined,
-        submitting: false
-      })
-    }, () => {
-      this.setState({
-        error: {
-          dismiss: () => this.setState({error: undefined})
+    this.props
+      .submit()
+      .then(
+        () => {
+          this.setState({
+            error: undefined,
+            submitting: false,
+          });
         },
-        submitting: false
-      })
-    }).catch(error => {
-      this.setState({
-        error: {
-          message: `${error}`,
-          dismiss: () => this.setState({error: undefined})
-        },
-        submitting: false
-      })
-    })
+        () => {
+          this.setState({
+            error: {
+              dismiss: () => this.setState({error: undefined}),
+            },
+            submitting: false,
+          });
+        }
+      )
+      .catch((error) => {
+        this.setState({
+          error: {
+            message: `${error}`,
+            dismiss: () => this.setState({error: undefined}),
+          },
+          submitting: false,
+        });
+      });
   }
 
   handleKeyDown(e: React.KeyboardEvent<HTMLDivElement>): boolean {
@@ -76,7 +76,7 @@ extends Component<FormViewProps, FormViewState> {
         e.preventDefault();
         this.submit();
 
-        return false
+        return false;
       }
     }
 
@@ -92,16 +92,13 @@ extends Component<FormViewProps, FormViewState> {
   }
 
   renderButtons(): ReactElement[] {
-    const elements: ReactElement[] = []
+    const elements: ReactElement[] = [];
     if (this.props.editing) {
       elements.push(
-        <Button
-          key="submit-button"
-          onClick={() => this.submit()}
-        >
+        <Button key="submit-button" onClick={() => this.submit()}>
           Submit
         </Button>
-      )
+      );
       elements.push(
         <Button
           key="cancel-button"
@@ -111,7 +108,7 @@ extends Component<FormViewProps, FormViewState> {
         >
           Done
         </Button>
-      )
+      );
     } else {
       elements.push(
         <Button
@@ -122,28 +119,29 @@ extends Component<FormViewProps, FormViewState> {
         >
           Edit
         </Button>
-      )
+      );
     }
-    return elements
+    return elements;
   }
 
   render(): ReactElement {
     const state = this.state;
     const props = this.props;
 
-    return <div
-     onKeyDown={this.handleKeyDown.bind(this)}
-     className={
-      "edit-view" + (props.className ? ` ${props.className}` : "")
-    }>
-      {state.submitting && <Preloader className="overlay" />}
-      {props.children}
-      {state.error && <ErrorPanel {...state.error} />}
-      {(!props.readonly) &&
-      <div className="buttons-area">
-        {this.renderButtons()}
+    return (
+      <div
+        onKeyDown={this.handleKeyDown.bind(this)}
+        className={
+          "edit-view" + (props.className ? ` ${props.className}` : "")
+        }
+      >
+        {state.submitting && <Preloader className="overlay" />}
+        {props.children}
+        {state.error && <ErrorPanel {...state.error} />}
+        {!props.readonly && (
+          <div className="buttons-area">{this.renderButtons()}</div>
+        )}
       </div>
-      }
-    </div>
+    );
   }
 }

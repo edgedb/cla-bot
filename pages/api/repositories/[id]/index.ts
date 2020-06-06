@@ -1,20 +1,18 @@
-import { container } from "../../../../service/di";
-import { NextApiRequest, NextApiResponse } from "next";
-import { TYPES } from "../../../../constants/types";
-import { handleExceptions } from "../..";
-import { RepositoriesHandler }
-from "../../../../service/handlers/repositories";
+import {container} from "../../../../service/di";
+import {NextApiRequest, NextApiResponse} from "next";
+import {TYPES} from "../../../../constants/types";
+import {handleExceptions} from "../..";
+import {RepositoriesHandler} from "../../../../service/handlers/repositories";
+import {auth} from "../../../../pages-common/auth";
 
+const repositoriesHandler = container.get<RepositoriesHandler>(
+  TYPES.RepositoriesHandler
+);
 
-const repositoriesHandler = container
-  .get<RepositoriesHandler>(TYPES.RepositoriesHandler);
-
-
-export default async (
-  req: NextApiRequest,
-  res: NextApiResponse<any>
-) => {
-  const { query: { id }} = req;
+export default async (req: NextApiRequest, res: NextApiResponse<any>) => {
+  const {
+    query: {id},
+  } = req;
 
   if (typeof id !== "string") {
     // should never happen by definition
@@ -23,16 +21,14 @@ export default async (
 
   switch (req.method) {
     case "DELETE":
+      await auth(req, res);
+
       await handleExceptions(res, async () => {
-        const body = req.body;
+        await repositoriesHandler.deleteRepositoryConfiguration(id);
 
-        await repositoriesHandler.deleteRepositoryConfiguration(
-          id
-        )
-
-        return res.status(204).end()
+        return res.status(204).end();
       });
   }
 
-  res.status(405).end(`${req.method} not allowed`)
-}
+  res.status(405).end(`${req.method} not allowed`);
+};

@@ -1,43 +1,41 @@
-import { Select, InputLabel, Button, FormHelperText } from "@material-ui/core";
-import { Component, ReactElement } from "react";
-import ErrorPanel, { ErrorProps } from "../../common/error"
+import {Select, InputLabel, Button, FormHelperText} from "@material-ui/core";
+import {Component, ReactElement} from "react";
+import ErrorPanel, {ErrorProps} from "../../common/error";
 import Preloader from "../../common/preloader";
-import { changeHandler } from "../../forms"
+import {changeHandler} from "../../forms";
 import Panel from "../../common/panel";
-import { get, post, ApplicationError } from "../../fetch";
-import { AgreementListItem } from "../agreements/contracts";
-import { Repository, ExternalRepository } from "./contracts";
+import {get, post, ApplicationError} from "../../fetch";
+import {AgreementListItem} from "../agreements/contracts";
+import {Repository, ExternalRepository} from "./contracts";
 import ArrayUtils from "../../array";
 
-
 interface NewRepositoryFormProps {
-  onNewRepository: () => void,
-  repositories: Repository[]
+  onNewRepository: () => void;
+  repositories: Repository[];
 }
-
 
 interface NewRepositoryFormState {
-  error?: ErrorProps
-  submitError?: ErrorProps
-  loading: boolean
-  submitting: boolean
-  agreements: AgreementListItem[]
-  repositories: ExternalRepository[]
-  allRepositories: ExternalRepository[],
-  selectedAgreementId: string
-  selectedRepositoryFullName: string,
-  selectedAgreementIdError: boolean,
-  selectedAgreementIdHelperText: string
-  selectedRepositoryFullNameError: boolean,
-  selectedRepositoryFullNameHelperText: string
+  error?: ErrorProps;
+  submitError?: ErrorProps;
+  loading: boolean;
+  submitting: boolean;
+  agreements: AgreementListItem[];
+  repositories: ExternalRepository[];
+  allRepositories: ExternalRepository[];
+  selectedAgreementId: string;
+  selectedRepositoryFullName: string;
+  selectedAgreementIdError: boolean;
+  selectedAgreementIdHelperText: string;
+  selectedRepositoryFullNameError: boolean;
+  selectedRepositoryFullNameHelperText: string;
 }
 
-
-export default class NewRepositoryForm
-extends Component<NewRepositoryFormProps, NewRepositoryFormState> {
-
+export default class NewRepositoryForm extends Component<
+  NewRepositoryFormProps,
+  NewRepositoryFormState
+> {
   constructor(props: NewRepositoryFormProps) {
-    super(props)
+    super(props);
     // TODO: would be nice to make repository select multiple!
     // (out of the scope of the MVP)
     this.state = {
@@ -53,8 +51,8 @@ extends Component<NewRepositoryFormProps, NewRepositoryFormState> {
       selectedAgreementIdError: false,
       selectedAgreementIdHelperText: "",
       selectedRepositoryFullNameError: false,
-      selectedRepositoryFullNameHelperText: ""
-    }
+      selectedRepositoryFullNameHelperText: "",
+    };
   }
 
   componentDidUpdate(): void {
@@ -69,8 +67,7 @@ extends Component<NewRepositoryFormProps, NewRepositoryFormState> {
       this.state.allRepositories
     );
 
-    if (this.state.repositories.length !== availableRepositories.length)
-    {
+    if (this.state.repositories.length !== availableRepositories.length) {
       // Scenario: the user deleted a repository from configuration,
       // it is therefore possible to create a new configuration for this
       // repository. For example to bind it to a different agreement.
@@ -80,7 +77,7 @@ extends Component<NewRepositoryFormProps, NewRepositoryFormState> {
         error: this.validateAvailableItems(
           this.state.agreements,
           availableRepositories
-        )
+        ),
       });
     }
   }
@@ -92,12 +89,12 @@ extends Component<NewRepositoryFormProps, NewRepositoryFormState> {
     // Since a repository can only be associated with a single agreement,
     // filter available repositories options, only to those that are not
     // configured yet
-    return externalRepositories
-      .filter(externalRepository => configuredRepositories
-        .find(repository =>
-          repository.fullName === externalRepository.fullName
+    return externalRepositories.filter(
+      (externalRepository) =>
+        configuredRepositories.find(
+          (repository) => repository.fullName === externalRepository.fullName
         ) === undefined
-      );
+    );
   }
 
   private validateAvailableItems(
@@ -117,76 +114,84 @@ extends Component<NewRepositoryFormProps, NewRepositoryFormState> {
     if (!hasRepositories) {
       if (this.props.repositories.length) {
         title = "All repositories configured";
-        message = "All your organization repositories are bound to an Agreement."
+        message =
+          "All your organization repositories are bound to an Agreement.";
       } else {
         // rare, but it might happen (organization without repositories)
-        message = "There are no configured repositories for your organization."
+        message =
+          "There are no configured repositories for your organization.";
       }
     } else if (!hasAgreements) {
-      message = "There are no configured agreements in the system. " +
-                "Start by configuring an agreement.";
+      message =
+        "There are no configured agreements in the system. " +
+        "Start by configuring an agreement.";
     }
 
     return {
       title,
       message,
-      status: "info"
+      status: "info",
     };
   }
 
   load(): void {
-
     Promise.all([
       get<AgreementListItem[]>("/api/agreements"),
       get<ExternalRepository[]>("/api/external-repositories"),
-    ]).then(([agreements, repositories]) => {
-      const configuredRepositories = this.props.repositories;
+    ]).then(
+      ([agreements, repositories]) => {
+        const configuredRepositories = this.props.repositories;
 
-      const availableRepositories = this.filterAvailableRepositories(
-        configuredRepositories,
-        repositories
-      );
+        const availableRepositories = this.filterAvailableRepositories(
+          configuredRepositories,
+          repositories
+        );
 
-      this.setState({
-        loading: false,
-        agreements: agreements,
-        repositories: availableRepositories,
-        allRepositories: repositories,
-        selectedAgreementId: agreements.length ? agreements[0].id : "",
-        error: this.validateAvailableItems(agreements, availableRepositories)
-      })
-    }, () => {
-      this.setState({
-        loading: false,
-        error: {
-          retry: () => {
-            this.load();
-          }
-        }
-      })
-    });
+        this.setState({
+          loading: false,
+          agreements: agreements,
+          repositories: availableRepositories,
+          allRepositories: repositories,
+          selectedAgreementId: agreements.length ? agreements[0].id : "",
+          error: this.validateAvailableItems(
+            agreements,
+            availableRepositories
+          ),
+        });
+      },
+      () => {
+        this.setState({
+          loading: false,
+          error: {
+            retry: () => {
+              this.load();
+            },
+          },
+        });
+      }
+    );
   }
 
   validate(): boolean {
     let anyError = false;
     const {
       selectedAgreementId,
-      selectedRepositoryFullName: selectedRepositoryId
+      selectedRepositoryFullName: selectedRepositoryId,
     } = this.state;
 
     if (!selectedAgreementId) {
       this.setState({
         selectedAgreementIdError: true,
-        selectedAgreementIdHelperText: "Please select a value"
-      })
+        selectedAgreementIdHelperText: "Please select a value",
+      });
       anyError = true;
     }
 
     if (!selectedRepositoryId) {
       this.setState({
         selectedRepositoryFullNameError: true,
-        selectedRepositoryFullNameHelperText: "Please select a value"
-      })
+        selectedRepositoryFullNameHelperText: "Please select a value",
+      });
       anyError = true;
     }
 
@@ -194,14 +199,11 @@ extends Component<NewRepositoryFormProps, NewRepositoryFormState> {
   }
 
   updateRepositoriesOptions(repositoryFullName: string): void {
-    const { repositories, agreements } = this.state;
+    const {repositories, agreements} = this.state;
     const toRemove = this.state.repositories.find(
-      item => item.fullName === repositoryFullName
+      (item) => item.fullName === repositoryFullName
     );
-    ArrayUtils.remove(
-      repositories,
-      toRemove
-    );
+    ArrayUtils.remove(repositories, toRemove);
 
     this.validateAvailableItems(agreements, repositories);
   }
@@ -214,44 +216,43 @@ extends Component<NewRepositoryFormProps, NewRepositoryFormState> {
     this.setState({
       submitting: true,
       submitError: undefined,
-      error: undefined
+      error: undefined,
     });
 
-    const {
-      selectedAgreementId,
-      selectedRepositoryFullName
-    } = this.state;
+    const {selectedAgreementId, selectedRepositoryFullName} = this.state;
 
     post("/api/repositories", {
       agreementId: selectedAgreementId,
-      repositoryFullName: selectedRepositoryFullName
-    }).then(() => {
-      this.updateRepositoriesOptions(selectedRepositoryFullName);
-      this.setState({
-        submitting: false,
-        selectedRepositoryFullName: ""
-      });
-
-      this.props.onNewRepository();
-    }, (error: ApplicationError) => {
-
-      if (error.status === 409) {
+      repositoryFullName: selectedRepositoryFullName,
+    }).then(
+      () => {
+        this.updateRepositoriesOptions(selectedRepositoryFullName);
         this.setState({
           submitting: false,
-          submitError: {
-            title: "Repository already configured",
-            message: "There is already a configuration for this repository.",
-            status: "info"
-          }
+          selectedRepositoryFullName: "",
         });
-        return;
-      }
 
-      this.setState({
-        submitting: false,
-        submitError: {}
-      });
-    });
+        this.props.onNewRepository();
+      },
+      (error: ApplicationError) => {
+        if (error.status === 409) {
+          this.setState({
+            submitting: false,
+            submitError: {
+              title: "Repository already configured",
+              message: "There is already a configuration for this repository.",
+              status: "info",
+            },
+          });
+          return;
+        }
+
+        this.setState({
+          submitting: false,
+          submitError: {},
+        });
+      }
+    );
   }
 
   render(): ReactElement {
@@ -260,23 +261,21 @@ extends Component<NewRepositoryFormProps, NewRepositoryFormState> {
       agreements,
       repositories,
       selectedAgreementId,
-      selectedRepositoryFullName
+      selectedRepositoryFullName,
     } = state;
 
     return (
-    <div>
-      {state.submitting && <Preloader className="overlay" />}
-      <Panel
+      <div>
+        {state.submitting && <Preloader className="overlay" />}
+        <Panel
           error={state.error}
           load={() => this.load()}
           loading={state.loading}
         >
-          <h1>Create new repository configuration</h1>
+          <h1>Bind repository to agreement</h1>
           <dl className="inline">
             <dt>
-              <InputLabel id="agreement-select-label">
-                Agreement
-              </InputLabel>
+              <InputLabel id="agreement-select-label">Agreement</InputLabel>
             </dt>
             <dd className="select-parent">
               <Select
@@ -288,26 +287,22 @@ extends Component<NewRepositoryFormProps, NewRepositoryFormState> {
                 name="selectedAgreementId"
                 onChange={changeHandler.bind(this)}
               >
-                {
-                agreements.map(agreement => {
+                {agreements.map((agreement) => {
                   return (
                     <option key={agreement.id} value={agreement.id}>
                       {agreement.name}
                     </option>
-                  )
-                })
-                }
+                  );
+                })}
               </Select>
-              {state.selectedAgreementIdHelperText &&
+              {state.selectedAgreementIdHelperText && (
                 <FormHelperText>
                   {state.selectedAgreementIdHelperText}
                 </FormHelperText>
-              }
+              )}
             </dd>
             <dt>
-              <InputLabel id="repository-select-label">
-                Repository
-              </InputLabel>
+              <InputLabel id="repository-select-label">Repository</InputLabel>
             </dt>
             <dd className="select-parent">
               <Select
@@ -320,8 +315,7 @@ extends Component<NewRepositoryFormProps, NewRepositoryFormState> {
                 name="selectedRepositoryFullName"
               >
                 <option value=""></option>
-                {
-                repositories.map(repository => {
+                {repositories.map((repository) => {
                   return (
                     <option
                       key={repository.fullName}
@@ -329,28 +323,24 @@ extends Component<NewRepositoryFormProps, NewRepositoryFormState> {
                     >
                       {repository.name}
                     </option>
-                  )
-                })
-                }
+                  );
+                })}
               </Select>
-              {state.selectedRepositoryFullNameHelperText &&
+              {state.selectedRepositoryFullNameHelperText && (
                 <FormHelperText>
                   {state.selectedRepositoryFullNameHelperText}
                 </FormHelperText>
-              }
+              )}
             </dd>
           </dl>
           <div className="buttons-area">
-            <Button
-              key="submit-button"
-              onClick={() => this.submit()}
-            >
+            <Button key="submit-button" onClick={() => this.submit()}>
               Submit
             </Button>
           </div>
-      </Panel>
-      {state.submitError && <ErrorPanel {...state.submitError} />}
-    </div>
-    )
+        </Panel>
+        {state.submitError && <ErrorPanel {...state.submitError} />}
+      </div>
+    );
   }
 }

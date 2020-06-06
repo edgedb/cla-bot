@@ -1,18 +1,11 @@
-import Document, {
-  Head,
-  Html,
-  Main,
-  NextScript
-  } from "next/document";
-import React, { ReactElement } from "react";
+import Document, {Head, Html, Main, NextScript} from "next/document";
+import React, {ReactElement} from "react";
 import theme from "../components/theme";
-import { ServerStyleSheets } from "@material-ui/core/styles";
-
+import {ServerStyleSheets} from "@material-ui/core/styles";
 
 // See:
 // https://github.com/zeit/next.js/issues/7322
 // https://github.com/zeit/next.js/issues/7322#issuecomment-603933531
-
 
 export default class MyDocument extends Document {
   render(): ReactElement {
@@ -76,7 +69,7 @@ MyDocument.getInitialProps = async (ctx) => {
     // Styles fragment is rendered after the app and page rendering finish.
     styles: [
       ...React.Children.toArray(initialProps.styles),
-      sheets.getStyleElement()
+      sheets.getStyleElement(),
     ],
   };
 };

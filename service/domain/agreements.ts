@@ -1,32 +1,29 @@
-
-
 export class AgreementListItem {
-  id: string | null
-  name: string
-  description?: string
-  creationTime?: Date
+  id: string | null;
+  name: string;
+  description?: string;
+  creationTime?: Date;
 
   constructor(
     id: string | null,
     name: string,
     description?: string,
     creationTime?: Date
-    ) {
-    this.id = id
-    this.name = name
-    this.description = description
-    this.creationTime = creationTime
+  ) {
+    this.id = id;
+    this.name = name;
+    this.description = description;
+    this.creationTime = creationTime;
   }
 }
 
-
 export class AgreementVersion {
-  id: string
-  agreementId?: string
-  current: boolean
-  draft: boolean
-  texts?: AgreementText[]
-  creationTime: Date
+  id: string;
+  agreementId?: string;
+  current: boolean;
+  draft: boolean;
+  texts?: AgreementText[];
+  creationTime: Date;
 
   constructor(
     id: string,
@@ -34,26 +31,25 @@ export class AgreementVersion {
     draft: boolean,
     agreementId: string | undefined,
     creationTime: Date,
-    texts?: AgreementText[],
+    texts?: AgreementText[]
   ) {
-    this.id = id
-    this.current = current
-    this.draft = draft
-    this.texts = texts
-    this.agreementId = agreementId
-    this.creationTime = creationTime
+    this.id = id;
+    this.current = current;
+    this.draft = draft;
+    this.texts = texts;
+    this.agreementId = agreementId;
+    this.creationTime = creationTime;
   }
 }
 
-
 export class AgreementText {
-  id: string
-  title: string
-  text: string
-  culture: string
-  versionId: string
-  updateTime: Date
-  creationTime: Date
+  id: string;
+  title: string;
+  text: string;
+  culture: string;
+  versionId: string;
+  updateTime: Date;
+  creationTime: Date;
 
   constructor(
     id: string,
@@ -64,38 +60,35 @@ export class AgreementText {
     updateTime: Date,
     creationTime: Date
   ) {
-    this.id = id
-    this.text = text
-    this.title = title
-    this.culture = culture
-    this.versionId = versionId
-    this.updateTime = updateTime
-    this.creationTime = creationTime
+    this.id = id;
+    this.text = text;
+    this.title = title;
+    this.culture = culture;
+    this.versionId = versionId;
+    this.updateTime = updateTime;
+    this.creationTime = creationTime;
   }
 }
 
-
 export interface AgreementTextInput {
-  title: string
-  text: string
-  culture: string
+  title: string;
+  text: string;
+  culture: string;
 }
-
 
 /**
  * Basic information about a configured agreement for a repository.
  */
 export class RepositoryAgreementInfo {
-  versionId: string
+  versionId: string;
 
   constructor(versionId: string) {
-    this.versionId = versionId
+    this.versionId = versionId;
   }
 }
 
-
 export class Agreement extends AgreementListItem {
-  versions: AgreementVersion[]
+  versions: AgreementVersion[];
 
   constructor(
     id: string,
@@ -104,14 +97,12 @@ export class Agreement extends AgreementListItem {
     creationTime: Date,
     versions: AgreementVersion[]
   ) {
-    super(id, name, description, creationTime)
-    this.versions = versions
+    super(id, name, description, creationTime);
+    this.versions = versions;
   }
 }
 
-
 export interface AgreementsRepository {
-
   getAgreements(): Promise<AgreementListItem[]>;
 
   getAgreement(agreementId: string): Promise<Agreement | null>;
@@ -143,16 +134,9 @@ export interface AgreementsRepository {
     description: string
   ): Promise<void>;
 
-  updateAgreementText(
-    id: string,
-    title: string,
-    body: string
-  ): Promise<void>;
+  updateAgreementText(id: string, title: string, body: string): Promise<void>;
 
-  updateAgreementVersion(
-    id: string,
-    draft: boolean
-  ): Promise<void>;
+  updateAgreementVersion(id: string, draft: boolean): Promise<void>;
 
   createAgreementVersion(
     agreementId: string,

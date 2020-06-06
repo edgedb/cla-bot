@@ -1,14 +1,10 @@
-import { async_retry } from "../service/common/resiliency";
-import { expect } from "chai";
-
+import {async_retry} from "../service/common/resiliency";
+import {expect} from "chai";
 
 describe("Async retry decorator", () => {
-
   it("Decorates an async function to support retries", async () => {
-
     class Example {
-
-      k: number
+      k: number;
 
       constructor() {
         this.k = 0;
@@ -19,7 +15,7 @@ describe("Async retry decorator", () => {
         this.k += 1;
 
         if (this.k < 3) {
-          throw new Error("Crash test")
+          throw new Error("Crash test");
         }
         return this.k;
       }

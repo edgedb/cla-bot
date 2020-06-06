@@ -1,5 +1,3 @@
-
-
 /**
  * Validates a single email address value.
  */

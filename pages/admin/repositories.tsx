@@ -1,7 +1,11 @@
+import AdminPage from "../../components/admin/page";
 import RepositoriesPage from "../../components/admin/repositories/repositories-page";
-import { ReactElement } from "react";
-
+import {ReactElement} from "react";
 
 export default function Page(): ReactElement {
-  return <RepositoriesPage />
+  return (
+    <AdminPage>
+      <RepositoriesPage />
+    </AdminPage>
+  );
 }

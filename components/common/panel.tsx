@@ -2,29 +2,25 @@
  * Common component for loadable partial view,
  * with support for loading / error views.
  */
-import { Component, ReactElement } from "react";
+import {Component, ReactElement} from "react";
 import Preloader from "./preloader";
-import ErrorPanel, { ErrorProps } from "./error";
-
+import ErrorPanel, {ErrorProps} from "./error";
 
 export interface PanelProps {
-  id?: string
-  loading: boolean
-  error?: ErrorProps
-  load?: () => void
+  id?: string;
+  loading: boolean;
+  error?: ErrorProps;
+  load?: () => void;
 }
 
-
 export default class Panel extends Component<PanelProps> {
-
   constructor(props: PanelProps) {
     super(props);
   }
 
   componentDidMount(): void {
     const props = this.props;
-    if (props.loading && !props.error)
-    {
+    if (props.loading && !props.error) {
       // enable automatic loading
       if (props.load) {
         props.load();
@@ -33,8 +29,8 @@ export default class Panel extends Component<PanelProps> {
   }
 
   render(): ReactElement {
-    const props = this.props
-    const error = props.error
+    const props = this.props;
+    const error = props.error;
 
     if (props.loading && !error) {
       return <Preloader />;
@@ -44,6 +40,6 @@ export default class Panel extends Component<PanelProps> {
       return <ErrorPanel {...error} />;
     }
 
-    return (<div id={props.id}>{props.children}</div>);
+    return <div id={props.id}>{props.children}</div>;
   }
 }

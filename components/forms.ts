@@ -1,5 +1,4 @@
-import { ChangeEvent } from "react";
-
+import {ChangeEvent} from "react";
 
 /**
  * Generic input field change handler, that updates a value in the state
@@ -7,9 +6,7 @@ import { ChangeEvent } from "react";
  */
 export function changeHandler(
   event: ChangeEvent<
-      HTMLInputElement
-    | HTMLTextAreaElement
-    | { name?: string; value: unknown }
+    HTMLInputElement | HTMLTextAreaElement | {name?: string; value: unknown}
   >
 ): void {
   const target = event.target;
@@ -17,7 +14,7 @@ export function changeHandler(
   if (!name) {
     throw new Error(
       "Missing name attribute in target input field. " +
-      "Add a name attribute matching a property in the state."
+        "Add a name attribute matching a property in the state."
     );
   }
   const update: {[key: string]: string | false} = {};
@@ -40,5 +37,5 @@ export function changeHandler(
     update[fieldNameHelperText] = "";
   }
 
-  self.setState(update)
+  self.setState(update);
 }

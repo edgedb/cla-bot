@@ -1,11 +1,8 @@
-
-
 export class PageFilters {
   page: number;
   size: number;
   search?: string;
 }
-
 
 /**
  * Represents a paginated set of items belonging to a collection,
@@ -17,12 +14,11 @@ export class PageFilters {
  * @param total the count of items in the whole collection.
  */
 export class PaginatedSet<T> {
-
-  items: T[]
-  total: number
+  items: T[];
+  total: number;
 
   constructor(items: T[], total: number) {
-    this.items = items
-    this.total = total
+    this.items = items;
+    this.total = total;
   }
 }

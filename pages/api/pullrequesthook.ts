@@ -1,27 +1,23 @@
-import { ClaCheckHandler } from "../../service/handlers/check-cla";
-import { ClaCheckInput } from "../../service/domain/cla";
-import { container } from "../../service/di";
-import { NextApiRequest, NextApiResponse } from "next";
-import { TYPES } from "../../constants/types";
-
+import {ClaCheckHandler} from "../../service/handlers/check-cla";
+import {ClaCheckInput} from "../../service/domain/cla";
+import {container} from "../../service/di";
+import {NextApiRequest, NextApiResponse} from "next";
+import {TYPES} from "../../constants/types";
 
 // Handler for GitHub pull requests.
 // It verifies that the user who is creating a PR signed the CLA,
 // and posts a status check to the PR.
 const handler = container.get<ClaCheckHandler>(TYPES.ClaCheckHandler);
 
-
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-  const {
-    method
-  } = req
+  const {method} = req;
 
-  if (method !== 'POST') {
+  if (method !== "POST") {
     return res.status(404).end("Not found");
   }
 
   // Next.js enforces lowercase header names
-  const event = req.headers['x-github-event']
+  const event = req.headers["x-github-event"];
 
   if (!event) {
     return res.status(400).end("Missing X-GitHub-Event header");
@@ -31,18 +27,16 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     case "ping":
       // sent when configuring a webhook
       res.status(200).end("Hi there!");
-      break
+      break;
     case "pull_request":
-      const { body } = req;
+      const {body} = req;
 
       const action = body.action;
-      if ([
-        "opened",
-        "reopened",
-        "synchronize"
-      ].indexOf(action) === -1) {
-        res.status(200).end(`Doing nothing: the pull_request action is ${action}`);
-        break
+      if (["opened", "reopened", "synchronize"].indexOf(action) === -1) {
+        res
+          .status(200)
+          .end(`Doing nothing: the pull_request action is ${action}`);
+        break;
       }
 
       const gitHubUserId = body?.pull_request?.user?.id;
@@ -68,7 +62,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         !targetRepositoryFullName ||
         !targetRepositoryName
       ) {
-        return res.status(400).end(`Expected a pull request webhook payload with:
+        return res.status(400)
+          .end(`Expected a pull request webhook payload with:
           pull_request.number;
           pull_request.user.id;
           pull_request.url;
@@ -83,27 +78,27 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
       const input: ClaCheckInput = {
         gitHubUserId,
-        licenseVersionId: null,
+        agreementVersionId: null,
         committers: null,
         pullRequest: {
           id: pullRequestId,
           number: pullRequestNumber,
           url: pullRequestUrl,
-          headSha: pullRequestHeadSha
+          headSha: pullRequestHeadSha,
         },
         repository: {
           id: targetRepositoryId,
           owner: targetRepositoryOwnerName,
           ownerId: targetRepositoryOwnerId,
           name: targetRepositoryName,
-          fullName: targetRepositoryFullName
-        }
-      }
+          fullName: targetRepositoryFullName,
+        },
+      };
 
-      await handler.checkCla(input)
-      res.status(200).end("OK")
-      break
+      await handler.checkCla(input);
+      res.status(200).end("OK");
+      break;
     default:
       return res.status(400).end(`The event ${event} is not handled.`);
   }
-}
+};

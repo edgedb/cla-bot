@@ -1,10 +1,9 @@
 import fetch from "cross-fetch";
 import fs from "fs";
 import jwt from "jsonwebtoken";
-import { async_retry } from "../../common/resiliency";
-import { getHeaders } from "./headers";
-import { expectSuccessfulResponse } from "../../common/web";
-
+import {async_retry} from "../../common/resiliency";
+import {getHeaders} from "./headers";
+import {expectSuccessfulResponse} from "../../common/web";
 
 export class InstallationNotFoundError extends Error {
   constructor(targetAccountId: number) {
@@ -13,28 +12,24 @@ export class InstallationNotFoundError extends Error {
   }
 }
 
-
 interface GitHubInstallationAccessTokenResult {
-  token: string
-  expires_at: string
-  permissions: { [key: string]: string }
-  repository_selection: string
+  token: string;
+  expires_at: string;
+  permissions: {[key: string]: string};
+  repository_selection: string;
 }
-
 
 // GitHub api returns much more information,
 // but here we care only about the following:
 interface GitHubInstallationItem {
-  id: number,
-  target_id: number
+  id: number;
+  target_id: number;
 }
-
 
 interface AccessToken {
-  value: string
-  expiresAt: number
+  value: string;
+  expiresAt: number;
 }
-
 
 export class GitHubAccessHandler {
   // This class handles client credentials flow to obtain access tokens
@@ -42,7 +37,7 @@ export class GitHubAccessHandler {
 
   private _privateKey: Buffer;
   private _githubApplicationId: number;
-  private _accountAccessTokensCache: { [accountId: number]: AccessToken}
+  private _accountAccessTokensCache: {[accountId: number]: AccessToken};
 
   constructor() {
     this._privateKey = this.getPrivateKey();
@@ -56,7 +51,7 @@ export class GitHubAccessHandler {
     if (!privateRsaKeyPath) {
       throw new Error(
         "Missing GITHUB_RSA_PRIVATE_KEY environmental variable: " +
-        "it must contain the path to a private RSA key used to generate JWTs"
+          "it must contain the path to a private RSA key used to generate JWTs"
       );
     }
     return privateRsaKeyPath;
@@ -68,7 +63,7 @@ export class GitHubAccessHandler {
     if (!githubApplicationIdRaw) {
       throw new Error(
         "Missing GITHUB_APPLICATION_ID environmental variable: " +
-        "it must contain the id of the GitHub application with organization rights."
+          "it must contain the id of the GitHub application with organization rights."
       );
     }
 
@@ -77,7 +72,7 @@ export class GitHubAccessHandler {
     if (isNaN(githubApplicationId)) {
       throw new Error(
         `Invalid GITHUB_APPLICATION_ID environmental variable: {githubApplicationIdRaw}` +
-        "it must contain the id of the GitHub application with organization rights."
+          "it must contain the id of the GitHub application with organization rights."
       );
     }
     return githubApplicationId;
@@ -92,25 +87,29 @@ export class GitHubAccessHandler {
     // this is low priority since creating a new access token here is cheap
     const time = Math.round(new Date().getTime() / 1000);
 
-    return jwt.sign({
-      "iat": time,
-      "exp": time + (9 * 60),
-      "iss": `${this._githubApplicationId}`,
-    }, this._privateKey, { algorithm: "RS256" });
+    return jwt.sign(
+      {
+        iat: time,
+        exp: time + 9 * 60,
+        iss: `${this._githubApplicationId}`,
+      },
+      this._privateKey,
+      {algorithm: "RS256"}
+    );
   }
 
   setCachedAccessToken(targetAccountId: number, token: AccessToken): void {
     this._accountAccessTokensCache[targetAccountId] = token;
   }
 
-  getCachedAccessToken(targetAccountId: number): AccessToken | null
-  {
+  getCachedAccessToken(targetAccountId: number): AccessToken | null {
     if (targetAccountId in this._accountAccessTokensCache) {
-      const cachedAccessToken = this
-        ._accountAccessTokensCache[targetAccountId];
+      const cachedAccessToken = this._accountAccessTokensCache[
+        targetAccountId
+      ];
 
       // applies a margin of 60 seconds while checking for expiration
-      if ((new Date().getTime() + 60000) < cachedAccessToken.expiresAt) {
+      if (new Date().getTime() + 60000 < cachedAccessToken.expiresAt) {
         // reusing a cached access token
         return cachedAccessToken;
       }
@@ -124,22 +123,18 @@ export class GitHubAccessHandler {
   private async getInstallationIdByAccountId(
     targetAccountId: number,
     primaryAccessToken: string
-  ): Promise<number>
-  {
-    const response = await fetch(
-      "https://api.github.com/app/installations",
-      {
-        method: "GET",
-        headers: getHeaders(primaryAccessToken)
-      }
-    );
+  ): Promise<number> {
+    const response = await fetch("https://api.github.com/app/installations", {
+      method: "GET",
+      headers: getHeaders(primaryAccessToken),
+    });
 
     await expectSuccessfulResponse(response);
 
     const data: GitHubInstallationItem[] = await response.json();
     let installationId: number | null = null;
 
-    data.forEach(installation => {
+    data.forEach((installation) => {
       if (installation.target_id === targetAccountId) {
         installationId = installation.id;
       }
@@ -181,14 +176,16 @@ export class GitHubAccessHandler {
     const installationId = await this.getInstallationIdByAccountId(
       targetAccountId,
       primaryAccessToken
-    )
+    );
 
     const installationAccessTokenResult = await this
-      .getAccessTokenForInstallation(installationId);
+      .getAccessTokenForInstallation(
+        installationId
+      );
 
     this.setCachedAccessToken(targetAccountId, {
       value: installationAccessTokenResult.token,
-      expiresAt: new Date(installationAccessTokenResult.expires_at).getTime()
+      expiresAt: new Date(installationAccessTokenResult.expires_at).getTime(),
     });
 
     return installationAccessTokenResult.token;
@@ -212,7 +209,7 @@ export class GitHubAccessHandler {
       `https://api.github.com/app/installations/${installationId}/access_tokens`,
       {
         method: "POST",
-        headers: getHeaders(primaryAccessToken)
+        headers: getHeaders(primaryAccessToken),
       }
     );
 
@@ -225,4 +222,4 @@ export class GitHubAccessHandler {
 
 const accessHandler = new GitHubAccessHandler();
 
-export { accessHandler };
+export {accessHandler};

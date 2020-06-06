@@ -1,12 +1,12 @@
 import AgreementDetailsPage from "../../../components/admin/agreements/agreement-page";
 import Preloader from "../../../components/common/preloader";
-import { ReactElement } from "react";
-import { withRouter } from "next/router";
-import { WithRouterProps } from "next/dist/client/with-router";
+import {ReactElement} from "react";
+import {withRouter} from "next/router";
+import {WithRouterProps} from "next/dist/client/with-router";
+import AdminPage from "../../../components/admin/page";
 
-
-function Page({ router }: WithRouterProps): ReactElement {
-  const agreementId = router.query.id
+function Page({router}: WithRouterProps): ReactElement {
+  const agreementId = router.query.id;
 
   if (typeof agreementId !== "string") {
     // For some reason, the router query parameters are only
@@ -15,10 +15,14 @@ function Page({ router }: WithRouterProps): ReactElement {
     // which is of course parsed and used by the server side.
     // Since we don't care about SEO here, return a preloader if the route
     // is not available.
-    return <Preloader className="overlay" />
+    return <Preloader className="overlay" />;
   }
 
-  return <AgreementDetailsPage id={agreementId} />
+  return (
+    <AdminPage>
+      <AgreementDetailsPage id={agreementId} />
+    </AdminPage>
+  );
 }
 
-export default withRouter(Page)
+export default withRouter(Page);

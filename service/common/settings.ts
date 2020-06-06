@@ -1,6 +1,4 @@
-
 export class SettingsError extends Error {}
-
 
 export class MissingSettingError extends SettingsError {
   constructor(settingName: string) {
@@ -9,11 +7,9 @@ export class MissingSettingError extends SettingsError {
   }
 }
 
-
 export function getEnvSettingOrThrow(name: string): string {
   const value = process.env[name];
 
-  if (!value)
-    throw new MissingSettingError(name);
+  if (!value) throw new MissingSettingError(name);
   return value;
 }

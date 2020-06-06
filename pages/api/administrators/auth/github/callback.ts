@@ -1,19 +1,15 @@
 import githubAuth from "./configuration";
-import { NextApiRequest, NextApiResponse } from "next";
-import { SafeError } from "../../../../../service/common/web";
+import {NextApiRequest, NextApiResponse} from "next";
+import {SafeError} from "../../../../../service/common/web";
+import {readOAuthError} from "../../../../../pages-common/oauth";
+import {AdministratorsHandler} from "../../../../../service/handlers/administrators";
+import {container} from "../../../../../service/di";
+import {TYPES} from "../../../../../constants/types";
+import {handleExceptions} from "../../../";
 
-
-function readOAuthError(req: NextApiRequest): string | null {
-  const query = req.query
-  const error = query.error
-  const error_description = query.error_description
-
-  if (error) {
-    return `OAuth integration error: ${error}; description: ${error_description}`
-  }
-  return null;
-}
-
+const administratorsHandler = container.get<AdministratorsHandler>(
+  TYPES.AdministratorsHandler
+);
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   // This function handles an incoming HTTP request following an attempt
@@ -21,32 +17,33 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   const error = readOAuthError(req);
 
   if (error) {
-    // this is most likely a configuration error on our side
+    // This is most likely a configuration error on our side,
     // however, this might happen if the end user modified by hand the GitHub
     // login page url (for example, modifying the redirect_uri)
     return res.status(400).end(error);
   }
 
-  try {
-    const requestUrl = req.url
+  const requestUrl = req.url;
 
-    if (!requestUrl)
-      throw new Error("Missing request url.")
+  if (!requestUrl) throw new Error("Missing request url.");
 
-    const token = await githubAuth.code.getToken(requestUrl);
-    const accessToken = token.accessToken;
+  const token = await githubAuth.code.getToken(requestUrl);
+  const accessToken = token.accessToken;
 
-    // TODO: verify that the user is an administrator
-    // TODO: issue an access token for the user, to be used on the client,
-    // redirect to admin page
-    res.status(200).end(accessToken)
-  } catch (error) {
+  // Verify that the user is an administrator
+  // issue an access token for the user, to be used on the client,
+  // redirect to admin page
 
-    if (error instanceof SafeError) {
-      res.status(error.statusCode).end(error.message);
-      return;
-    }
+  await handleExceptions(res, async () => {
+    const result = await administratorsHandler.validateAdministratorLogin(
+      accessToken
+    );
 
-    res.status(500).end("Internal server error");
-  }
-}
+    // Redirect to a page that sets the access token to the session
+    // storage, then redirects to the admin page
+    res.writeHead(302, {
+      Location: `/admin/after-login?access_token=${result}`,
+    });
+    res.end();
+  });
+};

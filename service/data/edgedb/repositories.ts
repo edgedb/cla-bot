@@ -1,12 +1,10 @@
-import { EdgeDBRepository } from "./base";
-import { injectable } from "inversify";
-import { RepositoriesRepository, Repository } from "../../domain/repositories";
-
+import {EdgeDBRepository} from "./base";
+import {injectable} from "inversify";
+import {RepositoriesRepository, Repository} from "../../domain/repositories";
 
 @injectable()
-export class EdgeDBRepositoriesRepository
-  extends EdgeDBRepository implements RepositoriesRepository {
-
+export class EdgeDBRepositoriesRepository extends EdgeDBRepository
+  implements RepositoriesRepository {
   async getConfiguredRepositories(): Promise<Repository[]> {
     const items = await this.run(async (connection) => {
       return await connection.fetchAll(
@@ -16,21 +14,24 @@ export class EdgeDBRepositoriesRepository
           agreementName := .agreement.name
         };`
       );
-    })
+    });
 
-    return items.map(entity => new Repository(
-      entity.id,
-      entity.full_name,
-      entity.agreementId,
-      entity.agreementName
-    ));
+    return items.map(
+      (entity) =>
+        new Repository(
+          entity.id,
+          entity.full_name,
+          entity.agreementId,
+          entity.agreementName
+        )
+    );
   }
 
   async createRepositoryConfiguration(
     agreementId: string,
     repositoryId: string
   ): Promise<void> {
-    await this.run(async connection => {
+    await this.run(async (connection) => {
       await connection.fetchAll(
         `
         INSERT Repository {
@@ -40,24 +41,22 @@ export class EdgeDBRepositoriesRepository
         `,
         {
           repository_id: repositoryId,
-          agreement_id: agreementId
+          agreement_id: agreementId,
         }
-      )
+      );
     });
   }
 
-  async deleteRepositoryConfiguration(
-    id: string
-  ): Promise<void> {
-    await this.run(async connection => {
+  async deleteRepositoryConfiguration(id: string): Promise<void> {
+    await this.run(async (connection) => {
       await connection.fetchOne(
         `
         DELETE Repository FILTER .id = <uuid>$id
         `,
         {
-          id
+          id,
         }
-      )
+      );
     });
   }
 }

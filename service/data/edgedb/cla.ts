@@ -1,20 +1,17 @@
-import { ContributorLicenseAgreement, ClaRepository } from "../../domain/cla";
-import { EdgeDBRepository } from "./base";
-import { injectable } from "inversify";
-
+import {ContributorLicenseAgreement, ClaRepository} from "../../domain/cla";
+import {EdgeDBRepository} from "./base";
+import {injectable} from "inversify";
 
 interface ClaItem {
-  id: string
-  email: string
-  versionId: string
-  creation_time: Date
+  id: string;
+  email: string;
+  versionId: string;
+  creation_time: Date;
 }
 
-
 @injectable()
-export class EdgeDBClaRepository
-extends EdgeDBRepository implements ClaRepository {
-
+export class EdgeDBClaRepository extends EdgeDBRepository
+  implements ClaRepository {
   async getClaByEmailAddress(
     email: string
   ): Promise<ContributorLicenseAgreement | null> {
@@ -23,12 +20,12 @@ extends EdgeDBRepository implements ClaRepository {
         `SELECT ContributorLicenseAgreement {
           email,
           creation_time,
-          versionId := .licenseVersion.id
+          versionId := .agreement_version.id
         }
         FILTER .email = <str>$0;`,
         [email]
       );
-    })
+    });
 
     if (signed_cla.length) {
       const item = signed_cla[0];
@@ -44,21 +41,21 @@ extends EdgeDBRepository implements ClaRepository {
   }
 
   async saveCla(data: ContributorLicenseAgreement): Promise<void> {
-    await this.run(async connection => {
+    await this.run(async (connection) => {
       const result = await connection.fetchAll(
         `
         INSERT ContributorLicenseAgreement {
           email := <str>$email,
-          licenseVersion := (SELECT LicenseVersion FILTER .id = <uuid>$version),
+          agreement_version := (SELECT AgreementVersion FILTER .id = <uuid>$version),
           creation_time := <datetime>$creation_time
         }
         `,
         {
           email: data.email,
           version: data.versionId,
-          creation_time: data.signedAt
+          creation_time: data.signedAt,
         }
-      )
+      );
       data.id = result[0].id;
     });
   }

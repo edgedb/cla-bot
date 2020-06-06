@@ -1,31 +1,30 @@
-import { get } from "../../fetch";
+import {get} from "../../fetch";
 import Layout from "../layout";
 import Panel from "../../common/panel";
-import { ErrorProps } from "../../common/error";
-import { Component, ReactElement } from "react";
+import {ErrorProps} from "../../common/error";
+import {Component, ReactElement} from "react";
 import Link from "next/link";
-import { Button } from "@material-ui/core";
-import { AgreementListItem } from "./contracts";
-import { AgreementsTable } from "./agreements-table";
-
+import {Button} from "@material-ui/core";
+import {AgreementListItem} from "./contracts";
+import {AgreementsTable} from "./agreements-table";
 
 export interface AgreementsPageState {
-  error?: ErrorProps
-  loading: boolean,
-  items: AgreementListItem[] | null
+  error?: ErrorProps;
+  loading: boolean;
+  items: AgreementListItem[] | null;
 }
 
-
-export default class AgreementsPage
-  extends Component<{}, AgreementsPageState> {
-
+export default class AgreementsPage extends Component<
+  {},
+  AgreementsPageState
+> {
   constructor(props: {}) {
     super(props);
 
     this.state = {
       loading: true,
       error: undefined,
-      items: null
+      items: null,
     };
   }
 
@@ -33,25 +32,28 @@ export default class AgreementsPage
     if (this.state.error) {
       this.setState({
         loading: true,
-        error: undefined
-      })
+        error: undefined,
+      });
     }
 
-    get<AgreementListItem[]>("/api/agreements").then(data => {
-      this.setState({
-        loading: false,
-        items: data
-      })
-    }, (error) => {
-      this.setState({
-        loading: false,
-        error: {
-          retry: () => {
-            this.load();
-          }
-        }
-      })
-    });
+    get<AgreementListItem[]>("/api/agreements").then(
+      (data) => {
+        this.setState({
+          loading: false,
+          items: data,
+        });
+      },
+      (error) => {
+        this.setState({
+          loading: false,
+          error: {
+            retry: () => {
+              this.load();
+            },
+          },
+        });
+      }
+    );
   }
 
   render(): ReactElement {
@@ -66,22 +68,16 @@ export default class AgreementsPage
           loading={state.loading}
         >
           <h1>Agreements</h1>
-          {state.items !== null &&
-          <AgreementsTable items={state.items} />
-          }
+          {state.items !== null && <AgreementsTable items={state.items} />}
           <div className="buttons-area">
             <Link href="/admin/agreements/new">
-              <Button
-                type="button"
-                variant="outlined"
-                color="primary"
-              >
+              <Button type="button" variant="outlined" color="primary">
                 Create new agreement
               </Button>
             </Link>
           </div>
         </Panel>
       </Layout>
-    )
+    );
   }
 }

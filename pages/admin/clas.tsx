@@ -1,12 +1,11 @@
-import Grid from "@material-ui/core/Grid";
-import Layout from "../../components/admin/layout";
-import Paper from "@material-ui/core/Paper";
+import ClasPage from "../../components/admin/clas/clas-page";
+import {ReactElement} from "react";
+import AdminPage from "../../components/admin/page";
 
-
-export default () => (
-  <Layout title="Signed CLAs">
-    <Paper>
-      <p>CLAs</p>
-    </Paper>
-  </Layout>
-)
+export default function Page(): ReactElement {
+  return (
+    <AdminPage>
+      <ClasPage />
+    </AdminPage>
+  );
+}
