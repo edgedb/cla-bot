@@ -178,9 +178,10 @@ export class GitHubAccessHandler {
       primaryAccessToken
     );
 
-    const installationAccessTokenResult = await this.getAccessTokenForInstallation(
-      installationId
-    );
+    const installationAccessTokenResult = await this
+      .getAccessTokenForInstallation(
+        installationId
+      );
 
     this.setCachedAccessToken(targetAccountId, {
       value: installationAccessTokenResult.token,

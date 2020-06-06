@@ -132,8 +132,9 @@ export class Version extends Component<VersionProps, VersionState> {
         open: true,
         title: "Make this version current?",
         description:
-          "When a version is set as current, its agreement text is displayed " +
-          "for CLA checks on repositories associated with this agreement.",
+          "When a version is set as current, its agreement text is " +
+          "displayed for CLA checks on repositories associated with " +
+          "this agreement.",
         close: () => this.dismissDialog(),
         confirm: () => this.makeCurrent(),
       },

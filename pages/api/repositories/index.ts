@@ -14,7 +14,8 @@ export default async (req: NextApiRequest, res: NextApiResponse<any>) => {
 
   switch (method) {
     case "GET":
-      const repositories = await repositoriesHandler.getConfiguredRepositories();
+      const repositories = await repositoriesHandler
+        .getConfiguredRepositories();
       res.status(200).json(repositories);
       return;
     case "POST":

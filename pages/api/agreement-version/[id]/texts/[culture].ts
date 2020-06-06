@@ -27,10 +27,11 @@ export default async (req: NextApiRequest, res: NextApiResponse<any>) => {
   switch (req.method) {
     case "GET":
       await handleExceptions(res, async () => {
-        const data = await agreementsHandler.getAgreementTextByVersionIdAndCulture(
-          id,
-          culture
-        );
+        const data = await agreementsHandler
+          .getAgreementTextByVersionIdAndCulture(
+            id,
+            culture
+          );
 
         if (!data) {
           return res.status(404).end("Agreement text not found.");

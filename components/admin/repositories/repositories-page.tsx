@@ -87,8 +87,9 @@ export default class Repositories extends Component<{}, RepositoriesState> {
         open: true,
         title: `Remove the binding for "${item.fullName}"?`,
         description:
-          "If confirmed, this repository - agreement binding will be removed. " +
-          `Later it is possible to create a new binding for "${item.fullName}".`,
+          `If confirmed, this repository - agreement ` +
+          `binding will be removed. Later it is possible to create a ` +
+          `new binding for "${item.fullName}".`,
         close: () => this.dismissDialog(),
         confirm: () => this.remove(item),
       },

@@ -86,9 +86,8 @@ class SignClaHandler {
     );
 
     // if a commet was created, update its text;
-    const commentInfo = await this._commentsRepository.getCommentInfoByPullRequestId(
-      data.pullRequest.id
-    );
+    const commentInfo = await this._commentsRepository
+      .getCommentInfoByPullRequestId(data.pullRequest.id);
 
     if (commentInfo == null) {
       return;
@@ -106,9 +105,8 @@ class SignClaHandler {
     data: ClaCheckInput,
     committers: string[]
   ): Promise<void> {
-    const allSigned = await this._claCheckHandler.allCommittersHaveSignedTheCla(
-      committers
-    );
+    const allSigned = await this._claCheckHandler
+      .allCommittersHaveSignedTheCla(committers);
 
     if (allSigned) {
       await this.completeClaCheck(data);

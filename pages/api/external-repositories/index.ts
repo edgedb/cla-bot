@@ -16,7 +16,8 @@ export default async (
 
   switch (method) {
     case "GET":
-      const repositories = await repositoriesHandler.getAvailableRepositories();
+      const repositories = await repositoriesHandler
+        .getAvailableRepositories();
       res.status(200).json(repositories);
       return;
   }
