@@ -6,6 +6,7 @@ import {AgreementsHandler} from "../service/handlers/agreements";
 import {TYPES} from "../constants/types";
 import {NextPageContext, GetStaticProps} from "next";
 import Props from "../components/props";
+import ClaView from "../components/common/cla-view";
 
 interface SignedLicenseProps {
   title: string;
@@ -35,12 +36,12 @@ export async function getServerSideProps(
   // but data model supports localization
   const cultureCode = "en";
 
-  const licenseText = await licensesHandler.getAgreementText(
+  const agreementText = await licensesHandler.getAgreementText(
     versionId,
     cultureCode
   );
 
-  return {props: {text: licenseText.text, title: licenseText.title}};
+  return {props: {text: agreementText.text, title: agreementText.title}};
 }
 
 export default class SignedContributorLicenseAgreementPage extends Component<
@@ -49,15 +50,14 @@ export default class SignedContributorLicenseAgreementPage extends Component<
   render(): ReactElement {
     const {text, title} = this.props;
 
-    // TODO: render markdown
-
     return (
       <Container className="contributor-agreement-area">
         <Head>
           <title>{title}</title>
         </Head>
         <main>
-          <div dangerouslySetInnerHTML={{__html: text}}></div>
+          <h1>{title}</h1>
+          <ClaView body={text} />
         </main>
       </Container>
     );

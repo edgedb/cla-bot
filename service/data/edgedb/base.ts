@@ -25,6 +25,12 @@ export class EdgeDBRepository {
         throw new SafeError(`${error}`, 400, error, "InvalidRequest");
       }
 
+      if (error instanceof TypeError) {
+        if (/invalid UUID/.test(error.message)) {
+          throw new SafeError(error.message, 404, undefined, "InvalidRequest");
+        }
+      }
+
       throw error;
     } finally {
       await connection.close();

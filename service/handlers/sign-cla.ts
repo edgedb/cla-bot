@@ -46,12 +46,12 @@ class SignClaHandler {
   @async_retry()
   async createCla(
     emailInfo: EmailInfo,
-    licenseVersionId: string
+    agreementVersionId: string
   ): Promise<ContributorLicenseAgreement> {
     const cla = new ContributorLicenseAgreement(
       uuid(),
       emailInfo.email.toString(),
-      licenseVersionId,
+      agreementVersionId,
       new Date()
     );
 
@@ -68,9 +68,9 @@ class SignClaHandler {
   }
 
   async completeClaCheck(data: ClaCheckInput): Promise<void> {
-    const licenseVersionId = this.readLicenseVersionId(data);
+    const agreementVersionId = this.readAgreementVersionId(data);
     const statusUrl = this._claCheckHandler.getSuccessStatusTargetUrl(
-      licenseVersionId
+      agreementVersionId
     );
 
     await this._statusCheckService.createStatus(
@@ -140,7 +140,7 @@ class SignClaHandler {
 
   private async handleAllMatchingEmails(
     matchingEmails: EmailInfo[],
-    licenseVersionId: string
+    agreementVersionId: string
   ): Promise<void> {
     for (let i = 0; i < matchingEmails.length; i++) {
       const matchingEmail = matchingEmails[i];
@@ -153,16 +153,16 @@ class SignClaHandler {
       );
 
       if (existingCla == null) {
-        await this.createCla(matchingEmail, licenseVersionId);
+        await this.createCla(matchingEmail, agreementVersionId);
       }
     }
   }
 
-  readLicenseVersionId(data: ClaCheckInput): string {
-    if (!data.licenseVersionId) {
+  readAgreementVersionId(data: ClaCheckInput): string {
+    if (!data.agreementVersionId) {
       throw new Error("Missing license version id in state");
     }
-    return data.licenseVersionId;
+    return data.agreementVersionId;
   }
 
   async signCla(
@@ -199,7 +199,7 @@ class SignClaHandler {
 
     await this.handleAllMatchingEmails(
       matchingEmails,
-      this.readLicenseVersionId(data)
+      this.readAgreementVersionId(data)
     );
 
     if (committers.length === 1) {

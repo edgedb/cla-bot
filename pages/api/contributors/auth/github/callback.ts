@@ -50,6 +50,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       return;
     }
 
-    res.status(500).end("Internal server error");
+    throw error;
   }
 };

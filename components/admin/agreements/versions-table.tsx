@@ -52,6 +52,7 @@ export class VersionsTable extends Component<VersionsTableProps> {
             <th>Current</th>
             <th>Status</th>
             <th>Id</th>
+            <th>Preview</th>
             <th>Created at</th>
           </tr>
         </thead>
@@ -68,6 +69,17 @@ export class VersionsTable extends Component<VersionsTableProps> {
                 </td>
                 <td>{this.renderStatusInformation(item.draft)}</td>
                 <td>{item.id}</td>
+                <td>
+                  <a
+                    href={
+                      '/signed-contributor-license-agreement?version=' +
+                      item.id
+                    }
+                    target="_blank"
+                  >
+                    See preview
+                  </a>
+                </td>
                 <td>{formatDate(item.creationTime)}</td>
               </tr>
             );

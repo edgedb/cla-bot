@@ -35,7 +35,7 @@ class ClaCheckHandler {
   private _statusCheckService: StatusChecksService;
 
   @inject(TYPES.AgreementsRepository)
-  private _licensesRepository: AgreementsRepository;
+  private _agreementsRepository: AgreementsRepository;
 
   @inject(TYPES.TokensHandler)
   private _tokensHandler: TokensHandler;
@@ -52,7 +52,9 @@ class ClaCheckHandler {
     // We create a JWT token, to ensure that the user cannot modify the
     // parameter
     const token = this._tokensHandler.createToken(data);
-    return `${this._settings.url}/contributor-license-agreement?state=${token}`;
+    return (
+      `${this._settings.url}/contributor-license-agreement?state=${token}`
+    );
   }
 
   getSignedComment(signedUrl: string): string {
@@ -74,9 +76,10 @@ class ClaCheckHandler {
     challengeUrl: string
   ): Promise<void> {
     // was a CLA comment for this PR already written?
-    const commentInfo = await this._commentsRepository.getCommentInfoByPullRequestId(
-      data.pullRequest.id
-    );
+    const commentInfo = await this._commentsRepository
+      .getCommentInfoByPullRequestId(
+        data.pullRequest.id
+      );
 
     if (commentInfo != null) {
       // Make sure that the comment is updated with failure information,
@@ -146,20 +149,22 @@ class ClaCheckHandler {
 
   @async_retry()
   async checkCla(data: ClaCheckInput): Promise<void> {
-    // Is a license configured for the PR repository?
+    // Is an agreement configured for the PR repository?
     // if not, there is no need to do a check for CLA signing
-    const currentLicenseForRepository = await this._licensesRepository.getCurrentAgreementVersionForRepository(
-      data.repository.fullName
-    );
+    const currentAgreementForRepository = await this._agreementsRepository
+      .getCurrentAgreementVersionForRepository(
+        data.repository.fullName
+      );
 
-    if (!currentLicenseForRepository) {
+    if (!currentAgreementForRepository) {
       return;
     }
 
-    const allCommitters = await this._statusCheckService.getAllCommittersByPullRequestId(
-      data.repository.fullName,
-      data.pullRequest.number
-    );
+    const allCommitters = await this._statusCheckService
+      .getAllCommittersByPullRequestId(
+        data.repository.fullName,
+        data.pullRequest.number
+      );
 
     if (!allCommitters.length) {
       throw new Error(
@@ -172,19 +177,20 @@ class ClaCheckHandler {
     // (when each of them authorizes our app);
     data.committers = allCommitters.map((email) => email.toLowerCase());
 
-    // TODO: rename "License" to "Agreement"
-    // TODO: rename "ContributorLicenseAgreement" to "SignedAgreement"
     let status: StatusCheckInput;
 
     const challengeUrl = this.getTargetUrlWithChallenge(data);
-    const allCommittersHaveSignedTheCla = await this.allCommittersHaveSignedTheCla(
-      allCommitters
-    );
+    const allCommittersHaveSignedTheCla = await this
+      .allCommittersHaveSignedTheCla(
+        allCommitters
+      );
 
     if (allCommittersHaveSignedTheCla) {
       status = new StatusCheckInput(
         CheckState.success,
-        this.getSuccessStatusTargetUrl(currentLicenseForRepository.versionId),
+        this.getSuccessStatusTargetUrl(
+          currentAgreementForRepository.versionId
+        ),
         SUCCESS_MESSAGE,
         CLA_CHECK_CONTEXT
       );

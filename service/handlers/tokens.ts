@@ -18,6 +18,12 @@ export class TokensHandler {
     return handler;
   }
 
+  /**
+   * Creates a generic JWT without expiration.
+   * The only purpose of such token is to ensure that end users cannot modify
+   * payloads. For example, this is used to generate `state` parameters
+   * for the OAuth flow for contributors' sign-in.
+   */
   createToken(data: any): string {
     return jwt.sign(Object.assign({}, data), this._settings.secret);
   }

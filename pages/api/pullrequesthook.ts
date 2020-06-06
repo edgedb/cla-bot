@@ -78,7 +78,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
       const input: ClaCheckInput = {
         gitHubUserId,
-        licenseVersionId: null,
+        agreementVersionId: null,
         committers: null,
         pullRequest: {
           id: pullRequestId,

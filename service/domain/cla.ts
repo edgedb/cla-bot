@@ -16,7 +16,7 @@ export interface ClaCheckPullRequest {
 export interface ClaCheckInput {
   gitHubUserId: number;
   committers: string[] | null;
-  licenseVersionId: string | null;
+  agreementVersionId: string | null;
   repository: ClaCheckRepository;
   pullRequest: ClaCheckPullRequest;
 }
@@ -34,12 +34,12 @@ export class ContributorLicenseAgreement {
   constructor(
     id: string | null,
     email: string,
-    licenseVersionId: string,
+    versionId: string,
     signedAt: Date
   ) {
     this.id = id;
     this.email = email;
-    this.versionId = licenseVersionId;
+    this.versionId = versionId;
     this.signedAt = signedAt;
   }
 }

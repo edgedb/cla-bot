@@ -10,6 +10,7 @@ import FormView from "../../common/form-view";
 import formatDate from "../../format-date";
 import {changeHandler} from "../../forms";
 import {TextField} from "@material-ui/core";
+import ClaView from "../../common/cla-view";
 
 export interface VersionTextProps {
   versionId: string;
@@ -229,11 +230,7 @@ export class VersionText extends Component<
   renderReadOnlyTextView(): ReactElement {
     return (
       <div id="read-only-preview">
-        <div
-          dangerouslySetInnerHTML={{
-            __html: mdParser.render(this.state.body),
-          }}
-        ></div>
+        <ClaView body={this.state.body} />
       </div>
     );
   }

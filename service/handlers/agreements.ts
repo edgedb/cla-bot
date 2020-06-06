@@ -138,36 +138,37 @@ export class AgreementsHandler {
     repositoryFullName: string,
     cultureCode: string
   ): Promise<AgreementText> {
-    const licenseText = await this._agreementsRepository.getAgreementTextForRepository(
-      repositoryFullName,
-      cultureCode
-    );
+    const agreementText = await this._agreementsRepository
+      .getAgreementTextForRepository(
+        repositoryFullName,
+        cultureCode
+      );
 
-    if (licenseText == null) {
+    if (agreementText == null) {
       throw new NotFoundError(
         `License not found: repository ${repositoryFullName} ${cultureCode}`
       );
     }
 
-    return licenseText;
+    return agreementText;
   }
 
   async getAgreementText(
     versionId: string,
     cultureCode: string
   ): Promise<AgreementText> {
-    const licenseText = await this._agreementsRepository.getAgreementText(
+    const agreementText = await this._agreementsRepository.getAgreementText(
       versionId,
       cultureCode
     );
 
-    if (licenseText == null) {
+    if (agreementText == null) {
       throw new NotFoundError(
-        `License not found: version ${versionId} ${cultureCode}`
+        `Agreement not found: version ${versionId} ${cultureCode}`
       );
     }
 
-    return licenseText;
+    return agreementText;
   }
 
   /**
@@ -175,9 +176,10 @@ export class AgreementsHandler {
    * (non draft). Its texts cannot be edited after this operation.
    */
   async completeAgreementVersion(versionId: string): Promise<void> {
-    const agreementVersion = await this._agreementsRepository.getAgreementVersion(
-      versionId
-    );
+    const agreementVersion = await this._agreementsRepository
+      .getAgreementVersion(
+        versionId
+      );
 
     if (agreementVersion === null) throw new NotFoundError();
 

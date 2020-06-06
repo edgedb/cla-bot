@@ -37,7 +37,7 @@ function mapTextEntity(entity: TextEntity): AgreementText {
     entity.title,
     entity.text,
     entity.culture,
-    "", // TODO: is version id needed?
+    "",
     new Date(entity.update_time),
     new Date(entity.creation_time)
   );
@@ -210,7 +210,10 @@ export class EdgeDBAgreementsRepository extends EdgeDBRepository
 
     if (!items.length) return null;
 
-    const currentVersion = items[0].license?.versions[0];
+    const currentVersion = items[0].agreement?.versions[0];
+    if (currentVersion === undefined) {
+      return null;
+    }
     return new RepositoryAgreementInfo(currentVersion.id);
   }
 
@@ -242,9 +245,11 @@ export class EdgeDBAgreementsRepository extends EdgeDBRepository
 
     if (!items.length) return null;
 
-    const currentVersion = items[0].license?.versions[0];
+    const currentVersion = items[0].agreement?.versions[0];
     const versionText = currentVersion.texts[0] as TextEntity;
-    return mapTextEntity(versionText);
+    const text = mapTextEntity(versionText);
+    text.versionId = currentVersion.id;
+    return text;
   }
 
   async getAgreementText(
