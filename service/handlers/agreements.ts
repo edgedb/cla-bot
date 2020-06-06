@@ -3,36 +3,32 @@ import {
   AgreementListItem,
   AgreementsRepository,
   AgreementText,
-  AgreementVersion
+  AgreementVersion,
 } from "../domain/agreements";
-import { inject, injectable } from "inversify";
+import {inject, injectable} from "inversify";
 import {
   InvalidArgumentError,
   NotFoundError,
-  InvalidOperationError
+  InvalidOperationError,
 } from "../../service/common/web";
-import { TYPES } from "../../constants/types";
-import { ServerError } from "../common/app";
-
+import {TYPES} from "../../constants/types";
+import {ServerError} from "../common/app";
 
 @injectable()
-export class AgreementsHandler
-{
+export class AgreementsHandler {
   @inject(TYPES.AgreementsRepository)
-  private _agreementsRepository: AgreementsRepository
+  private _agreementsRepository: AgreementsRepository;
 
   async getAgreements(): Promise<AgreementListItem[]> {
     return await this._agreementsRepository.getAgreements();
   }
 
   async getAgreement(id: string): Promise<Agreement | null> {
-    return await this._agreementsRepository.getAgreement(id)
+    return await this._agreementsRepository.getAgreement(id);
   }
 
-  async getAgreementVersion(
-    id: string
-  ): Promise<AgreementVersion | null> {
-    return await this._agreementsRepository.getAgreementVersion(id)
+  async getAgreementVersion(id: string): Promise<AgreementVersion | null> {
+    return await this._agreementsRepository.getAgreementVersion(id);
   }
 
   async updateAgreement(
@@ -43,26 +39,23 @@ export class AgreementsHandler
     // TODO: check etag!! Disallow updating the entity if etag doesn't match
 
     if (!name)
-      throw new InvalidArgumentError("Missing `name` input parameter.")
+      throw new InvalidArgumentError("Missing `name` input parameter.");
 
-    await this._agreementsRepository.updateAgreement(id, name, description)
+    await this._agreementsRepository.updateAgreement(id, name, description);
   }
 
   private getAgreementTextByVersionAndCulture(
     version: AgreementVersion,
     culture: string
-  ): AgreementText
-  {
+  ): AgreementText {
     const texts = version.texts;
 
     if (texts === undefined) {
       // Expected populated texts here: this must not happen here
-      throw new ServerError(
-        "Missing texts property in agreement context."
-      );
+      throw new ServerError("Missing texts property in agreement context.");
     }
 
-    const text = texts.filter(item => item.culture === culture)[0];
+    const text = texts.filter((item) => item.culture === culture)[0];
     return text || null;
   }
 
@@ -70,13 +63,13 @@ export class AgreementsHandler
     versionId: string,
     culture: string
   ): Promise<AgreementText | null> {
-    const version = await this._agreementsRepository
-      .getAgreementVersion(versionId)
+    const version = await this._agreementsRepository.getAgreementVersion(
+      versionId
+    );
 
-    if (version === null)
-      throw new NotFoundError()
+    if (version === null) throw new NotFoundError();
 
-    return this.getAgreementTextByVersionAndCulture(version, culture)
+    return this.getAgreementTextByVersionAndCulture(version, culture);
   }
 
   async updateAgreementTextByVersionIdAndCulture(
@@ -90,23 +83,23 @@ export class AgreementsHandler
     // editing the same object at the same time
 
     if (!title)
-      throw new InvalidArgumentError("Missing `title` input parameter.")
+      throw new InvalidArgumentError("Missing `title` input parameter.");
 
     if (!body)
-      throw new InvalidArgumentError("Missing `body` input parameter.")
+      throw new InvalidArgumentError("Missing `body` input parameter.");
 
-    const version = await this._agreementsRepository
-      .getAgreementVersion(versionId)
+    const version = await this._agreementsRepository.getAgreementVersion(
+      versionId
+    );
 
-    if (version === null)
-      throw new NotFoundError()
+    if (version === null) throw new NotFoundError();
 
     if (version.draft === false)
       throw new InvalidOperationError(
         "Cannot update an agreement version that is no more a draft."
-      )
+      );
 
-    const text = this.getAgreementTextByVersionAndCulture(version, culture)
+    const text = this.getAgreementTextByVersionAndCulture(version, culture);
 
     if (text === null) {
       // TODO: create an agreement text entity associated with the
@@ -116,14 +109,14 @@ export class AgreementsHandler
       // since every new agreement and new clone is initialized with a text
       // for English language, and the first version of the application
       // only supports English.
-      throw new Error("Not implemented")
+      throw new Error("Not implemented");
     } else {
       // update existing
       await this._agreementsRepository.updateAgreementText(
         text.id,
         title,
         body
-      )
+      );
     }
   }
 
@@ -131,9 +124,7 @@ export class AgreementsHandler
     name: string,
     description?: string
   ): Promise<AgreementListItem> {
-    return await this._agreementsRepository.createAgreement(
-      name, description
-    );
+    return await this._agreementsRepository.createAgreement(name, description);
   }
 
   /**
@@ -147,16 +138,18 @@ export class AgreementsHandler
     repositoryFullName: string,
     cultureCode: string
   ): Promise<AgreementText> {
-    const licenseText = await this._agreementsRepository
-      .getAgreementTextForRepository(repositoryFullName, cultureCode)
+    const licenseText = await this._agreementsRepository.getAgreementTextForRepository(
+      repositoryFullName,
+      cultureCode
+    );
 
     if (licenseText == null) {
       throw new NotFoundError(
         `License not found: repository ${repositoryFullName} ${cultureCode}`
-      )
+      );
     }
 
-    return licenseText
+    return licenseText;
   }
 
   async getAgreementText(
@@ -164,42 +157,38 @@ export class AgreementsHandler
     cultureCode: string
   ): Promise<AgreementText> {
     const licenseText = await this._agreementsRepository.getAgreementText(
-      versionId, cultureCode
-    )
+      versionId,
+      cultureCode
+    );
 
     if (licenseText == null) {
       throw new NotFoundError(
         `License not found: version ${versionId} ${cultureCode}`
-      )
+      );
     }
 
-    return licenseText
+    return licenseText;
   }
 
   /**
    * Marks an agreement version with the given id as DONE
    * (non draft). Its texts cannot be edited after this operation.
    */
-  async completeAgreementVersion(
-    versionId: string
-  ): Promise<void> {
-    const agreementVersion = await this._agreementsRepository
-      .getAgreementVersion(versionId);
+  async completeAgreementVersion(versionId: string): Promise<void> {
+    const agreementVersion = await this._agreementsRepository.getAgreementVersion(
+      versionId
+    );
 
-    if (agreementVersion === null)
-      throw new NotFoundError();
+    if (agreementVersion === null) throw new NotFoundError();
 
-    await this._agreementsRepository.updateAgreementVersion(
-      versionId,
-      false
-    )
+    await this._agreementsRepository.updateAgreementVersion(versionId, false);
   }
 
   private readAgreementVersionParentId(version: AgreementVersion): string {
-    const agreementId = version.agreementId
+    const agreementId = version.agreementId;
 
     if (agreementId === undefined)
-      throw new ServerError("Missing parent id in version context.")
+      throw new ServerError("Missing parent id in version context.");
 
     return agreementId;
   }
@@ -212,22 +201,24 @@ export class AgreementsHandler
    * is displayed in CLA checks for repositories bound to the parent
    * agreement object.
    */
-  async makeAgreementVersionCurrent(
-    versionId: string
-  ): Promise<void> {
-    const version = await this._agreementsRepository
-      .getAgreementVersion(versionId)
+  async makeAgreementVersionCurrent(versionId: string): Promise<void> {
+    const version = await this._agreementsRepository.getAgreementVersion(
+      versionId
+    );
 
-    if (version === null)
-      throw new NotFoundError()
+    if (version === null) throw new NotFoundError();
 
     if (version.draft)
-      throw new InvalidOperationError("Cannot set a draft version as current.")
+      throw new InvalidOperationError(
+        "Cannot set a draft version as current."
+      );
 
     const agreementId = this.readAgreementVersionParentId(version);
 
-    await this._agreementsRepository
-      .setCurrentAgreementVersion(agreementId, versionId)
+    await this._agreementsRepository.setCurrentAgreementVersion(
+      agreementId,
+      versionId
+    );
   }
 
   /**
@@ -237,14 +228,12 @@ export class AgreementsHandler
    * @param versionId id of the version to copy
    * @param newVersionNumber number to associate with the cloned version
    */
-  async cloneAgreementVersion(
-    versionId: string
-  ): Promise<AgreementVersion> {
-    const version = await this._agreementsRepository
-      .getAgreementVersion(versionId)
+  async cloneAgreementVersion(versionId: string): Promise<AgreementVersion> {
+    const version = await this._agreementsRepository.getAgreementVersion(
+      versionId
+    );
 
-    if (version === null)
-      throw new NotFoundError()
+    if (version === null) throw new NotFoundError();
 
     const agreementId = this.readAgreementVersionParentId(version);
 
@@ -254,16 +243,15 @@ export class AgreementsHandler
       throw new ServerError("Missing texts information");
     }
 
-    return await this._agreementsRepository
-      .createAgreementVersion(
-        agreementId,
-        version.texts.map(existingText => {
-          return {
-            title: existingText.title,
-            text: existingText.text,
-            culture: existingText.culture
-          };
-        })
-      );
+    return await this._agreementsRepository.createAgreementVersion(
+      agreementId,
+      version.texts.map((existingText) => {
+        return {
+          title: existingText.title,
+          text: existingText.text,
+          culture: existingText.culture,
+        };
+      })
+    );
   }
 }

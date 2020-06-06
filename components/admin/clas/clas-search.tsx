@@ -1,28 +1,25 @@
 import formatDate from "../../format-date";
-import { Button, TextField } from "@material-ui/core";
-import { changeHandler } from "../../forms";
-import { Component, ReactElement } from "react";
-import { ContributorLicenseAgreement } from "./contracts";
-import ErrorPanel, { ErrorProps } from "../../common/error";
-import { ApplicationError, get } from "../../fetch";
+import {Button, TextField} from "@material-ui/core";
+import {changeHandler} from "../../forms";
+import {Component, ReactElement} from "react";
+import {ContributorLicenseAgreement} from "./contracts";
+import ErrorPanel, {ErrorProps} from "../../common/error";
+import {ApplicationError, get} from "../../fetch";
 import Preloader from "../../common/preloader";
-import { validateEmail } from "../../../service/common/emails";
-
+import {validateEmail} from "../../../service/common/emails";
 
 export interface ClaSearchState {
-  error?: ErrorProps
-  waiting: boolean
-  item: ContributorLicenseAgreement | null | undefined,
-  search: string
-  searchError: boolean
-  searchHelperText: string
+  error?: ErrorProps;
+  waiting: boolean;
+  item: ContributorLicenseAgreement | null | undefined;
+  search: string;
+  searchError: boolean;
+  searchHelperText: string;
 }
 
-
 export class ClaSearch extends Component<{}, ClaSearchState> {
-
   constructor(props: {}) {
-    super(props)
+    super(props);
 
     this.state = {
       error: undefined,
@@ -30,18 +27,18 @@ export class ClaSearch extends Component<{}, ClaSearchState> {
       item: undefined,
       search: "",
       searchError: false,
-      searchHelperText: ""
+      searchHelperText: "",
     };
   }
 
   search(): void {
-    let { search } = this.state;
+    let {search} = this.state;
 
     if (!search || !search.trim()) {
       this.setState({
         searchError: true,
-        searchHelperText: "Please insert a value"
-      })
+        searchHelperText: "Please insert a value",
+      });
       return;
     }
 
@@ -50,43 +47,46 @@ export class ClaSearch extends Component<{}, ClaSearchState> {
     if (!validateEmail(search)) {
       this.setState({
         searchError: true,
-        searchHelperText: "The value is not a valid email address."
-      })
+        searchHelperText: "The value is not a valid email address.",
+      });
       return;
     }
 
     this.setState({
       waiting: true,
-      error: undefined
-    })
+      error: undefined,
+    });
 
     get<ContributorLicenseAgreement>(
       `/api/clas/${encodeURIComponent(search)}`
-    ).then(data => {
-      this.setState({
-        waiting: false,
-        item: data
-      });
-    }, (error: ApplicationError) => {
-      if (error.status === 404) {
-        // Not an error in this case
+    ).then(
+      (data) => {
         this.setState({
           waiting: false,
-          item: null
+          item: data,
         });
+      },
+      (error: ApplicationError) => {
+        if (error.status === 404) {
+          // Not an error in this case
+          this.setState({
+            waiting: false,
+            item: null,
+          });
 
-        return;
+          return;
+        }
+        this.setState({
+          waiting: false,
+          error: {},
+        });
       }
-      this.setState({
-        waiting: false,
-        error: {}
-      });
-    });
+    );
   }
 
   render(): ReactElement {
     const state = this.state;
-    const { search, waiting, item } = state;
+    const {search, waiting, item} = state;
 
     return (
       <div>
@@ -103,33 +103,30 @@ export class ClaSearch extends Component<{}, ClaSearchState> {
           onChange={changeHandler.bind(this)}
         />
         <div className="buttons-area">
-          <Button
-            title="Search CLA"
-            onClick={() => this.search()}
-          >
+          <Button title="Search CLA" onClick={() => this.search()}>
             Search
           </Button>
         </div>
-        {item !== undefined &&
+        {item !== undefined && (
           <div className="region">
-            {item === null
-            ? <p>There is no signed CLA for the given email address.</p>
-            :
-            <div>
-              <dl className="inline">
-                <dt>Id</dt>
-                <dd>{item.id}</dd>
-                <dt>Email</dt>
-                <dd>{item.email}</dd>
-                <dt>Signed at</dt>
-                <dd>{formatDate(item.signedAt)}</dd>
-                <dt>Agreement version:</dt>
-                <dd>{item.versionId}</dd>
-              </dl>
-            </div>
-            }
+            {item === null ? (
+              <p>There is no signed CLA for the given email address.</p>
+            ) : (
+              <div>
+                <dl className="inline">
+                  <dt>Id</dt>
+                  <dd>{item.id}</dd>
+                  <dt>Email</dt>
+                  <dd>{item.email}</dd>
+                  <dt>Signed at</dt>
+                  <dd>{formatDate(item.signedAt)}</dd>
+                  <dt>Agreement version:</dt>
+                  <dd>{item.versionId}</dd>
+                </dl>
+              </div>
+            )}
           </div>
-        }
+        )}
         {state.error && <ErrorPanel {...state.error} />}
       </div>
     );

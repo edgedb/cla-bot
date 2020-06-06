@@ -1,16 +1,15 @@
 import githubAuth from "./configuration";
-import { NextApiRequest, NextApiResponse } from "next";
-import { SafeError } from "../../../../../service/common/web";
-import { readOAuthError } from "../../../../../pages-common/oauth";
-import { AdministratorsHandler } from "../../../../../service/handlers/administrators";
-import { container } from "../../../../../service/di";
-import { TYPES } from "../../../../../constants/types";
-import { handleExceptions } from "../../../";
+import {NextApiRequest, NextApiResponse} from "next";
+import {SafeError} from "../../../../../service/common/web";
+import {readOAuthError} from "../../../../../pages-common/oauth";
+import {AdministratorsHandler} from "../../../../../service/handlers/administrators";
+import {container} from "../../../../../service/di";
+import {TYPES} from "../../../../../constants/types";
+import {handleExceptions} from "../../../";
 
-
-const administratorsHandler = container
-  .get<AdministratorsHandler>(TYPES.AdministratorsHandler);
-
+const administratorsHandler = container.get<AdministratorsHandler>(
+  TYPES.AdministratorsHandler
+);
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   // This function handles an incoming HTTP request following an attempt
@@ -24,10 +23,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(400).end(error);
   }
 
-  const requestUrl = req.url
+  const requestUrl = req.url;
 
-  if (!requestUrl)
-    throw new Error("Missing request url.")
+  if (!requestUrl) throw new Error("Missing request url.");
 
   const token = await githubAuth.code.getToken(requestUrl);
   const accessToken = token.accessToken;
@@ -37,8 +35,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   // redirect to admin page
 
   await handleExceptions(res, async () => {
-    const result = await administratorsHandler
-      .validateAdministratorLogin(accessToken);
+    const result = await administratorsHandler.validateAdministratorLogin(
+      accessToken
+    );
 
     // Redirect to a page that sets the access token to the session
     // storage, then redirects to the admin page
@@ -47,4 +46,4 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     });
     res.end();
   });
-}
+};

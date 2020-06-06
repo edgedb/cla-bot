@@ -1,18 +1,14 @@
-import { container } from "../service/di";
-import { NextApiRequest, NextApiResponse } from "next";
-import { TokenExpiredError } from "jsonwebtoken";
-import { TokensHandler } from "../service/handlers/tokens";
-import { TYPES } from "../constants/types";
-
+import {container} from "../service/di";
+import {NextApiRequest, NextApiResponse} from "next";
+import {TokenExpiredError} from "jsonwebtoken";
+import {TokensHandler} from "../service/handlers/tokens";
+import {TYPES} from "../constants/types";
 
 export interface AuthContext {
-  user: object
+  user: object;
 }
 
-
-const tokensHandler = container
-  .get<TokensHandler>(TYPES.TokensHandler);
-
+const tokensHandler = container.get<TokensHandler>(TYPES.TokensHandler);
 
 function getMessageForError(error: Error): string {
   if (error instanceof TokenExpiredError) {
@@ -22,10 +18,7 @@ function getMessageForError(error: Error): string {
   return "Unauthorized";
 }
 
-
-function readJWTBearer(
-  req: NextApiRequest
-): Promise<object> {
+function readJWTBearer(req: NextApiRequest): Promise<object> {
   return new Promise((resolve, reject) => {
     const authorization = req.headers.authorization;
 
@@ -55,7 +48,6 @@ function readJWTBearer(
   });
 }
 
-
 // NB: the function below is coded like in the official documentation
 // middlewares example (2020.06.04).
 // This is convenient because some admin api routes can still be public:
@@ -73,12 +65,15 @@ export function auth(
   res: NextApiResponse
 ): Promise<void> {
   return new Promise((resolve, reject) => {
-    readJWTBearer(req).then(user => {
-      (req as unknown as AuthContext).user = user;
-      resolve();
-    }, error => {
-      res.status(401).end(error);
-      reject(error);
-    });
+    readJWTBearer(req).then(
+      (user) => {
+        ((req as unknown) as AuthContext).user = user;
+        resolve();
+      },
+      (error) => {
+        res.status(401).end(error);
+        reject(error);
+      }
+    );
   });
 }

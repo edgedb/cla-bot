@@ -1,22 +1,20 @@
-import { auth } from "../../../../pages-common/auth";
-import { AgreementsHandler } from "../../../../service/handlers/agreements";
-import { container } from "../../../../service/di";
-import { handleExceptions } from "../..";
-import { NextApiRequest, NextApiResponse } from "next";
-import { TYPES } from "../../../../constants/types";
+import {auth} from "../../../../pages-common/auth";
+import {AgreementsHandler} from "../../../../service/handlers/agreements";
+import {container} from "../../../../service/di";
+import {handleExceptions} from "../..";
+import {NextApiRequest, NextApiResponse} from "next";
+import {TYPES} from "../../../../constants/types";
 
+const agreementsHandler = container.get<AgreementsHandler>(
+  TYPES.AgreementsHandler
+);
 
-const agreementsHandler = container
-  .get<AgreementsHandler>(TYPES.AgreementsHandler);
-
-
-export default async (
-  req: NextApiRequest,
-  res: NextApiResponse<any>
-) => {
+export default async (req: NextApiRequest, res: NextApiResponse<any>) => {
   await auth(req, res);
 
-  const { query: { id }} = req;
+  const {
+    query: {id},
+  } = req;
 
   if (typeof id !== "string") {
     // should never happen by definition
@@ -33,5 +31,5 @@ export default async (
       });
   }
 
-  res.status(405).end(`${req.method} not allowed`)
-}
+  res.status(405).end(`${req.method} not allowed`);
+};

@@ -1,14 +1,12 @@
 import jwt from "jsonwebtoken";
-import { inject, injectable } from "inversify";
-import { SafeError } from "../common/web";
-import { ServiceSettings } from "../settings";
-import { TYPES } from "../../constants/types";
-
+import {inject, injectable} from "inversify";
+import {SafeError} from "../common/web";
+import {ServiceSettings} from "../settings";
+import {TYPES} from "../../constants/types";
 
 @injectable()
 export class TokensHandler {
-
-  @inject(TYPES.ServiceSettings) private _settings: ServiceSettings
+  @inject(TYPES.ServiceSettings) private _settings: ServiceSettings;
 
   set settings(value: ServiceSettings) {
     this._settings = value;
@@ -21,7 +19,7 @@ export class TokensHandler {
   }
 
   createToken(data: any): string {
-    return jwt.sign(Object.assign({}, data), this._settings.secret)
+    return jwt.sign(Object.assign({}, data), this._settings.secret);
   }
 
   /**
@@ -41,20 +39,22 @@ export class TokensHandler {
   createApplicationToken(data: any, maxAgeInSeconds: number = 86400): string {
     const time = Math.round(new Date().getTime() / 1000);
 
-    return jwt.sign(Object.assign({}, data, {
-      "iat": time,
-      "exp": time + maxAgeInSeconds,
-      "iss": "CLA-Bot",
-      "aud": "CLA-Bot"
-    }), this._settings.secret);
+    return jwt.sign(
+      Object.assign({}, data, {
+        iat: time,
+        exp: time + maxAgeInSeconds,
+        iss: "CLA-Bot",
+        aud: "CLA-Bot",
+      }),
+      this._settings.secret
+    );
   }
 
   verifyToken(rawToken: string): object {
     return jwt.verify(rawToken, this._settings.secret) as object;
   }
 
-  parseToken(rawToken: string): object
-  {
+  parseToken(rawToken: string): object {
     try {
       return this.verifyToken(rawToken);
     } catch (error) {

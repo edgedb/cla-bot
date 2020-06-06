@@ -1,30 +1,28 @@
 import ArrayUtils from "../../array";
-import ConfirmDialog, { closedDialog, ConfirmDialogProps }
-from "../../common/confirm-dialog";
+import ConfirmDialog, {
+  closedDialog,
+  ConfirmDialogProps,
+} from "../../common/confirm-dialog";
 import Layout from "../layout";
 import NewRepositoryForm from "./repository-new";
 import Panel from "../../common/panel";
 import Preloader from "../../common/preloader";
-import { Button } from "@material-ui/core";
-import { Component, ReactElement } from "react";
-import { del, get } from "../../fetch";
-import { ErrorProps } from "../../common/error";
-import { RepositoriesTable } from "./repositories-table";
-import { Repository } from "./contracts";
-
+import {Button} from "@material-ui/core";
+import {Component, ReactElement} from "react";
+import {del, get} from "../../fetch";
+import {ErrorProps} from "../../common/error";
+import {RepositoriesTable} from "./repositories-table";
+import {Repository} from "./contracts";
 
 interface RepositoriesState {
-  error?: ErrorProps
-  loading: boolean,
-  waiting: boolean,
-  repositories: Repository[]
-  confirm: ConfirmDialogProps
+  error?: ErrorProps;
+  loading: boolean;
+  waiting: boolean;
+  repositories: Repository[];
+  confirm: ConfirmDialogProps;
 }
 
-
-export default class Repositories
-extends Component<{}, RepositoriesState> {
-
+export default class Repositories extends Component<{}, RepositoriesState> {
   constructor(props: {}) {
     super(props);
 
@@ -33,7 +31,7 @@ extends Component<{}, RepositoriesState> {
       waiting: false,
       error: undefined,
       repositories: [],
-      confirm: closedDialog()
+      confirm: closedDialog(),
     };
   }
 
@@ -41,16 +39,16 @@ extends Component<{}, RepositoriesState> {
     if (this.state.error) {
       this.setState({
         loading: true,
-        error: undefined
-      })
+        error: undefined,
+      });
     }
 
     get<Repository[]>("/api/repositories").then(
-      items => {
+      (items) => {
         this.setState({
           loading: false,
-          repositories: items
-        })
+          repositories: items,
+        });
       },
       () => {
         this.setState({
@@ -58,20 +56,20 @@ extends Component<{}, RepositoriesState> {
           error: {
             retry: () => {
               this.load();
-            }
-          }
-        })
+            },
+          },
+        });
       }
-    )
+    );
   }
 
   dismissDialog(): void {
     const dialog = this.state.confirm;
-    dialog.open = false
+    dialog.open = false;
     this.setState({
       waiting: false,
-      confirm: dialog
-    })
+      confirm: dialog,
+    });
   }
 
   addErrorToDialog(): void {
@@ -79,8 +77,8 @@ extends Component<{}, RepositoriesState> {
     dialog.error = {};
     this.setState({
       waiting: false,
-      confirm: dialog
-    })
+      confirm: dialog,
+    });
   }
 
   onRemoveClick(item: Repository): void {
@@ -89,26 +87,28 @@ extends Component<{}, RepositoriesState> {
         open: true,
         title: `Remove the binding for "${item.fullName}"?`,
         description:
-        "If confirmed, this repository - agreement binding will be removed. " +
-        `Later it is possible to create a new binding for "${item.fullName}".`,
+          "If confirmed, this repository - agreement binding will be removed. " +
+          `Later it is possible to create a new binding for "${item.fullName}".`,
         close: () => this.dismissDialog(),
-        confirm: () => this.remove(item)
-      }
-    })
+        confirm: () => this.remove(item),
+      },
+    });
   }
 
   remove(item: Repository): void {
     this.setState({
-      waiting: true
+      waiting: true,
     });
 
-    del(`/api/repositories/${item.id}`)
-    .then(() => {
-      ArrayUtils.remove(this.state.repositories, item);
-      this.dismissDialog();
-    }, () => {
-      this.addErrorToDialog();
-    });
+    del(`/api/repositories/${item.id}`).then(
+      () => {
+        ArrayUtils.remove(this.state.repositories, item);
+        this.dismissDialog();
+      },
+      () => {
+        this.addErrorToDialog();
+      }
+    );
   }
 
   onNewRepository(): void {
@@ -140,6 +140,6 @@ extends Component<{}, RepositoriesState> {
         </Panel>
         <ConfirmDialog {...state.confirm} />
       </Layout>
-    )
+    );
   }
 }

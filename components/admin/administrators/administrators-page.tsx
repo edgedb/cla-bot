@@ -1,30 +1,31 @@
-import ConfirmDialog, { ConfirmDialogProps, closedDialog }
-from "../../common/confirm-dialog";
+import ConfirmDialog, {
+  ConfirmDialogProps,
+  closedDialog,
+} from "../../common/confirm-dialog";
 import Layout from "../layout";
 import Panel from "../../common/panel";
-import { Component, ReactElement } from "react";
-import { ErrorProps } from "../../common/error";
-import { get, del } from "../../fetch";
-import { AdministratorsTable } from "./administrators-table";
-import { Administrator } from "./contracts";
+import {Component, ReactElement} from "react";
+import {ErrorProps} from "../../common/error";
+import {get, del} from "../../fetch";
+import {AdministratorsTable} from "./administrators-table";
+import {Administrator} from "./contracts";
 import ArrayUtils from "../../array";
 import Preloader from "../../common/preloader";
 import NewAdministratorForm from "./administrator-new";
 
-
 interface AdministratorsPageProps {
-  error?: ErrorProps
-  loading: boolean,
-  waiting: boolean,
-  administrators: Administrator[]
-  confirm: ConfirmDialogProps
-  showNewAdministratorForm: boolean
+  error?: ErrorProps;
+  loading: boolean;
+  waiting: boolean;
+  administrators: Administrator[];
+  confirm: ConfirmDialogProps;
+  showNewAdministratorForm: boolean;
 }
 
-
-export default class AdministratorsPage
-extends Component<{}, AdministratorsPageProps> {
-
+export default class AdministratorsPage extends Component<
+  {},
+  AdministratorsPageProps
+> {
   constructor(props: {}) {
     super(props);
 
@@ -34,7 +35,7 @@ extends Component<{}, AdministratorsPageProps> {
       error: undefined,
       administrators: [],
       confirm: closedDialog(),
-      showNewAdministratorForm: false
+      showNewAdministratorForm: false,
     };
   }
 
@@ -42,16 +43,16 @@ extends Component<{}, AdministratorsPageProps> {
     if (this.state.error) {
       this.setState({
         loading: true,
-        error: undefined
-      })
+        error: undefined,
+      });
     }
 
     get<Administrator[]>("/api/administrators").then(
-      administrators => {
+      (administrators) => {
         this.setState({
           loading: false,
-          administrators
-        })
+          administrators,
+        });
       },
       () => {
         this.setState({
@@ -59,20 +60,20 @@ extends Component<{}, AdministratorsPageProps> {
           error: {
             retry: () => {
               this.load();
-            }
-          }
-        })
+            },
+          },
+        });
       }
-    )
+    );
   }
 
   dismissDialog(): void {
     const dialog = this.state.confirm;
-    dialog.open = false
+    dialog.open = false;
     this.setState({
       waiting: false,
-      confirm: dialog
-    })
+      confirm: dialog,
+    });
   }
 
   addErrorToDialog(): void {
@@ -80,8 +81,8 @@ extends Component<{}, AdministratorsPageProps> {
     dialog.error = {};
     this.setState({
       waiting: false,
-      confirm: dialog
-    })
+      confirm: dialog,
+    });
   }
 
   onRemoveClick(item: Administrator): void {
@@ -90,25 +91,27 @@ extends Component<{}, AdministratorsPageProps> {
         open: true,
         title: `Remove administrator "${item.email}"?`,
         description:
-        "If confirmed, this administrator won`t be able to login anymore. ",
+          "If confirmed, this administrator won`t be able to login anymore. ",
         close: () => this.dismissDialog(),
-        confirm: () => this.remove(item)
-      }
-    })
+        confirm: () => this.remove(item),
+      },
+    });
   }
 
   remove(item: Administrator): void {
     this.setState({
-      waiting: true
+      waiting: true,
     });
 
-    del(`/api/administrators/${item.id}`)
-    .then(() => {
-      ArrayUtils.remove(this.state.administrators, item);
-      this.dismissDialog();
-    }, () => {
-      this.addErrorToDialog();
-    });
+    del(`/api/administrators/${item.id}`).then(
+      () => {
+        ArrayUtils.remove(this.state.administrators, item);
+        this.dismissDialog();
+      },
+      () => {
+        this.addErrorToDialog();
+      }
+    );
   }
 
   onNewAdministrator(): void {
@@ -139,6 +142,6 @@ extends Component<{}, AdministratorsPageProps> {
         </Panel>
         <ConfirmDialog {...state.confirm} />
       </Layout>
-    )
+    );
   }
 }

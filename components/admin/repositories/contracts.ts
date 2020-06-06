@@ -4,14 +4,13 @@
 // Objects defined in domain namespace are different as they represent
 // higher level objects as they are handled by the server side.
 
-
 /**
  * Data about a GitHub repository.
  */
 export interface ExternalRepository {
-  id: number
-  name: string
-  fullName: string
+  id: number;
+  name: string;
+  fullName: string;
 }
 
 /**
@@ -19,8 +18,8 @@ export interface ExternalRepository {
  * that is a repository associated with an agreement.
  */
 export interface Repository {
-  id: string
-  agreementId: string
-  agreementName: string
-  fullName: string
+  id: string;
+  agreementId: string;
+  agreementName: string;
+  fullName: string;
 }

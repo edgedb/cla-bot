@@ -4,9 +4,8 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 import Grid from "@material-ui/core/Grid";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Paper from "@material-ui/core/Paper";
-import React, { ReactElement } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-
+import React, {ReactElement} from "react";
+import {makeStyles} from "@material-ui/core/styles";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -17,8 +16,8 @@ const useStyles = makeStyles((theme) => ({
     backgroundRepeat: "no-repeat",
     backgroundColor:
       theme.palette.type === "light"
-      ? theme.palette.grey[50]
-      : theme.palette.grey[900],
+        ? theme.palette.grey[50]
+        : theme.palette.grey[900],
     backgroundSize: "cover",
     backgroundPosition: "center",
   },
@@ -41,7 +40,6 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-
 export default function SignInSide(): ReactElement {
   const classes = useStyles();
 
@@ -55,13 +53,9 @@ export default function SignInSide(): ReactElement {
             <LockOutlinedIcon />
           </Avatar>
           <br />
-          <Button
-            variant="contained"
-          >
+          <Button variant="contained">
             <i className="fab fa-github"></i>
-            <a href="/api/administrators/auth/github">
-              Sign in with GitHub
-            </a>
+            <a href="/api/administrators/auth/github">Sign in with GitHub</a>
           </Button>
         </div>
       </Grid>

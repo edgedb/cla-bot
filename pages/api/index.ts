@@ -1,7 +1,5 @@
-
-import { NextApiResponse } from "next";
-import { ErrorDetails, SafeError } from "../../service/common/web";
-
+import {NextApiResponse} from "next";
+import {ErrorDetails, SafeError} from "../../service/common/web";
 
 /**
  * Executes a given function, handling any thrown SafeError to serve
@@ -15,9 +13,8 @@ export async function handleExceptions<T>(
   action: () => Promise<void>
 ): Promise<void> {
   try {
-    await action()
+    await action();
   } catch (error) {
-
     if (error instanceof SafeError) {
       // handled error: the service is behaving as desired
       res.status(error.statusCode).json(error.getObject());

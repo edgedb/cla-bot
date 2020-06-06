@@ -1,32 +1,29 @@
-import { inject, injectable } from "inversify";
-import { TYPES } from "../../constants/types";
+import {inject, injectable} from "inversify";
+import {TYPES} from "../../constants/types";
 import {
   Administrator,
   AdministratorsRepository,
 } from "../domain/administrators";
-import { BadRequestError, UnauthorizedError } from "../common/web";
-import { validateEmail } from "../common/emails";
-import { UsersService } from "../domain/users";
-import { TokensHandler } from "./tokens";
-
+import {BadRequestError, UnauthorizedError} from "../common/web";
+import {validateEmail} from "../common/emails";
+import {UsersService} from "../domain/users";
+import {TokensHandler} from "./tokens";
 
 @injectable()
-export class AdministratorsHandler
-{
+export class AdministratorsHandler {
   @inject(TYPES.AdministratorsRepository)
-  private _repository: AdministratorsRepository
+  private _repository: AdministratorsRepository;
 
-  @inject(TYPES.UsersService) private _usersService: UsersService
+  @inject(TYPES.UsersService) private _usersService: UsersService;
 
-  @inject(TYPES.TokensHandler) private _tokensHandler: TokensHandler
+  @inject(TYPES.TokensHandler) private _tokensHandler: TokensHandler;
 
   async getAdministrators(): Promise<Administrator[]> {
-    return await this._repository.getAdministrators()
+    return await this._repository.getAdministrators();
   }
 
   async addAdministrator(email: string): Promise<void> {
-    if (!email || !email.trim())
-      throw new BadRequestError("Missing email");
+    if (!email || !email.trim()) throw new BadRequestError("Missing email");
 
     email = email.trim();
 
@@ -55,8 +52,7 @@ export class AdministratorsHandler
     // kills performance and defeats the purpose of JWTs in the first place.
     // (Out of the scope of the MVP)
 
-    if (!id || !id.trim())
-      throw new BadRequestError("Missing id");
+    if (!id || !id.trim()) throw new BadRequestError("Missing id");
 
     await this._repository.removeAdministrator(id);
   }
@@ -70,11 +66,12 @@ export class AdministratorsHandler
    * is configured as administrator in the system.
    */
   async validateAdministratorLogin(accessToken: string): Promise<string> {
-    const userEmails = await this._usersService
-      .getUserEmailAddresses(accessToken);
+    const userEmails = await this._usersService.getUserEmailAddresses(
+      accessToken
+    );
 
     // use only the primary email
-    const emailInfo = userEmails.find(item => item.primary && item.verified);
+    const emailInfo = userEmails.find((item) => item.primary && item.verified);
 
     if (emailInfo === undefined) {
       throw new UnauthorizedError(
@@ -82,8 +79,9 @@ export class AdministratorsHandler
       );
     }
 
-    const admin = await this._repository
-      .getAdministratorByEmail(emailInfo.email);
+    const admin = await this._repository.getAdministratorByEmail(
+      emailInfo.email
+    );
 
     if (admin === null) {
       // The user who signed-in is not an administrator, return Unauthorized
@@ -99,7 +97,7 @@ export class AdministratorsHandler
     // For example, a user might have read only access to Signed CLAs,
     // with a scope: "Read.CLA", another to agreements with "Agreements.Read"
     const appAccessToken = this._tokensHandler.createApplicationToken({
-      email: emailInfo
+      email: emailInfo,
     });
     return appAccessToken;
   }

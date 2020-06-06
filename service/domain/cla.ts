@@ -1,37 +1,35 @@
-
-
 export interface ClaCheckRepository {
-  id: number,
-  owner: string,
-  ownerId: number,
-  name: string,
-  fullName: string
+  id: number;
+  owner: string;
+  ownerId: number;
+  name: string;
+  fullName: string;
 }
 
 export interface ClaCheckPullRequest {
-  id: number
-  number: number
-  headSha: string
-  url: string
+  id: number;
+  number: number;
+  headSha: string;
+  url: string;
 }
 
 export interface ClaCheckInput {
-  gitHubUserId: number
-  committers: string[] | null
-  licenseVersionId: string | null
-  repository: ClaCheckRepository
-  pullRequest: ClaCheckPullRequest
+  gitHubUserId: number;
+  committers: string[] | null;
+  licenseVersionId: string | null;
+  repository: ClaCheckRepository;
+  pullRequest: ClaCheckPullRequest;
 }
 
 export interface ClaCheckState extends ClaCheckInput {
-  commentId: string
+  commentId: string;
 }
 
 export class ContributorLicenseAgreement {
-  id: string | null
-  email: string
-  versionId: string
-  signedAt: Date
+  id: string | null;
+  email: string;
+  versionId: string;
+  signedAt: Date;
 
   constructor(
     id: string | null,
@@ -40,14 +38,13 @@ export class ContributorLicenseAgreement {
     signedAt: Date
   ) {
     this.id = id;
-    this.email = email
-    this.versionId = licenseVersionId
-    this.signedAt = signedAt
+    this.email = email;
+    this.versionId = licenseVersionId;
+    this.signedAt = signedAt;
   }
 }
 
 export interface ClaRepository {
-
   getClaByEmailAddress(
     email: string
   ): Promise<ContributorLicenseAgreement | null>;

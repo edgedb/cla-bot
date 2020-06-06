@@ -18,4 +18,4 @@ const TYPES = {
   ClasHandler: Symbol.for("ClasHandler"),
 };
 
-export { TYPES };
+export {TYPES};

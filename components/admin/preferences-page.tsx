@@ -1,51 +1,48 @@
 import Layout from "./layout";
 import Select from "@material-ui/core/Select";
-import { Component, ReactElement } from "react";
-import { MenuItem } from "@material-ui/core";
-
+import {Component, ReactElement} from "react";
+import {MenuItem} from "@material-ui/core";
 
 const DatesCulturePreferenceKey = "DATES_CULTURE";
 
 const SupportedCultures = "en-us en-gb".split(/\s/g);
 
-
 interface Preferences {
-  datesCulture: string
+  datesCulture: string;
 }
 
 // Basic, simple preferences page to handle date formats, using localStorage.
 export default class PreferencesPage extends Component<unknown, Preferences> {
-
   constructor(props: unknown) {
     super(props);
 
     this.state = {
-      datesCulture: ""
-    }
+      datesCulture: "",
+    };
   }
 
-  onCultureSelect(event: React.ChangeEvent<{ value: unknown }>): void {
+  onCultureSelect(event: React.ChangeEvent<{value: unknown}>): void {
     const value = event.target.value as string;
 
     localStorage.setItem(DatesCulturePreferenceKey, value);
 
     this.setState({
-      datesCulture: value
+      datesCulture: value,
     });
   }
 
   readInitialValues(): Preferences {
     return {
-      datesCulture: localStorage.getItem(DatesCulturePreferenceKey) || "en-us"
+      datesCulture: localStorage.getItem(DatesCulturePreferenceKey) || "en-us",
     };
   }
 
   componentDidMount(): void {
     this.setState(this.readInitialValues());
-  };
+  }
 
   render(): ReactElement {
-    const { datesCulture } = this.state;
+    const {datesCulture} = this.state;
 
     return (
       <Layout title="Preferences">
@@ -59,15 +56,13 @@ export default class PreferencesPage extends Component<unknown, Preferences> {
               value={datesCulture}
               onChange={this.onCultureSelect.bind(this)}
             >
-              {
-              SupportedCultures.map(item => {
+              {SupportedCultures.map((item) => {
                 return (
                   <MenuItem key={item} value={item}>
                     {item.toUpperCase()}
                   </MenuItem>
                 );
-              })
-              }
+              })}
             </Select>
           </dd>
         </dl>

@@ -5,8 +5,8 @@
 // higher level objects as they are handled by the server side.
 
 export interface ContributorLicenseAgreement {
-  id: string
-  email: string
-  versionId: string
-  signedAt: string
+  id: string;
+  email: string;
+  versionId: string;
+  signedAt: string;
 }

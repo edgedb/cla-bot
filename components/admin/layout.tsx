@@ -9,31 +9,30 @@ import Head from "next/head";
 import IconButton from "@material-ui/core/IconButton";
 import List from "@material-ui/core/List";
 import MenuIcon from "@material-ui/icons/Menu";
-import React, { ReactElement } from "react";
+import React, {ReactElement} from "react";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
-import { mainListItems, secondaryListItems }
-from "../../components/admin/menu";
-
+import {mainListItems, secondaryListItems} from "../../components/admin/menu";
 
 interface AdminLayoutProps {
-  title?: string
-  children: any
+  title?: string;
+  children: any;
 }
 
 interface AdminLayoutState {
-  drawerOpen: boolean
+  drawerOpen: boolean;
 }
 
-export default class AdminLayout
-extends React.Component<AdminLayoutProps, AdminLayoutState> {
-
+export default class AdminLayout extends React.Component<
+  AdminLayoutProps,
+  AdminLayoutState
+> {
   constructor(props: AdminLayoutProps) {
-    super(props)
+    super(props);
 
     this.state = {
-      drawerOpen: false
-    }
+      drawerOpen: false,
+    };
   }
 
   readInitialOpen(): boolean {
@@ -46,16 +45,16 @@ extends React.Component<AdminLayoutProps, AdminLayoutState> {
 
   componentDidMount(): void {
     this.setState({
-      drawerOpen: this.readInitialOpen()
-    })
-  };
+      drawerOpen: this.readInitialOpen(),
+    });
+  }
 
   toggleDrawer(): void {
     const isOpen = this.state.drawerOpen;
 
     this.setState({
-      drawerOpen: !isOpen
-    })
+      drawerOpen: !isOpen,
+    });
 
     this.setInitialOpen(!isOpen);
   }
@@ -73,8 +72,9 @@ extends React.Component<AdminLayoutProps, AdminLayoutState> {
 
     return (
       <div
-      id="admin-layout"
-      className={open ? "ui-drawer-open" : "ui-drawer-closed"}>
+        id="admin-layout"
+        className={open ? "ui-drawer-open" : "ui-drawer-closed"}
+      >
         <Head>
           <title>{this.props.title}</title>
         </Head>
@@ -90,11 +90,12 @@ extends React.Component<AdminLayoutProps, AdminLayoutState> {
               <MenuIcon />
             </IconButton>
             <Typography
-            className="headline"
-            component="h1"
-            variant="h6"
-            color="inherit"
-            noWrap>
+              className="headline"
+              component="h1"
+              variant="h6"
+              color="inherit"
+              noWrap
+            >
               CLA-Bot
             </Typography>
             <IconButton
@@ -108,17 +109,10 @@ extends React.Component<AdminLayoutProps, AdminLayoutState> {
             </IconButton>
           </Toolbar>
         </AppBar>
-        <Drawer
-          variant="permanent"
-          className="drawer"
-          open={open}
-        >
+        <Drawer variant="permanent" className="drawer" open={open}>
           <div className="drawer-toggle-btn">
             <IconButton onClick={() => this.toggleDrawer()}>
-              {open
-                ? <ChevronLeftIcon />
-                : <ChevronRightIcon />
-              }
+              {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
             </IconButton>
           </div>
           <Divider />
@@ -127,9 +121,7 @@ extends React.Component<AdminLayoutProps, AdminLayoutState> {
           <List>{secondaryListItems}</List>
         </Drawer>
         <main>
-          <div id="content-area">
-            {this.props.children}
-          </div>
+          <div id="content-area">{this.props.children}</div>
         </main>
       </div>
     );

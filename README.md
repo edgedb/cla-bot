@@ -7,7 +7,17 @@ A GitHub bot and Web UI for managing contributor license agreements.
 * Node.js v13.3.0
 * yarn (install with `npm install -g yarn`)
 
-Getting started:
+A full setup requires also:
+
+* a configured OAuth application in GitHub
+* a configured GitHub application in GitHub
+* an instance of EdgeDB with a database configured running `migrations/structure.edgeql`
+* `.env` file populated with proper application settings
+* a web hook for pull requests
+
+For more information on this first-time configuration, refer to the documentation under `docs` folder.
+
+### Getting started:
 
 ```bash
 # install dependencies
@@ -15,18 +25,6 @@ yarn install
 
 # run the development server
 yarn next
-```
-
-A full setup requires configuring an EdgeDB database, two applications in GitHub, and a web hook for pull requests. For more information on a full
-
-Running tests:
-
-```
-# tslint formatting
-yarn tslint --project .
-
-# unit tests
-npm t
 ```
 
 ## Project structure
@@ -43,6 +41,3 @@ This project uses onion architecture, with the following namespaces:
 * `docs` folder contains documentation for developers
 
 Business logic is lousy coupled with the data access layer, since it is only aware of interfaces, not concrete implementations of DAL logic. Everything inside the `service` folder is abstracted from `Next.js` and should be reusable with other web frameworks, unmodified.
-
-## GitHub integration
-See the `docs` folder for examples and more information on the GitHub integration. Relevant functions in the code are commented to describe non obvious dynamics of the GitHub API. The folder includes a [Postman](https://www.postman.com) collection with some of the web requests used by this application.

@@ -1,39 +1,44 @@
-import { async_retry } from "../common/resiliency";
-import { CheckState, StatusCheckInput, StatusChecksService } from "../../service/domain/checks";
-import { ClaCheckInput, ClaRepository } from "../../service/domain/cla";
-import { CommentsRepository, CommentsService } from "../../service/domain/comments";
-import { inject, injectable } from "inversify";
-import { AgreementsRepository } from "../domain/agreements";
-import { ServiceSettings } from "../settings";
-import { TokensHandler } from "../handlers/tokens";
-import { TYPES } from "../../constants/types";
+import {async_retry} from "../common/resiliency";
+import {
+  CheckState,
+  StatusCheckInput,
+  StatusChecksService,
+} from "../../service/domain/checks";
+import {ClaCheckInput, ClaRepository} from "../../service/domain/cla";
+import {
+  CommentsRepository,
+  CommentsService,
+} from "../../service/domain/comments";
+import {inject, injectable} from "inversify";
+import {AgreementsRepository} from "../domain/agreements";
+import {ServiceSettings} from "../settings";
+import {TokensHandler} from "../handlers/tokens";
+import {TYPES} from "../../constants/types";
 
-
-export const CLA_CHECK_CONTEXT = "CLA Signing"
-export const SUCCESS_MESSAGE = "The Contributor License Agreement is signed."
-export const FAILURE_MESSAGE = "Please sign our Contributor License Agreement."
-
+export const CLA_CHECK_CONTEXT = "CLA Signing";
+export const SUCCESS_MESSAGE = "The Contributor License Agreement is signed.";
+export const FAILURE_MESSAGE =
+  "Please sign our Contributor License Agreement.";
 
 @injectable()
 class ClaCheckHandler {
-
-  @inject(TYPES.ServiceSettings) private _settings: ServiceSettings
-  @inject(TYPES.ClaRepository) private _claRepository: ClaRepository
+  @inject(TYPES.ServiceSettings) private _settings: ServiceSettings;
+  @inject(TYPES.ClaRepository) private _claRepository: ClaRepository;
 
   @inject(TYPES.CommentsService)
-  private _commentsService: CommentsService
+  private _commentsService: CommentsService;
 
   @inject(TYPES.CommentsRepository)
-  private _commentsRepository: CommentsRepository
+  private _commentsRepository: CommentsRepository;
 
   @inject(TYPES.StatusChecksService)
-  private _statusCheckService: StatusChecksService
+  private _statusCheckService: StatusChecksService;
 
   @inject(TYPES.AgreementsRepository)
-  private _licensesRepository: AgreementsRepository
+  private _licensesRepository: AgreementsRepository;
 
   @inject(TYPES.TokensHandler)
-  private _tokensHandler: TokensHandler
+  private _tokensHandler: TokensHandler;
 
   getTargetUrlWithChallenge(data: ClaCheckInput): string {
     // The target URL for the check must not only point to this instance of
@@ -47,17 +52,21 @@ class ClaCheckHandler {
     // We create a JWT token, to ensure that the user cannot modify the
     // parameter
     const token = this._tokensHandler.createToken(data);
-    return `${this._settings.url}/contributor-license-agreement?state=${token}`
+    return `${this._settings.url}/contributor-license-agreement?state=${token}`;
   }
 
   getSignedComment(signedUrl: string): string {
-    return `All committers signed the Contributor License Agreement. <br/> ` +
-    `[![CLA signed](${this._settings.url}/cla-signed.svg)](${signedUrl})`
+    return (
+      `All committers signed the Contributor License Agreement. <br/> ` +
+      `[![CLA signed](${this._settings.url}/cla-signed.svg)](${signedUrl})`
+    );
   }
 
   getNotSignedComment(challengeUrl: string): string {
-    return `Committers are required to sign the Contributor License Agreement. <br/> ` +
-    `[![CLA not signed](${this._settings.url}/cla-not-signed.svg)](${challengeUrl})`
+    return (
+      `Committers are required to sign the Contributor License Agreement. <br/> ` +
+      `[![CLA not signed](${this._settings.url}/cla-not-signed.svg)](${challengeUrl})`
+    );
   }
 
   private async addCommentWithNegativeStatus(
@@ -65,8 +74,9 @@ class ClaCheckHandler {
     challengeUrl: string
   ): Promise<void> {
     // was a CLA comment for this PR already written?
-    const commentInfo = await this._commentsRepository
-      .getCommentInfoByPullRequestId(data.pullRequest.id)
+    const commentInfo = await this._commentsRepository.getCommentInfoByPullRequestId(
+      data.pullRequest.id
+    );
 
     if (commentInfo != null) {
       // Make sure that the comment is updated with failure information,
@@ -81,7 +91,7 @@ class ClaCheckHandler {
         data.repository.fullName,
         commentInfo.commentId,
         this.getNotSignedComment(challengeUrl)
-      )
+      );
       return;
     }
 
@@ -90,7 +100,7 @@ class ClaCheckHandler {
       data.repository.fullName,
       data.pullRequest.number,
       this.getNotSignedComment(challengeUrl)
-    )
+    );
 
     await this._commentsRepository.storeCommentInfo(
       commentId,
@@ -113,9 +123,7 @@ class ClaCheckHandler {
     for (let i = 0; i < allCommitters.length; i++) {
       const email = allCommitters[i];
 
-      const cla = await this._claRepository.getClaByEmailAddress(
-        email
-      );
+      const cla = await this._claRepository.getClaByEmailAddress(email);
 
       if (cla == null) {
         return false;
@@ -130,45 +138,48 @@ class ClaCheckHandler {
     // a certain version of the CLA, therefore we keep the version id in
     // the status URL: in the future we can display the exact license that
     // was signed at this point in time.
-    return `${this._settings.url}/signed-contributor-license-agreement` +
-           `?version=${versionId}`;
+    return (
+      `${this._settings.url}/signed-contributor-license-agreement` +
+      `?version=${versionId}`
+    );
   }
 
   @async_retry()
-  async checkCla(
-    data: ClaCheckInput
-  ): Promise<void> {
+  async checkCla(data: ClaCheckInput): Promise<void> {
     // Is a license configured for the PR repository?
     // if not, there is no need to do a check for CLA signing
-    const currentLicenseForRepository = await this._licensesRepository
-      .getCurrentAgreementVersionForRepository(data.repository.fullName)
+    const currentLicenseForRepository = await this._licensesRepository.getCurrentAgreementVersionForRepository(
+      data.repository.fullName
+    );
 
     if (!currentLicenseForRepository) {
       return;
     }
 
-    const allCommitters = await this._statusCheckService
-      .getAllCommittersByPullRequestId(
-        data.repository.fullName,
-        data.pullRequest.number
-      )
+    const allCommitters = await this._statusCheckService.getAllCommittersByPullRequestId(
+      data.repository.fullName,
+      data.pullRequest.number
+    );
 
     if (!allCommitters.length) {
-      throw new Error("Failed to extract the committers emails for the pull request.")
+      throw new Error(
+        "Failed to extract the committers emails for the pull request."
+      );
     }
 
     // Store committers in the input state, so we don't need to fetch
     // again the same information when validating each committer
     // (when each of them authorizes our app);
-    data.committers = allCommitters.map(email => email.toLowerCase());
+    data.committers = allCommitters.map((email) => email.toLowerCase());
 
     // TODO: rename "License" to "Agreement"
     // TODO: rename "ContributorLicenseAgreement" to "SignedAgreement"
-    let status: StatusCheckInput
+    let status: StatusCheckInput;
 
     const challengeUrl = this.getTargetUrlWithChallenge(data);
-    const allCommittersHaveSignedTheCla = await this
-      .allCommittersHaveSignedTheCla(allCommitters)
+    const allCommittersHaveSignedTheCla = await this.allCommittersHaveSignedTheCla(
+      allCommitters
+    );
 
     if (allCommittersHaveSignedTheCla) {
       status = new StatusCheckInput(
@@ -198,4 +209,4 @@ class ClaCheckHandler {
   }
 }
 
-export { ClaCheckHandler };
+export {ClaCheckHandler};

@@ -1,24 +1,21 @@
 import fetch from "cross-fetch";
-import { async_retry } from "../../common/resiliency";
-import { Comment, CommentsService } from "../../domain/comments";
-import { expectSuccessfulResponse } from "../../common/web";
-import { accessHandler, GitHubAccessHandler } from "./clientcredentials";
-import { getHeadersForJsonContent } from "./headers"
-import { injectable } from "inversify";
-
+import {async_retry} from "../../common/resiliency";
+import {Comment, CommentsService} from "../../domain/comments";
+import {expectSuccessfulResponse} from "../../common/web";
+import {accessHandler, GitHubAccessHandler} from "./clientcredentials";
+import {getHeadersForJsonContent} from "./headers";
+import {injectable} from "inversify";
 
 interface CratedCommentOutput {
-  id: string
+  id: string;
 }
-
 
 @injectable()
 export class GitHubCommentsService implements CommentsService {
-
   private _access_token_handler: GitHubAccessHandler;
 
   public constructor() {
-      this._access_token_handler = accessHandler;
+    this._access_token_handler = accessHandler;
   }
 
   @async_retry()
@@ -28,15 +25,16 @@ export class GitHubCommentsService implements CommentsService {
     issueId: number,
     body: string
   ): Promise<string> {
-    const accessToken = await this._access_token_handler
-      .getAccessTokenForAccount(targetAccountId);
+    const accessToken = await this._access_token_handler.getAccessTokenForAccount(
+      targetAccountId
+    );
 
     const response = await fetch(
       `https://api.github.com/repos/${targetRepoFullName}/issues/${issueId}/comments`,
       {
         method: "POST",
-        body: JSON.stringify({ body }),
-        headers: getHeadersForJsonContent(accessToken)
+        body: JSON.stringify({body}),
+        headers: getHeadersForJsonContent(accessToken),
       }
     );
 
@@ -53,15 +51,16 @@ export class GitHubCommentsService implements CommentsService {
     commentId: string,
     body: string
   ): Promise<void> {
-    const accessToken = await this._access_token_handler
-      .getAccessTokenForAccount(targetAccountId);
+    const accessToken = await this._access_token_handler.getAccessTokenForAccount(
+      targetAccountId
+    );
 
     const response = await fetch(
       `https://api.github.com/repos/${targetRepoFullName}/issues/comments/${commentId}`,
       {
         method: "PATCH",
-        body: JSON.stringify({ body }),
-        headers: getHeadersForJsonContent(accessToken)
+        body: JSON.stringify({body}),
+        headers: getHeadersForJsonContent(accessToken),
       }
     );
 

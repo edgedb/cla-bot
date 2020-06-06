@@ -1,12 +1,10 @@
-import { CommentInfo, CommentsRepository } from "../../domain/comments";
-import { EdgeDBRepository } from "./base";
-import { injectable } from "inversify";
-
+import {CommentInfo, CommentsRepository} from "../../domain/comments";
+import {EdgeDBRepository} from "./base";
+import {injectable} from "inversify";
 
 @injectable()
-export class EdgeDBCommentsRepository
-extends EdgeDBRepository implements CommentsRepository {
-
+export class EdgeDBCommentsRepository extends EdgeDBRepository
+  implements CommentsRepository {
   async getCommentInfoByPullRequestId(
     pullRequestId: number
   ): Promise<CommentInfo | null> {
@@ -18,7 +16,7 @@ extends EdgeDBRepository implements CommentsRepository {
         } FILTER .pull_request_id = <int64>$0 limit 1;`,
         [pullRequestId]
       );
-    })
+    });
 
     if (items.length) {
       const item = items[0];
@@ -26,7 +24,7 @@ extends EdgeDBRepository implements CommentsRepository {
         id: item.id,
         commentId: item.comment_id,
         pullRequestId,
-        createdAt: item.creation_time
+        createdAt: item.creation_time,
       };
     }
 
@@ -38,7 +36,7 @@ extends EdgeDBRepository implements CommentsRepository {
     pullRequestId: number,
     createdAt: Date
   ): Promise<void> {
-    await this.run(async connection => {
+    await this.run(async (connection) => {
       await connection.fetchAll(
         `
         INSERT CommentInfo {
@@ -50,9 +48,9 @@ extends EdgeDBRepository implements CommentsRepository {
         {
           comment_id: commentId,
           pull_request_id: pullRequestId,
-          creation_time: createdAt
+          creation_time: createdAt,
         }
-      )
+      );
     });
   }
 }

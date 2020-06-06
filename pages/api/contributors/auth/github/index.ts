@@ -1,6 +1,5 @@
 import githubAuth from "./configuration";
-import { NextApiRequest, NextApiResponse } from "next";
-
+import {NextApiRequest, NextApiResponse} from "next";
 
 export default (req: NextApiRequest, res: NextApiResponse) => {
   // redirects to GitHub login page to authorize our application
@@ -21,6 +20,6 @@ export default (req: NextApiRequest, res: NextApiResponse) => {
     `);
   }
 
-  res.setHeader("Location", signInUrl + state)
-  res.status(302).end()
-}
+  res.setHeader("Location", signInUrl + state);
+  res.status(302).end();
+};

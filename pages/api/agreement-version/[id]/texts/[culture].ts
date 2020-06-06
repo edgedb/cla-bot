@@ -1,20 +1,18 @@
-import { auth } from "../../../../../pages-common/auth";
-import { container } from "../../../../../service/di";
-import { AgreementsHandler } from "../../../../../service/handlers/agreements";
-import { NextApiRequest, NextApiResponse } from "next";
-import { TYPES } from "../../../../../constants/types";
-import { handleExceptions } from "../../../";
+import {auth} from "../../../../../pages-common/auth";
+import {container} from "../../../../../service/di";
+import {AgreementsHandler} from "../../../../../service/handlers/agreements";
+import {NextApiRequest, NextApiResponse} from "next";
+import {TYPES} from "../../../../../constants/types";
+import {handleExceptions} from "../../../";
 
+const agreementsHandler = container.get<AgreementsHandler>(
+  TYPES.AgreementsHandler
+);
 
-const agreementsHandler = container
-  .get<AgreementsHandler>(TYPES.AgreementsHandler);
-
-
-export default async (
-  req: NextApiRequest,
-  res: NextApiResponse<any>
-) => {
-  const { query: { id, culture }} = req;
+export default async (req: NextApiRequest, res: NextApiResponse<any>) => {
+  const {
+    query: {id, culture},
+  } = req;
 
   if (typeof id !== "string") {
     // should never happen by definition
@@ -29,18 +27,17 @@ export default async (
   switch (req.method) {
     case "GET":
       await handleExceptions(res, async () => {
-        const data = await agreementsHandler
-        .getAgreementTextByVersionIdAndCulture(
+        const data = await agreementsHandler.getAgreementTextByVersionIdAndCulture(
           id,
           culture
-        )
+        );
 
         if (!data) {
-          return res.status(404).end("Agreement text not found.")
+          return res.status(404).end("Agreement text not found.");
         }
 
-        return res.status(200).json(data)
-      })
+        return res.status(200).json(data);
+      });
 
       break;
     case "PUT":
@@ -56,13 +53,13 @@ export default async (
           culture,
           body.title,
           body.text
-        )
-        return res.status(204).end()
+        );
+        return res.status(204).end();
       });
 
       break;
     default:
-      res.status(405).end(`${req.method} not allowed`)
+      res.status(405).end(`${req.method} not allowed`);
       break;
   }
-}
+};

@@ -1,7 +1,6 @@
 import fetch from "cross-fetch";
-import { expectSuccessfulResponse } from "../../common/web";
-import { ServerError } from "../../common/app";
-
+import {expectSuccessfulResponse} from "../../common/web";
+import {ServerError} from "../../common/app";
 
 export function hasMoreItems(response: Response): boolean {
   // https://developer.github.com/v3/guides/traversing-with-pagination/
@@ -16,20 +15,19 @@ export function hasMoreItems(response: Response): boolean {
   return true;
 }
 
-
 export async function fetchAllItems<T>(
   url: string,
   init?: RequestInit
 ): Promise<T[]> {
   let pageNumber = 1;
-  let items: T[] = []
+  let items: T[] = [];
 
   if (url.indexOf("?") > -1) {
     // Throw exception: feature not implemented, due to missing time.
     // To support a query string in URL, proper query handling must be done.
     throw new ServerError(
       "Feature not implemented. This method does not implement handling of " +
-      "query string in `url` parameter."
+        "query string in `url` parameter."
     );
   }
 
@@ -48,5 +46,5 @@ export async function fetchAllItems<T>(
     pageNumber += 1;
   }
 
-  return items
+  return items;
 }

@@ -5,6 +5,6 @@
 // higher level objects as they are handled by the server side.
 
 export interface Administrator {
-  id: string
-  email: string
+  id: string;
+  email: string;
 }

@@ -1,33 +1,30 @@
 import Head from "next/head";
-import { Container } from "@material-ui/core";
-import { Component, ReactElement } from "react";
-import { container } from "../service/di";
-import { AgreementsHandler } from "../service/handlers/agreements";
-import { TYPES } from "../constants/types";
-import { NextPageContext, GetStaticProps, } from "next";
-import Props from "../components/props"
-
+import {Container} from "@material-ui/core";
+import {Component, ReactElement} from "react";
+import {container} from "../service/di";
+import {AgreementsHandler} from "../service/handlers/agreements";
+import {TYPES} from "../constants/types";
+import {NextPageContext, GetStaticProps} from "next";
+import Props from "../components/props";
 
 interface SignedLicenseProps {
-  title: string,
-  text: string
+  title: string;
+  text: string;
 }
 
-
-const licensesHandler = container
-  .get<AgreementsHandler>(TYPES.AgreementsHandler);
-
+const licensesHandler = container.get<AgreementsHandler>(
+  TYPES.AgreementsHandler
+);
 
 function readVersionParameter(context: NextPageContext): string {
   const version = context.query.version;
 
   if (typeof version !== "string") {
-    throw new Error("Expected a version parameter")
+    throw new Error("Expected a version parameter");
   }
 
   return version;
 }
-
 
 export async function getServerSideProps(
   context: NextPageContext
@@ -41,17 +38,16 @@ export async function getServerSideProps(
   const licenseText = await licensesHandler.getAgreementText(
     versionId,
     cultureCode
-  )
+  );
 
-  return { props: { text: licenseText.text, title: licenseText.title } };
+  return {props: {text: licenseText.text, title: licenseText.title}};
 }
 
-
-export default class SignedContributorLicenseAgreementPage
-extends Component<SignedLicenseProps> {
-
+export default class SignedContributorLicenseAgreementPage extends Component<
+  SignedLicenseProps
+> {
   render(): ReactElement {
-    const { text, title } = this.props
+    const {text, title} = this.props;
 
     // TODO: render markdown
 
@@ -61,9 +57,9 @@ extends Component<SignedLicenseProps> {
           <title>{title}</title>
         </Head>
         <main>
-          <div dangerouslySetInnerHTML={{ __html: text }}></div>
+          <div dangerouslySetInnerHTML={{__html: text}}></div>
         </main>
       </Container>
-    )
+    );
   }
 }

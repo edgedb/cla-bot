@@ -1,9 +1,7 @@
-import React, { ReactElement } from "react";
-import { Component } from "react";
-
+import React, {ReactElement} from "react";
+import {Component} from "react";
 
 export default class AfterLoginPage extends Component {
-
   readTokenFromQuery(): string | null {
     const search = location.search;
 
@@ -37,8 +35,6 @@ export default class AfterLoginPage extends Component {
   }
 
   render(): ReactElement {
-    return (
-      <React.Fragment></React.Fragment>
-    )
+    return <React.Fragment></React.Fragment>;
   }
 }

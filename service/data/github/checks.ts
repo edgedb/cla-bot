@@ -1,44 +1,43 @@
 import fetch from "cross-fetch";
-import { accessHandler, GitHubAccessHandler } from "./clientcredentials";
-import { async_retry } from "../../common/resiliency";
-import { CheckState, StatusCheckInput, StatusChecksService } from "../../domain/checks";
-import { expectSuccessfulResponse } from "../../common/web";
-import { getHeadersForJsonContent } from "./headers";
-import { hasMoreItems } from "./utils";
-import { injectable } from "inversify";
-
+import {accessHandler, GitHubAccessHandler} from "./clientcredentials";
+import {async_retry} from "../../common/resiliency";
+import {
+  CheckState,
+  StatusCheckInput,
+  StatusChecksService,
+} from "../../domain/checks";
+import {expectSuccessfulResponse} from "../../common/web";
+import {getHeadersForJsonContent} from "./headers";
+import {hasMoreItems} from "./utils";
+import {injectable} from "inversify";
 
 interface GitHubPersonInfo {
-  name: string
-  email: string
-  date: string
+  name: string;
+  email: string;
+  date: string;
 }
-
 
 interface GitHubCommitInfo {
-  author: GitHubPersonInfo
-  committer: GitHubPersonInfo
-  message: string
-  url: string
+  author: GitHubPersonInfo;
+  committer: GitHubPersonInfo;
+  message: string;
+  url: string;
 }
-
 
 interface GitHubCommitItem {
-  sha: string,
-  node_id: string
-  commit: GitHubCommitInfo
-  url: string
-  html_url: string
+  sha: string;
+  node_id: string;
+  commit: GitHubCommitInfo;
+  url: string;
+  html_url: string;
 }
-
 
 @injectable()
 export class GitHubStatusChecksAPI implements StatusChecksService {
-
   private _access_token_handler: GitHubAccessHandler;
 
   public constructor() {
-      this._access_token_handler = accessHandler;
+    this._access_token_handler = accessHandler;
   }
 
   @async_retry()
@@ -62,7 +61,7 @@ export class GitHubStatusChecksAPI implements StatusChecksService {
 
       const data: GitHubCommitItem[] = await response.json();
 
-      data.forEach(item => {
+      data.forEach((item) => {
         const committerEmail = item.commit.committer.email;
 
         if (committersEmails.indexOf(committerEmail) === -1) {
@@ -87,8 +86,9 @@ export class GitHubStatusChecksAPI implements StatusChecksService {
     pullRequestHeadSha: string,
     data: StatusCheckInput
   ): Promise<void> {
-    const accessToken = await this._access_token_handler
-      .getAccessTokenForAccount(targetAccountId);
+    const accessToken = await this._access_token_handler.getAccessTokenForAccount(
+      targetAccountId
+    );
 
     const response = await fetch(
       `https://api.github.com/repos/${targetRepoFullName}/statuses/${pullRequestHeadSha}`,
@@ -98,9 +98,9 @@ export class GitHubStatusChecksAPI implements StatusChecksService {
           state: CheckState[data.state],
           target_url: data.targetUrl,
           description: data.description,
-          context: data.context
+          context: data.context,
         }),
-        headers: getHeadersForJsonContent(accessToken)
+        headers: getHeadersForJsonContent(accessToken),
       }
     );
 
