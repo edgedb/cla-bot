@@ -56,7 +56,8 @@ async function appFetch<T>(
 
   const response = await fetch(input, init);
 
-  // TODO: handle data from server even when it includes error details
+  // TODO: complete logic to handle data from server even when it includes
+  // error details, to provide useful information to the user
   const data = await tryParseBodyAsJSON(response);
 
   if (response.status === 404) {
