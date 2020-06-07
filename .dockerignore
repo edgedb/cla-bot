@@ -1,0 +1,15 @@
+/.git
+/.github
+**/node_modules
+
+/docs
+/migrations
+/.next
+/.vscode
+/yarn-error.log
+
+# PlantUML output folder
+/out
+
+Dockerfile
+README.md

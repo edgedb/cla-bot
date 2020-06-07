@@ -21,3 +21,6 @@ jobs:
     - name: Run tests
       run: |
         npm t
+    - name: Create production build
+      run: |
+        yarn next build

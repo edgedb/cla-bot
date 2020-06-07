@@ -97,7 +97,7 @@ export class AdministratorsHandler {
     // For example, a user might have read only access to Signed CLAs,
     // with a scope: "Read.CLA", another to agreements with "Agreements.Read"
     const appAccessToken = this._tokensHandler.createApplicationToken({
-      email: emailInfo,
+      email: emailInfo.email,
     });
     return appAccessToken;
   }

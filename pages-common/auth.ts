@@ -63,12 +63,12 @@ function readJWTBearer(req: NextApiRequest): Promise<object> {
 export function auth(
   req: NextApiRequest,
   res: NextApiResponse
-): Promise<void> {
+): Promise<object> {
   return new Promise((resolve, reject) => {
     readJWTBearer(req).then(
       (user) => {
         ((req as unknown) as AuthContext).user = user;
-        resolve();
+        resolve(user);
       },
       (error) => {
         res.status(401).end(error);
