@@ -2,6 +2,7 @@ import React from "react";
 import {Component, ReactElement} from "react";
 import {get, ApplicationError} from "../fetch";
 import ErrorPanel, {ErrorProps} from "../common/error";
+import Preloader from "../common/preloader";
 
 interface AdminPageState {
   authenticated: boolean;
@@ -68,7 +69,7 @@ export default class AdminPage extends Component<unknown, AdminPageState> {
       if (error !== undefined) {
         return <ErrorPanel {...error} />
       }
-      return <React.Fragment></React.Fragment>;
+      return <Preloader className="overlay" />;
     }
 
     return <React.Fragment>{this.props.children}</React.Fragment>;
