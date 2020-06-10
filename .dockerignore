@@ -11,5 +11,9 @@
 # PlantUML output folder
 /out
 
+# Note: the .env file is created in docker-entrypoint.py
+.env
+**/*.env
+
 Dockerfile
 README.md
