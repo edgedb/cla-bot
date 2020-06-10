@@ -19,6 +19,8 @@ COPY --from=builder /app .
 ENV NODE_ENV production
 ENV CUSTOMER nobody
 ENV REGION us-east-2
+ENV SERVER_URL https://example.foo.io
+ENV ORGANIZATION_NAME githuborg
 
 EXPOSE 80
 EXPOSE 443
