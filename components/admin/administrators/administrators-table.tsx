@@ -17,7 +17,7 @@ export class AdministratorsTable extends Component<AdministratorsTableProps> {
         <thead>
           <tr>
             <th></th>
-            <th>Full name</th>
+            <th>Email</th>
             <th></th>
           </tr>
         </thead>

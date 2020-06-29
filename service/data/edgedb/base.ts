@@ -1,5 +1,5 @@
 import {AwaitConnection} from "edgedb/dist/src/client";
-import {connect} from "./connect";
+import {getPool} from "./connect";
 import {injectable} from "inversify";
 import {ConstraintViolationError} from "edgedb";
 import {ConflictError, SafeError} from "../../common/web";
@@ -9,10 +9,10 @@ export class EdgeDBRepository {
   async run<T>(
     action: (connection: AwaitConnection) => Promise<T>
   ): Promise<T> {
-    // TODO: use a connection pool, when it is implemented in edgedb-js
-    const connection = await connect();
+    const pool = await getPool();
+    const proxy = await pool.acquire();
     try {
-      return await action(connection);
+      return await action(proxy.connection);
     } catch (error) {
       // handles common errors in a centralized manner, rethrowing exceptions
       // that handled by the front-end and used to return information
@@ -33,7 +33,7 @@ export class EdgeDBRepository {
 
       throw error;
     } finally {
-      await connection.close();
+      await pool.release(proxy);
     }
   }
 }
