@@ -1,14 +1,13 @@
 @import "settings.vars.scss";
 @import "mixins.scss";
 @import "prism.scss";
-@import "./preloaders.scss";
+@import "./loaders.scss";
 @import "./tables.scss";
 @import "./buttons.scss";
 @import "./admin//layout.scss";
 @import "./lists.scss";
 @import "./errors.scss";
 @import "./help.scss";
-
 
 body {
   @include mainfont;

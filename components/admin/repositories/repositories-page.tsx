@@ -6,7 +6,7 @@ import ConfirmDialog, {
 import Layout from "../layout";
 import NewRepositoryForm from "./repository-new";
 import Panel from "../../common/panel";
-import Preloader from "../../common/preloader";
+import Loader from "../../common/loader";
 import {Button} from "@material-ui/core";
 import {Component, ReactElement} from "react";
 import {del, get} from "../../fetch";
@@ -121,7 +121,7 @@ export default class Repositories extends Component<{}, RepositoriesState> {
 
     return (
       <Layout title="Repositories">
-        {state.waiting && <Preloader className="overlay" />}
+        {state.waiting && <Loader className="overlay" />}
         <Panel
           error={state.error}
           load={this.load.bind(this)}

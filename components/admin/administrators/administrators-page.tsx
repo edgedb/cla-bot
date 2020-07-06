@@ -10,7 +10,7 @@ import {get, del} from "../../fetch";
 import {AdministratorsTable} from "./administrators-table";
 import {Administrator} from "./contracts";
 import ArrayUtils from "../../array";
-import Preloader from "../../common/preloader";
+import Loader from "../../common/loader";
 import NewAdministratorForm from "./administrator-new";
 
 interface AdministratorsPageProps {
@@ -123,7 +123,7 @@ export default class AdministratorsPage extends Component<
 
     return (
       <Layout title="Administrators">
-        {state.waiting && <Preloader className="overlay" />}
+        {state.waiting && <Loader className="overlay" />}
         <Panel
           error={state.error}
           load={this.load.bind(this)}

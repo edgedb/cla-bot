@@ -2,11 +2,11 @@ import React from "react";
 import {Component, ReactElement} from "react";
 import {get, ApplicationError} from "../fetch";
 import ErrorPanel, {ErrorProps} from "../common/error";
-import Preloader from "../common/preloader";
+import Loader from "../common/loader";
 
 interface AdminPageState {
   authenticated: boolean;
-  error?: ErrorProps
+  error?: ErrorProps;
 }
 
 /**
@@ -44,12 +44,13 @@ export default class AdminPage extends Component<unknown, AdminPageState> {
     // TODO: a possible improvement, is to support refresh tokens if the
     // user is still a valid administrator.
 
-    get("/api/administrators/me")
-      .then(() => {
+    get("/api/administrators/me").then(
+      () => {
         this.setState({
           authenticated: true,
         });
-      }, (error: ApplicationError) => {
+      },
+      (error: ApplicationError) => {
         sessionStorage.removeItem("ACCESS_TOKEN");
 
         if (error.status === 401) {
@@ -59,7 +60,8 @@ export default class AdminPage extends Component<unknown, AdminPageState> {
             error: {},
           });
         }
-      });
+      }
+    );
   }
 
   render(): ReactElement {
@@ -67,9 +69,9 @@ export default class AdminPage extends Component<unknown, AdminPageState> {
 
     if (!authenticated) {
       if (error !== undefined) {
-        return <ErrorPanel {...error} />
+        return <ErrorPanel {...error} />;
       }
-      return <Preloader className="overlay" />;
+      return <Loader className="overlay" />;
     }
 
     return <React.Fragment>{this.props.children}</React.Fragment>;

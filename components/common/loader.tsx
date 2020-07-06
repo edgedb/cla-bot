@@ -1,12 +1,12 @@
 import {Component, ReactElement} from "react";
 
-export interface PreloaderProps {
+export interface LoaderProps {
   id?: string;
   className?: string;
 }
 
-export default class Preloader extends Component<PreloaderProps> {
-  constructor(props: PreloaderProps) {
+export default class Loader extends Component<LoaderProps> {
+  constructor(props: LoaderProps) {
     super(props);
   }
 

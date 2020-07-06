@@ -7,7 +7,7 @@ import {Button} from "@material-ui/core";
 import {Component, ReactElement} from "react";
 import {post, ApplicationError} from "../../fetch";
 import {VersionText} from "./version-text";
-import Preloader from "../../common/preloader";
+import Loader from "../../common/loader";
 
 export interface VersionProps {
   details: AgreementVersion;
@@ -176,7 +176,7 @@ export class Version extends Component<VersionProps, VersionState> {
 
     return (
       <div>
-        {state.waiting && <Preloader className="overlay" />}
+        {state.waiting && <Loader className="overlay" />}
         <VersionText
           versionId={details.id}
           culture="en"

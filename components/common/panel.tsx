@@ -3,7 +3,7 @@
  * with support for loading / error views.
  */
 import {Component, ReactElement} from "react";
-import Preloader from "./preloader";
+import Loader from "./loader";
 import ErrorPanel, {ErrorProps} from "./error";
 
 export interface PanelProps {
@@ -33,7 +33,7 @@ export default class Panel extends Component<PanelProps> {
     const error = props.error;
 
     if (props.loading && !error) {
-      return <Preloader />;
+      return <Loader />;
     }
 
     if (error) {

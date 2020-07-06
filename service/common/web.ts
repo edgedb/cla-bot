@@ -86,6 +86,15 @@ export class ConflictError extends SafeError {
   }
 }
 
+export class InternalServerError extends SafeError {
+  constructor(
+    message: string = "Internal server error",
+    internalError?: Error
+  ) {
+    super(message, 500, internalError, "Internal server error");
+  }
+}
+
 /**
  * Base class for outgoing web requests errors.
  * That is, errors we throw when we do a web request and it fails.
