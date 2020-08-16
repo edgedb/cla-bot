@@ -3,7 +3,7 @@
 This page describes the provided Dockerfile used to create an instance of the
 `cla-bot` with [`edbcloud`](https://github.com/edgedb/cloud/).
 
-## How application settings are retrieved
+## How application settings are handled
 
 The image entrypoint runs `docker-entrypoint.py` which, using `boto3`, obtains
 application settings stored as secrets, configure them as environmental

@@ -9,7 +9,7 @@ import {TokensHandler} from "../service/handlers/tokens";
 import {TYPES} from "../constants/types";
 import {NextPageContext} from "next";
 import ClaView from "../components/common/cla-view";
-import { ServerError } from "../service/common/app";
+import {ServerError} from "../service/common/app";
 
 interface AgreementPageProps {
   state: string;
@@ -82,9 +82,7 @@ export default class AgreementPage extends Component<AgreementPageProps> {
         <main>
           <h1>{title}</h1>
           <ClaView body={text} />
-          <Button
-            variant="contained"
-          >
+          <Button variant="contained">
             <a {...signInAnchorOps}>Sign in with GitHub to agree</a>
           </Button>
         </main>
