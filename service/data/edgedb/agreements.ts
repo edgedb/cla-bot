@@ -59,7 +59,7 @@ export class EdgeDBAgreementsRepository extends EdgeDBRepository
   implements AgreementsRepository {
   async getAgreement(agreementId: string): Promise<Agreement | null> {
     const items = await this.run(async (connection) => {
-      return await connection.fetchAll(
+      return await connection.query(
         `SELECT Agreement {
           name,
           description,
@@ -94,7 +94,7 @@ export class EdgeDBAgreementsRepository extends EdgeDBRepository
     versionId: string
   ): Promise<AgreementVersion | null> {
     const items = await this.run(async (connection) => {
-      return await connection.fetchAll(
+      return await connection.query(
         `SELECT AgreementVersion {
           current,
           draft,
@@ -125,7 +125,7 @@ export class EdgeDBAgreementsRepository extends EdgeDBRepository
     description: string
   ): Promise<void> {
     await this.run(async (connection) => {
-      await connection.fetchOne(
+      await connection.queryOne(
         `
         UPDATE Agreement
         FILTER .id = <uuid>$id
@@ -151,7 +151,7 @@ export class EdgeDBAgreementsRepository extends EdgeDBRepository
     body: string
   ): Promise<void> {
     await this.run(async (connection) => {
-      await connection.fetchOne(
+      await connection.queryOne(
         `
         UPDATE AgreementText
         FILTER .id = <uuid>$id
@@ -173,7 +173,7 @@ export class EdgeDBAgreementsRepository extends EdgeDBRepository
 
   async updateAgreementVersion(id: string, draft: boolean): Promise<void> {
     await this.run(async (connection) => {
-      await connection.fetchOne(
+      await connection.queryOne(
         `
         UPDATE AgreementVersion
         FILTER .id = <uuid>$id
@@ -193,7 +193,7 @@ export class EdgeDBAgreementsRepository extends EdgeDBRepository
     repositoryFullName: string
   ): Promise<RepositoryAgreementInfo | null> {
     const items = await this.run(async (connection) => {
-      return await connection.fetchAll(
+      return await connection.query(
         `SELECT Repository {
           agreement: {
             versions: {
@@ -222,7 +222,7 @@ export class EdgeDBAgreementsRepository extends EdgeDBRepository
     cultureCode: string
   ): Promise<AgreementText | null> {
     const items = await this.run(async (connection) => {
-      return await connection.fetchAll(
+      return await connection.query(
         `SELECT Repository {
           agreement: {
             versions: {
@@ -257,7 +257,7 @@ export class EdgeDBAgreementsRepository extends EdgeDBRepository
     cultureCode: string
   ): Promise<AgreementText | null> {
     const items = await this.run(async (connection) => {
-      return await connection.fetchAll(
+      return await connection.query(
         `SELECT AgreementVersion {
           texts: {
             text,
@@ -284,7 +284,7 @@ export class EdgeDBAgreementsRepository extends EdgeDBRepository
     cultureCode: string
   ): Promise<string | null> {
     const items = await this.run(async (connection) => {
-      return await connection.fetchAll(
+      return await connection.query(
         `SELECT Repository {
           agreement: {
             versions: {
@@ -309,7 +309,7 @@ export class EdgeDBAgreementsRepository extends EdgeDBRepository
 
   async getAgreements(): Promise<AgreementListItem[]> {
     const items = await this.run(async (connection) => {
-      return await connection.fetchAll(
+      return await connection.query(
         `SELECT Agreement {
           name,
           description,
@@ -338,7 +338,7 @@ export class EdgeDBAgreementsRepository extends EdgeDBRepository
 
     return await this.run(async (connection) => {
       const creationTime = new Date();
-      const result = await connection.fetchAll(
+      const result = await connection.query(
         `
         INSERT Agreement {
           name := <str>$name,
@@ -378,7 +378,7 @@ export class EdgeDBAgreementsRepository extends EdgeDBRepository
     versionId: string
   ): Promise<void> {
     await this.run(async (connection) => {
-      await connection.fetchAll(
+      await connection.query(
         `
       WITH X := (SELECT AgreementVersion {
         id,
@@ -410,7 +410,7 @@ export class EdgeDBAgreementsRepository extends EdgeDBRepository
     const {title, text, culture} = texts[0];
 
     return await this.run(async (connection) => {
-      const items = await connection.fetchAll(
+      const items = await connection.query(
         `
         UPDATE Agreement
         FILTER

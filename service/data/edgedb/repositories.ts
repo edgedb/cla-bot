@@ -7,7 +7,7 @@ export class EdgeDBRepositoriesRepository extends EdgeDBRepository
   implements RepositoriesRepository {
   async getConfiguredRepositories(): Promise<Repository[]> {
     const items = await this.run(async (connection) => {
-      return await connection.fetchAll(
+      return await connection.query(
         `SELECT Repository {
           full_name,
           agreementId := .agreement.id,
@@ -32,7 +32,7 @@ export class EdgeDBRepositoriesRepository extends EdgeDBRepository
     repositoryId: string
   ): Promise<void> {
     await this.run(async (connection) => {
-      await connection.fetchAll(
+      await connection.query(
         `
         INSERT Repository {
           full_name := <str>$repository_id,
@@ -49,7 +49,7 @@ export class EdgeDBRepositoriesRepository extends EdgeDBRepository
 
   async deleteRepositoryConfiguration(id: string): Promise<void> {
     await this.run(async (connection) => {
-      await connection.fetchOne(
+      await connection.queryOne(
         `
         DELETE Repository FILTER .id = <uuid>$id
         `,
