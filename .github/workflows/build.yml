@@ -5,22 +5,27 @@ on:
   push:
     branches:
       - master
-      - 'releases/*'
+      - "releases/*"
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-    - name: Install dependencies
-      run: |
-        yarn install
-    - name: Run tslint tests
-      run: |
-        yarn tslint --project .
-    - name: Run tests
-      run: |
-        npm t
-    - name: Create production build
-      run: |
-        yarn next build
+      - uses: actions/checkout@v1
+      - name: Install dependencies
+        run: |
+          yarn install
+      - name: Temporary fix for edgedb package
+        run: |
+          FILE="node_modules/edgedb/dist/src/pool.d.ts" && \
+          sed -i -E 's, } from "./ifaces";,\, onConnectionClose } from "./ifaces";,' $FILE && \
+          sed -i -E 's,private \[holderAttr\];$,private [holderAttr];\r    [onConnectionClose](): void;\r,' $FILE
+      - name: Run tslint tests
+        run: |
+          yarn tslint --project .
+      - name: Run tests
+        run: |
+          npm t
+      - name: Create production build
+        run: |
+          yarn next build

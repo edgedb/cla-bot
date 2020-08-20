@@ -1,7 +1,7 @@
 import {Select, InputLabel, Button, FormHelperText} from "@material-ui/core";
 import {Component, ReactElement} from "react";
 import ErrorPanel, {ErrorProps} from "../../common/error";
-import Preloader from "../../common/preloader";
+import Loader from "../../common/loader";
 import {changeHandler} from "../../forms";
 import Panel from "../../common/panel";
 import {get, post, ApplicationError} from "../../fetch";
@@ -266,7 +266,7 @@ export default class NewRepositoryForm extends Component<
 
     return (
       <div>
-        {state.submitting && <Preloader className="overlay" />}
+        {state.submitting && <Loader className="overlay" />}
         <Panel
           error={state.error}
           load={() => this.load()}

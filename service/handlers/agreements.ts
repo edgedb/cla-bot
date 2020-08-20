@@ -17,18 +17,18 @@ import {ServerError} from "../common/app";
 @injectable()
 export class AgreementsHandler {
   @inject(TYPES.AgreementsRepository)
-  private _agreementsRepository: AgreementsRepository;
+  private _repository: AgreementsRepository;
 
   async getAgreements(): Promise<AgreementListItem[]> {
-    return await this._agreementsRepository.getAgreements();
+    return await this._repository.getAgreements();
   }
 
   async getAgreement(id: string): Promise<Agreement | null> {
-    return await this._agreementsRepository.getAgreement(id);
+    return await this._repository.getAgreement(id);
   }
 
   async getAgreementVersion(id: string): Promise<AgreementVersion | null> {
-    return await this._agreementsRepository.getAgreementVersion(id);
+    return await this._repository.getAgreementVersion(id);
   }
 
   async updateAgreement(
@@ -41,7 +41,7 @@ export class AgreementsHandler {
     if (!name)
       throw new InvalidArgumentError("Missing `name` input parameter.");
 
-    await this._agreementsRepository.updateAgreement(id, name, description);
+    await this._repository.updateAgreement(id, name, description);
   }
 
   private getAgreementTextByVersionAndCulture(
@@ -63,9 +63,7 @@ export class AgreementsHandler {
     versionId: string,
     culture: string
   ): Promise<AgreementText | null> {
-    const version = await this._agreementsRepository.getAgreementVersion(
-      versionId
-    );
+    const version = await this._repository.getAgreementVersion(versionId);
 
     if (version === null) throw new NotFoundError();
 
@@ -88,9 +86,7 @@ export class AgreementsHandler {
     if (!body)
       throw new InvalidArgumentError("Missing `body` input parameter.");
 
-    const version = await this._agreementsRepository.getAgreementVersion(
-      versionId
-    );
+    const version = await this._repository.getAgreementVersion(versionId);
 
     if (version === null) throw new NotFoundError();
 
@@ -112,11 +108,7 @@ export class AgreementsHandler {
       throw new Error("Not implemented");
     } else {
       // update existing
-      await this._agreementsRepository.updateAgreementText(
-        text.id,
-        title,
-        body
-      );
+      await this._repository.updateAgreementText(text.id, title, body);
     }
   }
 
@@ -124,7 +116,7 @@ export class AgreementsHandler {
     name: string,
     description?: string
   ): Promise<AgreementListItem> {
-    return await this._agreementsRepository.createAgreement(name, description);
+    return await this._repository.createAgreement(name, description);
   }
 
   /**
@@ -138,11 +130,10 @@ export class AgreementsHandler {
     repositoryFullName: string,
     cultureCode: string
   ): Promise<AgreementText> {
-    const agreementText = await this._agreementsRepository
-      .getAgreementTextForRepository(
-        repositoryFullName,
-        cultureCode
-      );
+    const agreementText = await this._repository.getAgreementTextForRepository(
+      repositoryFullName,
+      cultureCode
+    );
 
     if (agreementText == null) {
       throw new NotFoundError(
@@ -157,7 +148,7 @@ export class AgreementsHandler {
     versionId: string,
     cultureCode: string
   ): Promise<AgreementText> {
-    const agreementText = await this._agreementsRepository.getAgreementText(
+    const agreementText = await this._repository.getAgreementText(
       versionId,
       cultureCode
     );
@@ -176,14 +167,13 @@ export class AgreementsHandler {
    * (non draft). Its texts cannot be edited after this operation.
    */
   async completeAgreementVersion(versionId: string): Promise<void> {
-    const agreementVersion = await this._agreementsRepository
-      .getAgreementVersion(
-        versionId
-      );
+    const agreementVersion = await this._repository.getAgreementVersion(
+      versionId
+    );
 
     if (agreementVersion === null) throw new NotFoundError();
 
-    await this._agreementsRepository.updateAgreementVersion(versionId, false);
+    await this._repository.updateAgreementVersion(versionId, false);
   }
 
   private readAgreementVersionParentId(version: AgreementVersion): string {
@@ -204,9 +194,7 @@ export class AgreementsHandler {
    * agreement object.
    */
   async makeAgreementVersionCurrent(versionId: string): Promise<void> {
-    const version = await this._agreementsRepository.getAgreementVersion(
-      versionId
-    );
+    const version = await this._repository.getAgreementVersion(versionId);
 
     if (version === null) throw new NotFoundError();
 
@@ -217,10 +205,7 @@ export class AgreementsHandler {
 
     const agreementId = this.readAgreementVersionParentId(version);
 
-    await this._agreementsRepository.setCurrentAgreementVersion(
-      agreementId,
-      versionId
-    );
+    await this._repository.setCurrentAgreementVersion(agreementId, versionId);
   }
 
   /**
@@ -231,21 +216,17 @@ export class AgreementsHandler {
    * @param newVersionNumber number to associate with the cloned version
    */
   async cloneAgreementVersion(versionId: string): Promise<AgreementVersion> {
-    const version = await this._agreementsRepository.getAgreementVersion(
-      versionId
-    );
+    const version = await this._repository.getAgreementVersion(versionId);
 
     if (version === null) throw new NotFoundError();
 
     const agreementId = this.readAgreementVersionParentId(version);
 
     if (version.texts === undefined) {
-      // TODO: improve the code: AgreementVersion details always has
-      // texts and agreementId populated.
       throw new ServerError("Missing texts information");
     }
 
-    return await this._agreementsRepository.createAgreementVersion(
+    return await this._repository.createAgreementVersion(
       agreementId,
       version.texts.map((existingText) => {
         return {

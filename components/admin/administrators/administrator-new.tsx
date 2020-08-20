@@ -1,7 +1,7 @@
 import {Button, TextField} from "@material-ui/core";
 import {Component, ReactElement} from "react";
 import ErrorPanel, {ErrorProps} from "../../common/error";
-import Preloader from "../../common/preloader";
+import Loader from "../../common/loader";
 import {changeHandler} from "../../forms";
 import {post, ApplicationError} from "../../fetch";
 import {validateEmail} from "../../../service/common/emails";
@@ -110,7 +110,7 @@ export default class NewAdministratorForm extends Component<
 
     return (
       <div>
-        {state.submitting && <Preloader className="overlay" />}
+        {state.submitting && <Loader className="overlay" />}
         <h1>Add new administrator</h1>
         <TextField
           value={state.email}

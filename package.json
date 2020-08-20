@@ -15,7 +15,7 @@
     "cross-env": "^7.0.2",
     "cross-fetch": "^3.0.4",
     "dotenv": "^8.2.0",
-    "edgedb": "^0.7.3",
+    "edgedb": "0.8.0",
     "immer": "^6.0.2",
     "inversify": "^5.0.1",
     "jsonwebtoken": "^8.5.1",

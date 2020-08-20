@@ -1,10 +1,42 @@
 @keyframes preloader4 {
-  from {transform: rotate(0deg);}
-  to {transform: rotate(360deg);}
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 @-webkit-keyframes preloader4 {
-  from {-webkit-transform: rotate(0deg);}
-  to {-webkit-transform: rotate(360deg);}
+  from {
+    -webkit-transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(360deg);
+  }
+}
+
+@keyframes fadein {
+  0% {
+    opacity: 0;
+  }
+  80% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes fadein {
+  0% {
+    opacity: 0;
+  }
+  80% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 #global-preloader {
@@ -23,6 +55,12 @@
   width: 100%;
   min-height: 300px;
   position: relative;
+
+  animation: 0.5s ease 0s normal forwards 1 fadein;
+  -webkit-animation: 0.5s ease 0s normal forwards 1 fadein;
+  opacity: 1;
+  transition-delay: 0.3s;
+
   .preloader-icon {
     position: absolute;
     background-repeat: no-repeat;
@@ -42,8 +80,8 @@
       border-bottom-color: rgba(102, 215, 220, 0.15);
       border-left-color: #bc7cd2;
       border-right-color: rgba(102, 215, 220, 0.15);
-      -webkit-animation: preloader4 .8s linear infinite;
-      animation: preloader4 .8s linear infinite;
+      -webkit-animation: preloader4 0.8s linear infinite;
+      animation: preloader4 0.8s linear infinite;
       position: absolute;
       left: 50%;
       top: 50%;
@@ -52,7 +90,7 @@
 
   &.overlay {
     position: fixed;
-    background-color: rgba(255,255,255,.8);
+    background-color: rgba(255, 255, 255, 0.8);
     z-index: 10000;
     top: 0;
     left: 0;
@@ -68,7 +106,7 @@
     position: absolute;
     top: 0;
     left: 0;
-    background-color: rgba(255,255,255,.8);
+    background-color: rgba(255, 255, 255, 0.8);
     z-index: 100;
   }
 

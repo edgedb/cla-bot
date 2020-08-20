@@ -1,16 +1,13 @@
-import {AwaitConnection} from "edgedb/dist/src/client";
-import {connect} from "./connect";
+import {getPool} from "./connect";
 import {injectable} from "inversify";
-import {ConstraintViolationError} from "edgedb";
+import {ConstraintViolationError, Connection} from "edgedb";
 import {ConflictError, SafeError} from "../../common/web";
 
 @injectable()
 export class EdgeDBRepository {
-  async run<T>(
-    action: (connection: AwaitConnection) => Promise<T>
-  ): Promise<T> {
-    // TODO: use a connection pool, when it is implemented in edgedb-js
-    const connection = await connect();
+  async run<T>(action: (connection: Connection) => Promise<T>): Promise<T> {
+    const pool = await getPool();
+    const connection = await pool.acquire();
     try {
       return await action(connection);
     } catch (error) {
@@ -33,7 +30,7 @@ export class EdgeDBRepository {
 
       throw error;
     } finally {
-      await connection.close();
+      await pool.release(connection);
     }
   }
 }

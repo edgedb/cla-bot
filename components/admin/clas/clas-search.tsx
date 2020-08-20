@@ -5,7 +5,7 @@ import {Component, ReactElement} from "react";
 import {ContributorLicenseAgreement} from "./contracts";
 import ErrorPanel, {ErrorProps} from "../../common/error";
 import {ApplicationError, get} from "../../fetch";
-import Preloader from "../../common/preloader";
+import Loader from "../../common/loader";
 import {validateEmail} from "../../../service/common/emails";
 
 export interface ClaSearchState {
@@ -90,7 +90,7 @@ export class ClaSearch extends Component<{}, ClaSearchState> {
 
     return (
       <div>
-        {waiting && <Preloader className="overlay" />}
+        {waiting && <Loader className="overlay" />}
         <TextField
           value={search}
           name="search"

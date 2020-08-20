@@ -9,7 +9,7 @@ export class EdgeDBCommentsRepository extends EdgeDBRepository
     pullRequestId: number
   ): Promise<CommentInfo | null> {
     const items = await this.run(async (connection) => {
-      return await connection.fetchAll(
+      return await connection.query(
         `SELECT CommentInfo {
           comment_id,
           creation_time
@@ -37,7 +37,7 @@ export class EdgeDBCommentsRepository extends EdgeDBRepository
     createdAt: Date
   ): Promise<void> {
     await this.run(async (connection) => {
-      await connection.fetchAll(
+      await connection.query(
         `
         INSERT CommentInfo {
           comment_id := <str>$comment_id,

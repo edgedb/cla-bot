@@ -1,5 +1,5 @@
 import AgreementDetailsPage from "../../../components/admin/agreements/agreement-page";
-import Preloader from "../../../components/common/preloader";
+import Loader from "../../../components/common/loader";
 import {ReactElement} from "react";
 import {withRouter} from "next/router";
 import {WithRouterProps} from "next/dist/client/with-router";
@@ -15,7 +15,7 @@ function Page({router}: WithRouterProps): ReactElement {
     // which is of course parsed and used by the server side.
     // Since we don't care about SEO here, return a preloader if the route
     // is not available.
-    return <Preloader className="overlay" />;
+    return <Loader className="overlay" />;
   }
 
   return (

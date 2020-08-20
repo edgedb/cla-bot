@@ -4,7 +4,7 @@ import Link from "next/link";
 import {Button, TextField} from "@material-ui/core";
 import {Component, ReactElement} from "react";
 import ErrorPanel, {ErrorProps} from "../../common/error";
-import Preloader from "../../common/preloader";
+import Loader from "../../common/loader";
 import {changeHandler} from "../../forms";
 import {post, ApplicationError} from "../../fetch";
 
@@ -89,7 +89,7 @@ export default class NewAgreementPage extends Component<
 
     return (
       <Layout title="New agreement">
-        {state.submitting && <Preloader className="overlay" />}
+        {state.submitting && <Loader className="overlay" />}
         <h1>Create new agreement</h1>
         <form noValidate>
           <Grid container spacing={2}>

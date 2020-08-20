@@ -16,7 +16,7 @@ export class EdgeDBClaRepository extends EdgeDBRepository
     email: string
   ): Promise<ContributorLicenseAgreement | null> {
     const signed_cla: ClaItem[] = await this.run(async (connection) => {
-      return await connection.fetchAll(
+      return await connection.query(
         `SELECT ContributorLicenseAgreement {
           email,
           creation_time,
@@ -42,7 +42,7 @@ export class EdgeDBClaRepository extends EdgeDBRepository
 
   async saveCla(data: ContributorLicenseAgreement): Promise<void> {
     await this.run(async (connection) => {
-      const result = await connection.fetchAll(
+      const result = await connection.query(
         `
         INSERT ContributorLicenseAgreement {
           email := <str>$email,

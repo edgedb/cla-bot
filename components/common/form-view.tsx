@@ -1,7 +1,7 @@
 import ErrorPanel, {ErrorProps} from "./error";
 import {Component, ReactElement} from "react";
 import {Button} from "@material-ui/core";
-import Preloader from "./preloader";
+import Loader from "./loader";
 
 interface FormViewProps {
   submit: () => Promise<void>;
@@ -135,7 +135,7 @@ export default class FormView extends Component<FormViewProps, FormViewState> {
           "edit-view" + (props.className ? ` ${props.className}` : "")
         }
       >
-        {state.submitting && <Preloader className="overlay" />}
+        {state.submitting && <Loader className="overlay" />}
         {props.children}
         {state.error && <ErrorPanel {...state.error} />}
         {!props.readonly && (

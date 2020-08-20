@@ -10,7 +10,7 @@ export class EdgeDBAdministratorsRepository extends EdgeDBRepository
   implements AdministratorsRepository {
   async getAdministrators(): Promise<Administrator[]> {
     const items = await this.run(async (connection) => {
-      return await connection.fetchAll(
+      return await connection.query(
         `SELECT Administrator {
           id,
           email
@@ -23,7 +23,7 @@ export class EdgeDBAdministratorsRepository extends EdgeDBRepository
 
   async getAdministratorByEmail(email: string): Promise<Administrator | null> {
     const items = await this.run(async (connection) => {
-      return await connection.fetchAll(
+      return await connection.query(
         `SELECT Administrator {
           id,
           email
@@ -45,7 +45,7 @@ export class EdgeDBAdministratorsRepository extends EdgeDBRepository
 
   async addAdministrator(email: string): Promise<void> {
     await this.run(async (connection) => {
-      await connection.fetchAll(
+      await connection.query(
         `
         INSERT Administrator {
           email := <str>$email
@@ -60,7 +60,7 @@ export class EdgeDBAdministratorsRepository extends EdgeDBRepository
 
   async removeAdministrator(id: string): Promise<void> {
     await this.run(async (connection) => {
-      await connection.fetchOne(
+      await connection.queryOne(
         `
         DELETE Administrator FILTER .id = <uuid>$id
         `,
