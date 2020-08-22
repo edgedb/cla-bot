@@ -1,54 +1,85 @@
 import Head from "next/head";
 import {Container} from "@material-ui/core";
 import {Component, ReactElement} from "react";
-import {container} from "../service/di";
 import {AgreementsHandler} from "../service/handlers/agreements";
-import {TYPES} from "../constants/types";
-import {NextPageContext, GetStaticProps} from "next";
-import Props from "../components/props";
 import ClaView from "../components/common/cla-view";
+import ErrorPanel, {ErrorProps} from "../components/common/error";
+import {get} from "../components/fetch";
+import Loader from "../components/common/loader";
 
-interface SignedLicenseProps {
+interface SignedLicense {
   title: string;
   text: string;
 }
 
-const licensesHandler = container.get<AgreementsHandler>(
-  TYPES.AgreementsHandler
-);
-
-function readVersionParameter(context: NextPageContext): string {
-  const version = context.query.version;
-
-  if (typeof version !== "string") {
-    throw new Error("Expected a version parameter");
-  }
-
-  return version;
-}
-
-export async function getServerSideProps(
-  context: NextPageContext
-): Promise<Props<SignedLicenseProps>> {
-  const versionId = readVersionParameter(context);
-
-  // We only support English on the front-end,
-  // but data model supports localization
-  const cultureCode = "en";
-
-  const agreementText = await licensesHandler.getAgreementText(
-    versionId,
-    cultureCode
-  );
-
-  return {props: {text: agreementText.text, title: agreementText.title}};
+interface SignedLicenseState {
+  error?: ErrorProps;
+  loading: boolean;
+  data?: SignedLicense;
 }
 
 export default class SignedContributorLicenseAgreementPage extends Component<
-  SignedLicenseProps
+  unknown,
+  SignedLicenseState
 > {
+  constructor(props: unknown) {
+    super(props);
+
+    this.state = {
+      loading: true,
+    };
+  }
+
+  componentDidMount(): void {
+    // Must happen on the client side
+    this.load();
+  }
+
+  get query(): string {
+    return location.search;
+  }
+
+  load(): void {
+    if (this.state.error) {
+      this.setState({
+        loading: true,
+        error: undefined,
+      });
+    }
+
+    // Note: passes the query as is to the server
+    get<SignedLicense>(`/api/signed-agreement${this.query}`).then(
+      (data) => {
+        this.setState({
+          loading: false,
+          data,
+        });
+      },
+      () => {
+        this.setState({
+          loading: false,
+          error: {
+            retry: () => {
+              this.load();
+            },
+          },
+        });
+      }
+    );
+  }
+
   render(): ReactElement {
-    const {text, title} = this.props;
+    const {loading, error, data} = this.state;
+
+    if (loading) {
+      return <Loader />;
+    }
+
+    if (error || !data) {
+      return <ErrorPanel {...error} />;
+    }
+
+    const {title, text} = data;
 
     return (
       <Container className="contributor-agreement-area">
