@@ -1,73 +1,85 @@
 import Head from "next/head";
-import Props from "../components/props";
-import {AgreementsHandler} from "../service/handlers/agreements";
 import {Button, Container} from "@material-ui/core";
-import {ClaCheckInput} from "../service/domain/cla";
 import {Component, ReactElement} from "react";
-import {container} from "../service/di";
-import {TokensHandler} from "../service/handlers/tokens";
-import {TYPES} from "../constants/types";
-import {NextPageContext} from "next";
 import ClaView from "../components/common/cla-view";
-import { ServerError } from "../service/common/app";
+import ErrorPanel, {ErrorProps} from "../components/common/error";
+import Loader from "../components/common/loader";
+import {get} from "../components/fetch";
 
-interface AgreementPageProps {
+interface AgreementPageState {
+  error?: ErrorProps;
+  loading: boolean;
+  data?: ContributorLicenseAgreement;
+}
+
+interface ContributorLicenseAgreement {
   state: string;
   title: string;
   text: string;
 }
 
-const tokensHandler = container.get<TokensHandler>(TYPES.TokensHandler);
-const licensesHandler = container.get<AgreementsHandler>(
-  TYPES.AgreementsHandler
-);
+export default class AgreementPage extends Component<
+  unknown,
+  AgreementPageState
+> {
+  constructor(props: unknown) {
+    super(props);
 
-function readStateParameter(context: NextPageContext): string {
-  const state = context.query.state;
-
-  if (typeof state !== "string") {
-    throw new Error("Expected a single state parameter");
+    this.state = {
+      loading: true,
+    };
   }
 
-  return state;
-}
-
-export async function getServerSideProps(
-  context: NextPageContext
-): Promise<Props<AgreementPageProps>> {
-  const rawState = readStateParameter(context);
-  const state = tokensHandler.parseToken(rawState) as ClaCheckInput;
-
-  // Read the current agreement for the PR repository
-  // Note: the page always fetches the current agreement text, regardless
-  // of thte time when the PR was created.
-  const agreementText = await licensesHandler.getAgreementTextForRepository(
-    state.repository.fullName,
-    "en"
-  );
-
-  if (agreementText.versionId === null) {
-    // We need the agreement version id here, for the reason described below
-    throw new ServerError("Missing version id in agreement text context.");
+  componentDidMount(): void {
+    // Must happen on the client side
+    this.load();
   }
 
-  state.agreementVersionId = agreementText.versionId;
+  get query(): string {
+    return location.search;
+  }
 
-  // Modify the state parameter to include the version id:
-  // this ensures that we store the right version id when the user signs in
-  // to agree
-  return {
-    props: {
-      state: tokensHandler.createToken(state),
-      text: agreementText.text,
-      title: agreementText.title,
-    },
-  };
-}
+  load(): void {
+    if (this.state.error) {
+      this.setState({
+        loading: true,
+        error: undefined,
+      });
+    }
 
-export default class AgreementPage extends Component<AgreementPageProps> {
+    // Note: passes the query as is to the server
+    get<ContributorLicenseAgreement>(`/api/cla${this.query}`).then(
+      (data) => {
+        this.setState({
+          loading: false,
+          data,
+        });
+      },
+      () => {
+        this.setState({
+          loading: false,
+          error: {
+            retry: () => {
+              this.load();
+            },
+          },
+        });
+      }
+    );
+  }
+
   render(): ReactElement {
-    const {state, text, title} = this.props;
+    const {loading, error, data} = this.state;
+
+    if (loading) {
+      return <Loader />;
+    }
+
+    if (error || !data) {
+      return <ErrorPanel {...error} />;
+    }
+
+    const {title, state, text} = data;
     const signInAnchorOps = {
       href: `/api/contributors/auth/github?state=${state}`,
     };
@@ -82,9 +94,7 @@ export default class AgreementPage extends Component<AgreementPageProps> {
         <main>
           <h1>{title}</h1>
           <ClaView body={text} />
-          <Button
-            variant="contained"
-          >
+          <Button variant="contained">
             <a {...signInAnchorOps}>Sign in with GitHub to agree</a>
           </Button>
         </main>
