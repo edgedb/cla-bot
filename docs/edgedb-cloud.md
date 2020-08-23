@@ -17,6 +17,10 @@ starts the web application in production mode.
 instances of the `CLA-bot` service within the same collection of secrets.
 The default prefix of secrets is "CLABOT\_".
 
+To use a custom prefix for secrets names:
+* update the Docker ENV variable `SECRETS_PREFIX`,
+* use a custom prefix when using the script to upload secrets described below
+
 ## Configuring secrets
 
 Prepare required services and a `.env` file as described in the [README](./README.md).
