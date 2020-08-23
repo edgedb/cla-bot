@@ -12,7 +12,7 @@
 #   4. create secrets:
 #        PUSH=1 ./clabot-secrets.sh
 #
-# Schedule previously configured secrets for deletion:
+# Schedule the deletion of previously configured secrets:
 #        DELETE=1 ./clabot-secrets.sh
 #
 # Update previously configured secrets:
