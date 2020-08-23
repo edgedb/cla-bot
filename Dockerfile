@@ -1,7 +1,5 @@
-FROM node:13.3.0 AS builder
+FROM node:13.3.0-buster-slim AS builder
 WORKDIR /app
-EXPOSE 80
-EXPOSE 443
 RUN npm install -g yarn
 
 COPY . .
@@ -15,10 +13,24 @@ RUN FILE="node_modules/edgedb/dist/src/pool.d.ts" && \
 
 RUN yarn next build
 
-FROM node:13.3.0-alpine AS final
+FROM node:13.3.0-buster-slim AS final
 WORKDIR /app
 COPY --from=builder /app .
 
-ENV NODE_ENV production
+RUN set -ex; export DEBIAN_FRONTEND=noninteractive; \
+  apt-get update && \
+  apt-get install -y --no-install-recommends \
+  python3 python3-pip && \
+  pip3 --no-cache-dir install boto3
 
-ENTRYPOINT ["yarn", "next", "start", "-p", "80"]
+ENV NODE_ENV production
+ENV CUSTOMER nobody
+ENV REGION us-east-2
+ENV SECRETS_PREFIX CLABOT_
+
+EXPOSE 80
+EXPOSE 443
+
+
+COPY docker-entrypoint.py /home/
+ENTRYPOINT ["/usr/bin/python3", "-u", "/home/docker-entrypoint.py"]

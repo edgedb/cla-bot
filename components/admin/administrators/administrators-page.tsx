@@ -13,7 +13,7 @@ import ArrayUtils from "../../array";
 import Loader from "../../common/loader";
 import NewAdministratorForm from "./administrator-new";
 
-interface AdministratorsPageProps {
+interface AdministratorsPageState {
   error?: ErrorProps;
   loading: boolean;
   waiting: boolean;
@@ -24,7 +24,7 @@ interface AdministratorsPageProps {
 
 export default class AdministratorsPage extends Component<
   {},
-  AdministratorsPageProps
+  AdministratorsPageState
 > {
   constructor(props: {}) {
     super(props);

@@ -3,12 +3,52 @@
 This page describes how to create an instance of the
 `cla-bot` with [`edbcloud`](https://github.com/edgedb/cloud/).
 
-## Initial configuration
+## How application settings are handled
 
-Prepare required services and `.env` file as described in the [README](./README.md).
+The image entrypoint runs `docker-entrypoint.py` which, using `boto3`, obtains
+application settings stored as secrets, configures them as environmental
+variables, and then replaces the current process with the `yarn` command that
+starts the web application in production mode.
+
+> TODO: a possible improvement is to handle application settings using `.env`
+> files stored in [Amazon S3](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/taskdef-envfiles.html)
+
+`docker-entrypoint.py` support secrets with a common prefix, to enable multiple
+instances of the `CLA-bot` service within the same collection of secrets.
+The default prefix of secrets is "CLABOT\_".
+
+To use a custom prefix for secrets names:
+* update the Docker ENV variable `SECRETS_PREFIX`,
+* use a custom prefix when using the script to upload secrets described below
+
+## Configuring secrets
+
+Prepare required services and a `.env` file as described in the [README](./README.md).
 The `SERVER_URL` setting inside the `.env` file can only be configured in a
 second moment, after the load balancer in edbcloud, and eventually a custom
 domain name, are configured.
+
+Copy the `.env` file inside the `scripts` folder at the root of the `cla-bot`
+repository, then use the provided `clabot-secrets.sh` script to upload secrets
+to the remote secrets manager. `edbcloud` doesn't support, yet, configuring
+arbitrary secrets. Therefore, specific application secrets need to be
+configured using the `aws` CLI.
+
+Script reference:
+
+| Action                                                           | Command                                   |
+| ---------------------------------------------------------------- | ----------------------------------------- |
+| Validate secrets                                                 | ./clabot-secrets.sh                       |
+| Create new secrets (fails if variables with the same name exist) | PUSH=1 ./clabot-secrets.sh                |
+| Schedule the deletion of previously configured secrets           | DELETE=1 ./clabot-secrets.sh              |
+| Updates existing secrets                                         | UPDATE=1 PUSH=1 ./clabot-secrets.sh       |
+| Use a custom prefix                                              | PREFIX=CLABOT2_ [...] ./clabot-secrets.sh |
+
+---
+
+**Note**: the private RSA key of the GitHub application can be copy pasted in
+the `scripts` folder, then its name configured as `GITHUB_RSA_PRIVATE_KEY`
+variable as in the provided example.
 
 ## Create an app service in edbcloud
 
