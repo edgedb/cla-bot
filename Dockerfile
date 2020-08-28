@@ -13,9 +13,12 @@ RUN FILE="node_modules/edgedb/dist/src/pool.d.ts" && \
 
 RUN yarn next build
 
+FROM edgedb/edgedb-cli:linux-x86_64-latest AS edgedbcli
+
 FROM node:13.3.0-buster-slim AS final
 WORKDIR /app
 COPY --from=builder /app .
+COPY --from=edgedbcli /usr/bin/edgedb /usr/bin/edgedb
 
 RUN set -ex; export DEBIAN_FRONTEND=noninteractive; \
   apt-get update && \
