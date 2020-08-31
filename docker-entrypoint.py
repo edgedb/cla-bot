@@ -1,9 +1,13 @@
 #!/usr/bin/env python3.7
 # This file runs on Debian Buster and needs to be Python 3.7 compatible.
 
+from __future__ import annotations
+from typing import Dict, Union, Any
+
 import os
 import shutil
-from typing import Dict
+import subprocess
+import sys
 
 import boto3
 
@@ -53,6 +57,57 @@ def get_env_variables(
     }
 
 
+def edgedb(
+    *args: Union[str, bytes, os.PathLike],
+    settings: Dict[str, str],
+    check: bool = True,
+    **kwargs: Any,
+) -> subprocess.CompletedProcess:
+
+    edgedb_cli = shutil.which("edgedb")
+    if not edgedb_cli:
+        raise RuntimeError('missing edgedb-cli executable')
+
+    try:
+        return subprocess.run(
+            [
+                edgedb_cli,
+                '-d', 'cla',
+                '--user', settings['EDGEDB_USER'],
+                '--host', settings['EDGEDB_HOST'],
+                '--password-from-stdin',
+                *args,
+            ],
+            input=settings['EDGEDB_PASSWORD'],
+            text=True,
+            check=check,
+            **kwargs,
+        )
+    except subprocess.CalledProcessError as e:
+        print(f'edgedb failed with exit code {e.returncode}', file=sys.stderr)
+        print(e.stderr, file=sys.stderr)
+        sys.exit(1)
+
+
+def edgedb_output(
+    *args: Union[str, bytes, os.PathLike],
+    settings: Dict[str, str],
+    **kwargs: Any,
+) -> str:
+    try:
+        return edgedb(
+            *args,
+            settings=settings,
+            capture_output=True,
+            **kwargs,
+        ).stdout.strip()
+    except subprocess.CalledProcessError as e:
+        print(f'edgedb failed with exit code {e.returncode}', file=sys.stderr)
+        if e.stderr:
+            print(e.stderr, file=sys.stderr)
+        sys.exit(1)
+
+
 def main() -> None:
     # Collect secrets and configure them as environmental variables read by the Next.js
     # application
@@ -78,6 +133,20 @@ def main() -> None:
 
     for key, value in env_variables.items():
         os.environ[key] = value
+
+    # Create the "cla" database if not exists
+    # TODO: replace this with `create-database --if-not-exists`
+    # once supported.
+    databases = set(edgedb_output(
+        'list-databases',
+        settings=env_variables,
+    ).split('\n'))
+
+    if 'cla' not in databases:
+        edgedb('create-database', 'cla', settings=env_variables, check=True)
+
+    # Apply migrations
+    edgedb('migrate', settings=env_variables)
 
     # start the next application
     yarn_executable = shutil.which("yarn")
