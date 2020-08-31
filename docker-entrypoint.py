@@ -24,7 +24,7 @@ def get_secret(secrets_manager, secret_name: str) -> str:
     if not prefix:
         if os.environ.get("CUSTOMER") and os.environ.get("INSTANCE"):
             prefix = (
-                f'edbcloud/app/{os.environ["CUSTOMER"]}"'
+                f'edbcloud/app/{os.environ["CUSTOMER"]}'
                 f'/{os.environ["INSTANCE"]}/'
             )
         else:
