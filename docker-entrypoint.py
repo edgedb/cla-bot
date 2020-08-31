@@ -20,15 +20,13 @@ def get_secrets_manager(region_name: str):
 def get_secret(secrets_manager, secret_name: str) -> str:
     # a prefix is used to enable multiple instances of the CLA-Bot inside the same
     # collection of secrets
-    prefix = os.environ.get("SECRETS_PREFIX")
-    if not prefix:
-        if os.environ.get("CUSTOMER") and os.environ.get("INSTANCE"):
-            prefix = (
-                f'edbcloud/app/{os.environ["CUSTOMER"]}'
-                f'/{os.environ["INSTANCE"]}/'
-            )
-        else:
-            prefix = "CLABOT_"
+    if os.environ.get("CUSTOMER") and os.environ.get("INSTANCE"):
+        prefix = (
+            f'edbcloud/app/{os.environ["CUSTOMER"]}'
+            f'/{os.environ["INSTANCE"]}/'
+        )
+    else:
+        prefix = os.environ.get("SECRETS_PREFIX", "CLABOT_")
     data = secrets_manager.get_secret_value(SecretId=prefix + secret_name)
     return data.get("SecretString")
 
@@ -80,7 +78,6 @@ def edgedb(
         return subprocess.run(
             [
                 edgedb_cli,
-                '-d', 'cla',
                 '--user', settings['EDGEDB_USER'],
                 '--host', settings['EDGEDB_HOST'],
                 '--password-from-stdin',
@@ -154,7 +151,7 @@ def main() -> None:
         edgedb('create-database', 'cla', settings=env_variables, check=True)
 
     # Apply migrations
-    edgedb('migrate', settings=env_variables)
+    edgedb('-d', 'cla', 'migrate', settings=env_variables)
 
     # start the next application
     yarn_executable = shutil.which("yarn")
