@@ -16,7 +16,15 @@ def get_secrets_manager(region_name: str):
 def get_secret(secrets_manager, secret_name: str) -> str:
     # a prefix is used to enable multiple instances of the CLA-Bot inside the same
     # collection of secrets
-    prefix = os.environ.get("SECRETS_PREFIX", "CLABOT_")
+    prefix = os.environ.get("SECRETS_PREFIX")
+    if not prefix:
+        if os.environ.get("CUSTOMER") and os.environ.get("INSTANCE"):
+            prefix = (
+                f'edbcloud/app/{os.environ["CUSTOMER"]}"'
+                f'/{os.environ["INSTANCE"]}/'
+            )
+        else:
+            prefix = "CLABOT_"
     data = secrets_manager.get_secret_value(SecretId=prefix + secret_name)
     return data.get("SecretString")
 
