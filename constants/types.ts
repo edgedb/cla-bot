@@ -12,6 +12,7 @@ const TYPES = {
   AgreementsHandler: Symbol.for("AgreementsHandler"),
   RepositoriesHandler: Symbol.for("RepositoriesHandler"),
   RepositoriesService: Symbol.for("RepositoriesService"),
+  OrganizationsService: Symbol.for("OrganizationsService"),
   RepositoriesRepository: Symbol.for("RepositoriesRepository"),
   AdministratorsHandler: Symbol.for("AdministratorsHandler"),
   AdministratorsRepository: Symbol.for("AdministratorsRepository"),

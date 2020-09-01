@@ -1,0 +1,20 @@
+#presentation {
+  margin: 20px auto;
+  width: 80%;
+  > h2 {
+    font-size: 0.9rem;
+  }
+
+  #main-title-wrapper {
+    display: flex;
+    justify-content: space-between;
+
+    h1 {
+      margin: 0 0 0.6rem 0;
+    }
+
+    a {
+      margin-bottom: auto;
+    }
+  }
+}

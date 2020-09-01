@@ -8,6 +8,8 @@ import {TYPES} from "../../../constants/types";
 import {UsersService} from "../../domain/users";
 import {RepositoriesService} from "../../domain/repositories";
 import {GitHubRepositoriesService} from "./repositories";
+import {OrganizationsService} from "../../domain/organizations";
+import {GitHubOrganizationsService} from "./organizations";
 
 export function registerGitHubServices(container: Container): void {
   container
@@ -16,6 +18,10 @@ export function registerGitHubServices(container: Container): void {
     .inSingletonScope();
 
   container.bind<UsersService>(TYPES.UsersService).to(GitHubUsersService);
+
+  container
+    .bind<OrganizationsService>(TYPES.OrganizationsService)
+    .to(GitHubOrganizationsService);
 
   container
     .bind<CommentsService>(TYPES.CommentsService)

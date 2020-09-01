@@ -12,6 +12,18 @@ export class InstallationNotFoundError extends Error {
   }
 }
 
+interface GitHubAppOwner {
+  login: string;
+  id: number;
+  type: string;
+}
+
+interface GitHubApp {
+  id: number;
+  slug: string;
+  owner: GitHubAppOwner;
+}
+
 interface GitHubInstallationAccessTokenResult {
   token: string;
   expires_at: string;
@@ -146,6 +158,42 @@ export class GitHubAccessHandler {
     return installationId;
   }
 
+  /**
+   * Obtains the ID of the GitHub application organization.
+   * This assumes that the CLA-Bot is created for an Organization.
+   */
+  @async_retry()
+  async getApplicationOrganizationId(
+    primaryAccessToken?: string
+  ): Promise<number> {
+    if (!primaryAccessToken)
+      primaryAccessToken = this.createPrimaryAccessToken();
+
+    const response = await fetch("https://api.github.com/app", {
+      method: "GET",
+      headers: getHeaders(primaryAccessToken),
+    });
+
+    await expectSuccessfulResponse(response);
+
+    const data: GitHubApp = await response.json();
+    return data.owner.id;
+  }
+
+  @async_retry()
+  async getOrgAccessToken(primaryAccessToken?: string): Promise<string> {
+    if (!primaryAccessToken)
+      primaryAccessToken = this.createPrimaryAccessToken();
+
+    const organizationId = await this.getApplicationOrganizationId(
+      primaryAccessToken
+    );
+    return await this.getAccessTokenForAccount(
+      organizationId,
+      primaryAccessToken
+    );
+  }
+
   @async_retry()
   async getAccessTokenForAccount(
     targetAccountId: number,
@@ -178,10 +226,10 @@ export class GitHubAccessHandler {
       primaryAccessToken
     );
 
-    const installationAccessTokenResult = await this
-      .getAccessTokenForInstallation(
-        installationId
-      );
+    // tslint:disable-next-line: max-line-length
+    const installationAccessTokenResult = await this.getAccessTokenForInstallation(
+      installationId
+    );
 
     this.setCachedAccessToken(targetAccountId, {
       value: installationAccessTokenResult.token,
