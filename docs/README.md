@@ -40,14 +40,20 @@ The service requires a GitHub app to interact with PR statuses and comments.
 Configure a GitHub app under account `Settings > Developer settings` having
 the following permissions:
 
+- Members `Read only` (used during admins' sign-in, under _Organization permissions_)
 - Commit statuses `Read & write`
 - Pull requests `Read & write`
   and required metadata (automatically set by GitHub UI).
 
-Then, a private RSA key must be downloaded to be used by the CLA-Bot.
+Then, a private RSA key must be generated and downloaded to be used by the CLA-Bot.
 The private RSA key is read from file system, and its path is
 configured as environmental variable `GITHUB_RSA_PRIVATE_KEY`, in the `.env`
 file.
+
+Finally, install the GitHub App onto the organization. Grant access
+to all repositories (although, the CLA-Bot supports also access to specific repositories).
+
+![Install application screen](./installing-app.png)
 
 ## OAuth app configuration
 

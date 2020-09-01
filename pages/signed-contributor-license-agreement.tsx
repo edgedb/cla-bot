@@ -1,7 +1,6 @@
 import Head from "next/head";
 import {Container} from "@material-ui/core";
 import {Component, ReactElement} from "react";
-import {AgreementsHandler} from "../service/handlers/agreements";
 import ClaView from "../components/common/cla-view";
 import ErrorPanel, {ErrorProps} from "../components/common/error";
 import {get} from "../components/fetch";

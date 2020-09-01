@@ -134,6 +134,12 @@ export default class AdministratorsPage extends Component<
             items={state.administrators}
             onRemove={this.onRemoveClick.bind(this)}
           />
+          <p>
+            <strong>Note:</strong> all the administrators of the organization
+            are automatically administrators of the CLA-Bot. Using this
+            interface it is possible to configure administrators of the CLA-Bot
+            without granting them admin access over the whole organization.
+          </p>
           <div className="new-item-region region">
             <NewAdministratorForm
               onNewAdministrator={this.onNewAdministrator.bind(this)}

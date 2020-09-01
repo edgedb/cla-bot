@@ -120,8 +120,15 @@ export class ClaSearch extends Component<{}, ClaSearchState> {
                   <dd>{item.email}</dd>
                   <dt>Signed at</dt>
                   <dd>{formatDate(item.signedAt)}</dd>
-                  <dt>Agreement version:</dt>
-                  <dd>{item.versionId}</dd>
+                  <dt>Agreement version</dt>
+                  <dd>
+                    <a
+                      href={`/signed-contributor-license-agreement?version=${item.versionId}`}
+                      target="_blank"
+                    >
+                      {item.versionId}
+                    </a>
+                  </dd>
                 </dl>
               </div>
             )}

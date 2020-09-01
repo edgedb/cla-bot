@@ -8,13 +8,21 @@ import {BadRequestError, UnauthorizedError} from "../common/web";
 import {validateEmail} from "../common/emails";
 import {UsersService} from "../domain/users";
 import {TokensHandler} from "./tokens";
+import {OrganizationsService} from "../domain/organizations";
+import {ServiceSettings} from "../settings";
 
 @injectable()
 export class AdministratorsHandler {
+  @inject(TYPES.ServiceSettings)
+  private _settings: ServiceSettings;
+
   @inject(TYPES.AdministratorsRepository)
   private _repository: AdministratorsRepository;
 
   @inject(TYPES.UsersService) private _usersService: UsersService;
+
+  @inject(TYPES.OrganizationsService)
+  private _organizationsService: OrganizationsService;
 
   @inject(TYPES.TokensHandler) private _tokensHandler: TokensHandler;
 
@@ -66,6 +74,33 @@ export class AdministratorsHandler {
    * is configured as administrator in the system.
    */
   async validateAdministratorLogin(accessToken: string): Promise<string> {
+    // first try to authenticate the user by comparing its id with
+    // organization members with admin role
+    const userInfo = await this._usersService.getUserInfoFromAccessToken(
+      accessToken
+    );
+
+    // is there an organization administrator with matching user id?
+    const organizationMembers = await this._organizationsService.getMembers(
+      this._settings.organizationName,
+      "admin"
+    );
+
+    if (
+      organizationMembers.some((item) => {
+        return item.id === userInfo.id;
+      })
+    ) {
+      // the person who just logged in is authorized because
+      // administrator of the organization being handled
+      return this._tokensHandler.createApplicationToken({
+        id: userInfo.id,
+        login: userInfo.login,
+        email: null,
+      });
+    }
+
+    // try to authenticate the user by email address and db configuration
     const userEmails = await this._usersService.getUserEmailAddresses(
       accessToken
     );
@@ -96,9 +131,10 @@ export class AdministratorsHandler {
     // extend the auth logic to validate user's rights on API endpoints.
     // For example, a user might have read only access to Signed CLAs,
     // with a scope: "Read.CLA", another to agreements with "Agreements.Read"
-    const appAccessToken = this._tokensHandler.createApplicationToken({
+    return this._tokensHandler.createApplicationToken({
+      id: userInfo.id,
+      login: userInfo.login,
       email: emailInfo.email,
     });
-    return appAccessToken;
   }
 }
