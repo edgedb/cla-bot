@@ -51,7 +51,11 @@ configured as environmental variable `GITHUB_RSA_PRIVATE_KEY`, in the `.env`
 file.
 
 Finally, install the GitHub App onto the organization. Grant access
-to all repositories (although, the CLA-Bot supports also access to specific repositories).
+to all repositories (although, the CLA-Bot supports also access to specific
+repositories).
+
+To install the application, click on the "Install app" link in the application's
+settings page.
 
 ![Install application screen](./installing-app.png)
 

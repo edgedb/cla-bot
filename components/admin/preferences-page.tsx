@@ -47,7 +47,7 @@ export default class PreferencesPage extends Component<unknown, Preferences> {
     return (
       <Layout title="Preferences">
         <h1>Preferences</h1>
-        <dl className="inline">
+        <dl>
           <dt>Dates format</dt>
           <dd>
             <Select

@@ -9,6 +9,7 @@ import ListItemText from "@material-ui/core/ListItemText";
 import PeopleIcon from "@material-ui/icons/People";
 import React, {ReactElement} from "react";
 import Settings from "@material-ui/icons/Settings";
+import ImportContactsRoundedIcon from "@material-ui/icons/ImportContactsRounded";
 
 interface MenuItem {
   href: string;
@@ -53,6 +54,11 @@ export const mainListItems = getMenu([
     href: "/admin/clas",
     text: "Signed CLAs",
     icon: <PeopleIcon />,
+  },
+  {
+    href: "/admin/import",
+    text: "Import CLAs",
+    icon: <ImportContactsRoundedIcon />,
   },
   {
     href: "/admin/administrators",

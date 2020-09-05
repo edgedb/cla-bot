@@ -113,7 +113,7 @@ export class ClaSearch extends Component<{}, ClaSearchState> {
               <p>There is no signed CLA for the given email address.</p>
             ) : (
               <div>
-                <dl className="inline">
+                <dl>
                   <dt>Id</dt>
                   <dd>{item.id}</dd>
                   <dt>Email</dt>

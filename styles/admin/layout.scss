@@ -1,8 +1,6 @@
 @import "./agreements.scss";
 
-
 #admin-layout {
-
   min-width: 320px;
 
   .app-toolbar {
@@ -23,12 +21,6 @@
     overflow: hidden;
   }
 
-  header, main, .drawer, .drawer > div {
-    -webkit-transition: all 0.2s ease-in-out;
-    -o-transition: all 0.2s ease-in-out;
-    transition: all 0.2s ease-in-out;
-  }
-
   .drawer-toggle-btn {
     text-align: center;
     padding-top: 3px;
@@ -41,7 +33,8 @@
   }
 
   &.ui-drawer-open {
-    > header, > main {
+    > header,
+    > main {
       padding-left: 195px;
     }
 
@@ -56,7 +49,8 @@
       width: 60px;
     }
 
-    > header, > main {
+    > header,
+    > main {
       padding-left: 60px;
     }
   }
@@ -69,7 +63,8 @@
     }
   }
 
-  section, .region {
+  section,
+  .region {
     margin-top: 40px;
     border-top: 1px dotted #dedede;
   }
@@ -124,11 +119,13 @@ body.compact {
     }
   }
 
-  table, dl {
+  table,
+  dl {
     font-size: 1rem;
   }
 
-  th, td {
+  th,
+  td {
     padding: 0;
   }
 
@@ -137,9 +134,7 @@ body.compact {
   }
 }
 
-
 body.fullscreen-editing {
-
   .alert-panel {
     position: fixed;
     z-index: 1000;
@@ -147,7 +142,8 @@ body.fullscreen-editing {
     left: 100px;
     padding: 12px 20px;
     width: calc(100% - 150px);
-    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
+      0 6px 20px 0 rgba(0, 0, 0, 0.19);
   }
 
   #admin-layout.ui-drawer-open {

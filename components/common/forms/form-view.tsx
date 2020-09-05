@@ -1,7 +1,7 @@
-import ErrorPanel, {ErrorProps} from "./error";
+import ErrorPanel, {ErrorProps} from "../error";
 import {Component, ReactElement} from "react";
 import {Button} from "@material-ui/core";
-import Loader from "./loader";
+import Loader from "../loader";
 
 interface FormViewProps {
   submit: () => Promise<void>;

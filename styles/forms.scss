@@ -1,0 +1,185 @@
+.select-wrapper > div {
+  min-width: 50%;
+}
+
+.select-wrapper .preloader-mask {
+  top: -12px;
+}
+
+.form-buttons {
+  justify-content: space-between !important;
+  flex: 0 0 auto;
+  display: flex;
+  padding: 8px 0;
+  align-items: center;
+
+  &.single-button {
+    justify-content: flex-end !important;
+  }
+
+  + .alert-panel {
+    margin-top: 1rem;
+  }
+}
+
+.MuiOutlinedInput-multiline {
+  padding: 4px 8px !important;
+  line-height: 1.8rem !important;
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.file-select {
+  border: 1px solid #ccc;
+  display: inline-block;
+  padding: 6px 12px;
+  cursor: pointer;
+  color: rgba(0, 0, 0, 0.87);
+  display: inline-flex;
+  position: relative;
+  font-size: 1rem;
+  box-sizing: border-box;
+  align-items: center;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 400;
+  line-height: 1.1876em;
+  letter-spacing: 0.00938em;
+  padding-right: 1rem;
+  border-radius: 4px;
+
+  .MuiSvgIcon-root {
+    width: 0.8em;
+    color: #17507f;
+    margin-right: 8px;
+  }
+}
+
+.file-select + .clear {
+  margin-left: 20px;
+  position: relative;
+  bottom: 7px;
+}
+
+input + button {
+  margin-left: 20px !important;
+}
+
+.file-input {
+  padding: 0 !important;
+}
+
+.file-info {
+  margin-top: 1.2rem;
+  font-size: 0.8em;
+}
+
+.file-info > span {
+  margin-right: 15px;
+  font-style: italic;
+}
+
+.MuiInputBase-input {
+  height: auto !important;
+}
+
+.file-example-select {
+  .download-link {
+    margin-left: 1.5rem;
+    font-size: 0.8em;
+  }
+}
+
+.ui-valid {
+  .MuiInputBase-root.Mui-disabled {
+    color: black;
+  }
+  .MuiInput-underline:before {
+    border: none;
+    content: "";
+    display: none;
+  }
+}
+
+.multi-checkbox {
+  padding: 0 1rem;
+  display: flex;
+  flex-flow: row;
+  flex-wrap: wrap;
+  overflow: visible;
+
+  .toggle-selection {
+    color: #17507f;
+  }
+
+  > label {
+    flex: 0 0 20%;
+    min-width: 150px;
+
+    .MuiTypography-root {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}
+
+dd {
+  > .MuiTextField-root {
+    width: 50%;
+  }
+
+  .MuiCheckbox-root__ {
+    padding: 0;
+  }
+
+  &.checkbox-option {
+    padding-left: 5px;
+  }
+
+  &.radios {
+    position: relative;
+    left: -17px;
+    bottom: 2px;
+  }
+}
+
+.MuiFormGroup-root[role="radiogroup"] {
+  padding: 0 1rem;
+}
+
+.ui-disabled {
+  opacity: 0.5;
+  cursor: default;
+
+  button {
+    color: gray;
+    border-color: gray;
+
+    &:hover,
+    &:focus {
+      color: gray;
+      border-color: gray;
+      background-color: white;
+    }
+  }
+
+  * {
+    cursor: default !important;
+  }
+}
+
+.danger {
+  border: 1px solid red;
+  border-radius: 5px;
+  padding: 1em;
+}
+
+.file-selection {
+  margin-bottom: 2rem;
+
+  .examples-dd {
+    padding-top: 6px;
+  }
+}

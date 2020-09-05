@@ -1,4 +1,5 @@
-ol, ul {
+ol,
+ul {
   li {
     padding: 0.6rem 0;
   }
@@ -7,49 +8,47 @@ ol, ul {
 dl {
   font-size: 1.2em;
 
-  &.inline {
-    display: flex;
-    flex-flow: row;
-    flex-wrap: wrap;
-    overflow: visible;
+  display: flex;
+  flex-flow: row;
+  flex-wrap: wrap;
+  overflow: visible;
 
-    dt {
-      flex: 0 0 20%;
-      text-overflow: ellipsis;
-      overflow: hidden;
-      border-bottom: 1px dotted #eee;
-      padding: 10px 0;
-      white-space: nowrap;
+  dt {
+    flex: 0 0 20%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    border-bottom: 1px dotted #eee;
+    padding: 10px 0;
+    white-space: nowrap;
 
-      label {
-        display: inline-block;
-      }
-
-      &:after {
-        content: ":";
-        display: inline;
-      }
+    label {
+      display: inline-block;
     }
 
-    dd {
-      flex:0 0 80%;
-      margin-left: auto;
-      text-align: left;
-      text-overflow: ellipsis;
-      overflow: hidden;
-      padding: 10px 0;
+    &:after {
+      content: ":";
+      display: inline;
+    }
+  }
 
-      &.select-parent {
-        padding: 5px 0;
+  dd {
+    flex: 0 0 80%;
+    margin-left: auto;
+    text-align: left;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    padding: 10px 0;
 
-        > div {
-          min-width: 300px;
-        }
+    &.select-parent {
+      padding: 5px 0;
+
+      > div {
+        min-width: 300px;
       }
     }
+  }
 
-    input {
-      padding: 10px !important;
-    }
+  input {
+    padding: 10px !important;
   }
 }

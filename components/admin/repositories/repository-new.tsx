@@ -273,7 +273,7 @@ export default class NewRepositoryForm extends Component<
           loading={state.loading}
         >
           <h1>Bind repository to agreement</h1>
-          <dl className="inline">
+          <dl>
             <dt>
               <InputLabel id="agreement-select-label">Agreement</InputLabel>
             </dt>
