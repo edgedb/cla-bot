@@ -1,5 +1,10 @@
-import {NextApiResponse} from "next";
+import {NextApiRequest, NextApiResponse} from "next";
 import {ErrorDetails, SafeError} from "../../service/common/web";
+import {container} from "../../service/di";
+import {TYPES} from "../../constants/types";
+import {ServiceSettings} from "../../service/settings";
+
+const settings = container.get<ServiceSettings>(TYPES.ServiceSettings);
 
 /**
  * Executes a given function, handling any thrown SafeError to serve
@@ -24,3 +29,15 @@ export async function handleExceptions<T>(
     throw error;
   }
 }
+
+interface Metadata {
+  organizationName: string;
+  organizationDisplayName: string;
+}
+
+export default (req: NextApiRequest, res: NextApiResponse<Metadata>) => {
+  res.status(200).json({
+    organizationName: settings.organizationName,
+    organizationDisplayName: settings.organizationDisplayName,
+  });
+};

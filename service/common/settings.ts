@@ -13,3 +13,10 @@ export function getEnvSettingOrThrow(name: string): string {
   if (!value) throw new MissingSettingError(name);
   return value;
 }
+
+export function getEnvSettingOrDefault(
+  name: string,
+  defaultValue: string
+): string {
+  return process.env[name] || defaultValue;
+}
