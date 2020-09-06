@@ -65,6 +65,7 @@ export class ClasHandler {
     const results: ClasImportEntryResult[] = [];
     for (const entry of data.entries) {
       try {
+        // TODO: store username, too, when supported
         await this._clasRepository.saveCla(
           new ContributorLicenseAgreement(
             uuid(),
