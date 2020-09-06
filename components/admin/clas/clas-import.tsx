@@ -192,10 +192,6 @@ export class ClasImport extends Component<{}, ClasImportState> {
   }
 
   async onFileSelect(file: File | null): Promise<void> {
-    this.setState({
-      selectedFile: file,
-    });
-
     if (file === null) {
       this.setState({
         fileProblem: undefined,
@@ -242,6 +238,9 @@ export class ClasImport extends Component<{}, ClasImportState> {
     this.validateItems(entries);
 
     this.setState({
+      fileProblem: undefined,
+      selectedFile: file,
+      output: undefined,
       entries,
     });
   }
@@ -275,7 +274,6 @@ export class ClasImport extends Component<{}, ClasImportState> {
   }
 
   confirm(): void {
-    // TODO: only if it contains at least one valid item...
     const {selectedAgreement, entries} = this.state;
     const validEntries = entries.filter(
       (item) => !item.emailError && !item.usernameError
