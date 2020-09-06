@@ -11,7 +11,7 @@ export function trimKeysAndValues(item: {
 }
 
 export function cleanSpaces(
-  items: Array<{[key: string]: string}>
-): Array<{[key: string]: string}> {
+  items: {[key: string]: string}[]
+): {[key: string]: string}[] {
   return items.map(trimKeysAndValues);
 }
