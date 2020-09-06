@@ -44,6 +44,27 @@ export class ContributorLicenseAgreement {
   }
 }
 
+export interface ClasImportEntry {
+  id: string;
+  email: string;
+  username: string;
+}
+
+export interface ClasImportInput {
+  agreementId: string;
+  entries: ClasImportEntry[];
+}
+
+export interface ClasImportEntryResult {
+  success: boolean;
+  entry: ClasImportEntry;
+  error?: string;
+}
+
+export interface ClasImportOutput {
+  results: ClasImportEntryResult[];
+}
+
 export interface ClaRepository {
   getClaByEmailAddress(
     email: string

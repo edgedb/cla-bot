@@ -10,3 +10,19 @@ export interface ContributorLicenseAgreement {
   versionId: string;
   signedAt: string;
 }
+
+export interface ImportEntry {
+  id: string;
+  email: string;
+  username: string;
+}
+
+export interface ImportEntryResult {
+  success: boolean;
+  entry: ImportEntry;
+  error?: string;
+}
+
+export interface ImportOutput {
+  results: ImportEntryResult[];
+}

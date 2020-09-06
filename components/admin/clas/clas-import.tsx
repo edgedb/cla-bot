@@ -19,6 +19,7 @@ import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
 import ErrorOutline from "@material-ui/icons/ErrorOutline";
 import NotInterestedIcon from "@material-ui/icons/NotInterested";
 import Publish from "@material-ui/icons/Publish";
+import {ImportOutput, ImportEntryResult} from "./contracts";
 
 enum ImportEntryStatus {
   valid = "valid",
@@ -36,6 +37,7 @@ interface ImportUIEntry {
   usernameError: boolean;
   usernameHelperText: string;
   status: ImportEntryStatus;
+  failureError?: string;
 }
 
 const Examples: FileExample[] = [
@@ -55,10 +57,6 @@ const Examples: FileExample[] = [
     href: "/import-examples/example.json",
   },
 ];
-
-interface ImportOutput {
-  foo: string;
-}
 
 interface ClasImportState {
   loading: boolean;
@@ -269,11 +267,21 @@ export class ClasImport extends Component<{}, ClasImportState> {
     }
   }
 
+  reset(): void {
+    this.fileInput.current?.clearSelection();
+    this.setState({
+      output: undefined,
+    });
+  }
+
   confirm(): void {
     // TODO: only if it contains at least one valid item...
     const {selectedAgreement, entries} = this.state;
+    const validEntries = entries.filter(
+      (item) => !item.emailError && !item.usernameError
+    );
 
-    if (selectedAgreement === null) {
+    if (selectedAgreement === null || !validEntries.length) {
       return;
     }
 
@@ -282,23 +290,45 @@ export class ClasImport extends Component<{}, ClasImportState> {
       submitError: undefined,
     });
 
-    post("/api/clas/import", {
+    post<ImportOutput>("/api/clas/import", {
       agreementId: selectedAgreement.id,
-      entries,
+      entries: validEntries,
     }).then(
-      () => {
-        // TODO: display output view
-        this.setState({
-          waiting: false,
-        });
+      (output) => {
+        this.handleOutput(output);
       },
       (error: ApplicationError) => {
         this.setState({
           waiting: false,
-          submitError: {},
+          submitError: {
+            message: error.message,
+          },
         });
       }
     );
+  }
+
+  handleOutput(output: ImportOutput): void {
+    const entries = this.state.entries;
+
+    for (const result of output.results) {
+      const matchingItem = entries.find((item) => item.id === result.entry.id);
+
+      if (!matchingItem) {
+        // should never happen; in case ignore
+        continue;
+      }
+
+      matchingItem.status = result.success
+        ? ImportEntryStatus.success
+        : ImportEntryStatus.failure;
+      matchingItem.failureError = result.error;
+    }
+
+    this.setState({
+      waiting: false,
+      output,
+    });
   }
 
   getAgreements(): Promise<AgreementListItem[]> {
@@ -327,7 +357,14 @@ export class ClasImport extends Component<{}, ClasImportState> {
   }
 
   render(): ReactElement {
-    const {error, waiting, selectedFile, fileProblem, entries} = this.state;
+    const {
+      error,
+      submitError,
+      waiting,
+      selectedFile,
+      fileProblem,
+      entries,
+    } = this.state;
 
     return (
       <div>
@@ -400,18 +437,103 @@ export class ClasImport extends Component<{}, ClasImportState> {
                 ))}
               </tbody>
             </table>
+            {this.renderOutput()}
             {!error && (
-              <div className="buttons-area">
-                <Button key="confirm-button" onClick={() => this.confirm()}>
-                  Confirm
-                </Button>
-              </div>
+              <div className="buttons-area">{this.renderButtons()}</div>
             )}
           </div>
         )}
         {error && <ErrorPanel {...error} />}
+        {submitError && <ErrorPanel {...submitError} />}
       </div>
     );
+  }
+
+  private renderFailedItems(failedItems: ImportEntryResult[]): ReactElement {
+    return (
+      <table className="failed-items-table">
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Error</th>
+          </tr>
+        </thead>
+        {failedItems.map((item) => (
+          <tr>
+            <td>{item.entry.email}</td>
+            <td>{item.error}</td>
+          </tr>
+        ))}
+      </table>
+    );
+  }
+
+  renderOutput(): ReactElement {
+    const {output} = this.state;
+
+    if (!output) {
+      return <React.Fragment></React.Fragment>;
+    }
+
+    const allSuccessful = output.results.every((item) => item.success);
+
+    if (allSuccessful) {
+      return (
+        <AlertPanel
+          title="Import complete"
+          message="All items were imported successfully."
+          severity={AlertSeverity.success}
+        />
+      );
+    }
+
+    const anySucceeded = output.results.some((item) => item.success);
+    const failedItems = output.results.filter((item) => !item.success);
+
+    if (anySucceeded) {
+      return (
+        <div>
+          <AlertPanel
+            title="Import partially failed"
+            message="Some items were not imported."
+            severity={AlertSeverity.warning}
+          />
+          {this.renderFailedItems(failedItems)}
+        </div>
+      );
+    }
+
+    return (
+      <div>
+        <AlertPanel
+          title="Import failed"
+          message="None of the items was imported."
+          severity={AlertSeverity.error}
+        />
+        {this.renderFailedItems(failedItems)}
+      </div>
+    );
+  }
+
+  renderButtons(): ReactElement[] {
+    const {output} = this.state;
+    const buttons: ReactElement[] = [];
+
+    if (output) {
+      buttons.push(
+        <Button key="reset-button" onClick={() => this.reset()}>
+          Reset
+        </Button>
+      );
+    } else {
+      buttons.push(
+        <Button key="confirm-button" onClick={() => this.confirm()}>
+          Confirm
+        </Button>
+      );
+    }
+
+    return buttons;
   }
 
   renderEntryStatus(item: ImportUIEntry): ReactElement {
@@ -420,11 +542,19 @@ export class ClasImport extends Component<{}, ClasImportState> {
     }
 
     if (item.status === ImportEntryStatus.failure) {
-      return <ErrorOutline className="ko" />;
+      return (
+        <span title={item.failureError}>
+          <ErrorOutline className="ko" />
+        </span>
+      );
     }
 
     if (item.status === ImportEntryStatus.success) {
-      return <Publish className="super" />;
+      return (
+        <span title="The item was imported successfully">
+          <Publish className="super" />
+        </span>
+      );
     }
 
     return (

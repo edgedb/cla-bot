@@ -1,4 +1,9 @@
-import {ContributorLicenseAgreement, ClaRepository} from "../../domain/cla";
+import {
+  ContributorLicenseAgreement,
+  ClaRepository,
+  ClasImportInput,
+  ClasImportOutput,
+} from "../../domain/cla";
 import {EdgeDBRepository} from "./base";
 import {injectable} from "inversify";
 
