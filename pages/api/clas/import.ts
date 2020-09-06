@@ -13,9 +13,6 @@ export default async (
   req: NextApiRequest,
   res: NextApiResponse<ClasImportOutput | ErrorDetails>
 ) => {
-  // TODO: import CLAs into the database;
-  // TODO: verify that Agreement ID is valid;
-  // TODO: use CONFLICT to handle existing agreements
   await auth(req, res);
 
   const {method} = req;
