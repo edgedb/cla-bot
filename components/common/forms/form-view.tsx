@@ -96,7 +96,7 @@ export default class FormView extends Component<FormViewProps, FormViewState> {
     if (this.props.editing) {
       elements.push(
         <Button key="submit-button" onClick={() => this.submit()}>
-          Submit
+          Confirm
         </Button>
       );
       elements.push(

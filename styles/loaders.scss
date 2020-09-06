@@ -127,6 +127,23 @@
     }
   }
 
+  &.mini {
+    width: 26px;
+    height: 26px;
+    min-height: 26px;
+
+    .preloader-icon {
+      background-size: 26px;
+      background-position: 0;
+      width: 26px;
+      height: 26px;
+      &:before {
+        width: 26px !important;
+        height: 26px !important;
+      }
+    }
+  }
+
   &.tiny-preloader {
     width: 16px;
     height: 16px;

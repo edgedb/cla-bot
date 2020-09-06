@@ -21,7 +21,8 @@ dl {
     padding: 10px 0;
     white-space: nowrap;
 
-    label {
+    label,
+    .MuiInputLabel-root {
       display: inline-block;
     }
 
@@ -51,4 +52,8 @@ dl {
   input {
     padding: 10px !important;
   }
+}
+
+dd .preloader-mask.mini {
+  bottom: 12px;
 }

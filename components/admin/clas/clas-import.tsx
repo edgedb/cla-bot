@@ -1,26 +1,41 @@
 import * as files from "../../common/files";
 import AlertPanel, {AlertProps, AlertSeverity} from "../../common/alert";
-import ErrorPanel from "../../common/error";
+import ErrorPanel, {ErrorProps} from "../../common/error";
 import FileInfo from "../../common/forms/file-info";
 import FileInput from "../../common/forms/file-input";
 import Loader from "../../common/loader";
 import React from "react";
 import uniqueId from "lodash/uniqueId";
-import {ApplicationError} from "../../fetch";
+import {ApplicationError, get, post} from "../../fetch";
 import {Component, ReactElement} from "react";
 import {ParseError, UnsupportedFileType} from "../../common/errors";
 import {parseSync as parseCSV} from "../../common/csv";
 import FileExamples, {FileExample} from "../../common/forms/file-examples";
-import {Button} from "@material-ui/core";
+import {Button, TextField} from "@material-ui/core";
+import {AgreementListItem} from "../agreements/contracts";
+import DynamicSelect from "../../common/forms/select-named-dynamic";
+import {validateEmail} from "../../../service/common/emails";
+import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
+import ErrorOutline from "@material-ui/icons/ErrorOutline";
+import NotInterestedIcon from "@material-ui/icons/NotInterested";
+import Publish from "@material-ui/icons/Publish";
 
-interface ImportOutput {
-  foo: string;
+enum ImportEntryStatus {
+  valid = "valid",
+  invalid = "invalid",
+  success = "success",
+  failure = "failure",
 }
 
-interface ImportEntry {
+interface ImportUIEntry {
   id: string;
   email: string;
+  emailError: boolean;
+  emailHelperText: string;
   username: string;
+  usernameError: boolean;
+  usernameHelperText: string;
+  status: ImportEntryStatus;
 }
 
 const Examples: FileExample[] = [
@@ -41,14 +56,20 @@ const Examples: FileExample[] = [
   },
 ];
 
+interface ImportOutput {
+  foo: string;
+}
+
 interface ClasImportState {
   loading: boolean;
   waiting: boolean;
-  error?: ApplicationError;
+  error?: ErrorProps;
+  submitError?: ErrorProps;
   output?: ImportOutput;
   selectedFile: File | null;
   fileProblem?: AlertProps;
-  entries: ImportEntry[];
+  entries: ImportUIEntry[];
+  selectedAgreement: AgreementListItem | null;
 }
 
 function uniqueEntryId(): string {
@@ -67,19 +88,25 @@ export class ClasImport extends Component<{}, ClasImportState> {
       waiting: false,
       selectedFile: null,
       entries: [],
+      selectedAgreement: null,
     };
     this.fileInput = React.createRef();
   }
 
-  private toEntries(array: any[]): ImportEntry[] {
+  private toEntries(array: any[]): ImportUIEntry[] {
     return array.map(this.toEntry);
   }
 
-  private toEntry(item: any): ImportEntry {
+  private toEntry(item: any): ImportUIEntry {
     return {
       id: uniqueEntryId(),
       email: item.email || item.emailAddress || "",
       username: item.username || "",
+      emailError: false,
+      emailHelperText: "",
+      usernameError: false,
+      usernameHelperText: "",
+      status: ImportEntryStatus.valid,
     };
   }
 
@@ -138,7 +165,7 @@ export class ClasImport extends Component<{}, ClasImportState> {
     }
   }
 
-  async parseFile(file: File): Promise<ImportEntry[]> {
+  async parseFile(file: File): Promise<ImportUIEntry[]> {
     const type = file.type;
     let contents: string;
 
@@ -179,7 +206,7 @@ export class ClasImport extends Component<{}, ClasImportState> {
       return;
     }
 
-    let entries: ImportEntry[];
+    let entries: ImportUIEntry[];
 
     try {
       entries = await this.parseFile(file);
@@ -214,15 +241,89 @@ export class ClasImport extends Component<{}, ClasImportState> {
       throw error;
     }
 
-    // this.validateItems(entries);
+    this.validateItems(entries);
 
     this.setState({
       entries,
     });
   }
 
+  validateItems(entries: ImportUIEntry[]): void {
+    for (const entry of entries) {
+      this.validateItem(entry);
+    }
+  }
+
+  validateItem(entry: ImportUIEntry): void {
+    if (!validateEmail(entry.email)) {
+      entry.emailError = true;
+      entry.emailHelperText = "The email address is invalid";
+    }
+    if (!entry.username) {
+      entry.usernameError = true;
+      entry.usernameHelperText = "Missing username";
+    }
+
+    if (entry.emailError || entry.usernameError) {
+      entry.status = ImportEntryStatus.invalid;
+    }
+  }
+
   confirm(): void {
-    console.log("CONFIRM!");
+    // TODO: only if it contains at least one valid item...
+    const {selectedAgreement, entries} = this.state;
+
+    if (selectedAgreement === null) {
+      return;
+    }
+
+    this.setState({
+      waiting: true,
+      submitError: undefined,
+    });
+
+    post("/api/clas/import", {
+      agreementId: selectedAgreement.id,
+      entries,
+    }).then(
+      () => {
+        // TODO: display output view
+        this.setState({
+          waiting: false,
+        });
+      },
+      (error: ApplicationError) => {
+        this.setState({
+          waiting: false,
+          submitError: {},
+        });
+      }
+    );
+  }
+
+  getAgreements(): Promise<AgreementListItem[]> {
+    return get<AgreementListItem[]>("/api/agreements");
+  }
+
+  onAgreementSelect(item: AgreementListItem | null): void {
+    this.setState({
+      selectedAgreement: item,
+    });
+  }
+
+  onAgreementsLoaded(items: AgreementListItem[]): void {
+    if (!items.length) {
+      // cannot import because there are no agreements configured in the system
+      this.setState({
+        error: {
+          title: "Cannot import CLAs",
+          message:
+            "Before importing CLAs, it is necessary to configure " +
+            "at least one agreement.",
+          status: "warning",
+        },
+      });
+    }
   }
 
   render(): ReactElement {
@@ -232,6 +333,14 @@ export class ClasImport extends Component<{}, ClasImportState> {
       <div>
         {waiting && <Loader className="overlay" />}
         <dl className="file-selection">
+          <dt>Agreement</dt>
+          <dd>
+            <DynamicSelect<AgreementListItem>
+              load={() => this.getAgreements()}
+              onSelect={this.onAgreementSelect.bind(this)}
+              onLoaded={this.onAgreementsLoaded.bind(this)}
+            />
+          </dd>
           <dt>Source</dt>
           <dd>
             <FileInput
@@ -263,27 +372,65 @@ export class ClasImport extends Component<{}, ClasImportState> {
                   <th></th>
                   <th>Email</th>
                   <th>Username</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
                 {entries.map((item, index) => (
                   <tr key={item.id}>
                     <td>{index + 1}</td>
-                    <td>{item.email}</td>
-                    <td>{item.username}</td>
+                    <td>
+                      <TextField
+                        value={item.email}
+                        error={item.emailError}
+                        helperText={item.emailHelperText}
+                        disabled
+                      />
+                    </td>
+                    <td>
+                      <TextField
+                        value={item.username}
+                        error={item.usernameError}
+                        helperText={item.usernameHelperText}
+                        disabled
+                      />
+                    </td>
+                    <td>{this.renderEntryStatus(item)}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
-            <div className="buttons-area">
-              <Button key="confirm-button" onClick={() => this.confirm()}>
-                Confirm
-              </Button>
-            </div>
+            {!error && (
+              <div className="buttons-area">
+                <Button key="confirm-button" onClick={() => this.confirm()}>
+                  Confirm
+                </Button>
+              </div>
+            )}
           </div>
         )}
-        {/*error && <ErrorPanel error={error} />*/}
+        {error && <ErrorPanel {...error} />}
       </div>
+    );
+  }
+
+  renderEntryStatus(item: ImportUIEntry): ReactElement {
+    if (item.status === ImportEntryStatus.valid) {
+      return <CheckCircleOutlineIcon className="ok" />;
+    }
+
+    if (item.status === ImportEntryStatus.failure) {
+      return <ErrorOutline className="ko" />;
+    }
+
+    if (item.status === ImportEntryStatus.success) {
+      return <Publish className="super" />;
+    }
+
+    return (
+      <span title={"The item contains errors."}>
+        <NotInterestedIcon className="ko" />
+      </span>
     );
   }
 }

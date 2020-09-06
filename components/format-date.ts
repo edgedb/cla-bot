@@ -40,8 +40,7 @@ export default function formatDate(
   if (isNumber(input)) {
     input = new Date(input);
   }
-  // NB: + "Z" here is fine because our API stores and returns dates in UTC
-  const value = input instanceof Date ? input : new Date(input + "Z");
+  const value = input instanceof Date ? input : new Date(input);
   try {
     return getCurrentFormat().format(value);
   } catch (error) {

@@ -126,7 +126,7 @@ export default class NewAdministratorForm extends Component<
         />
         <div className="buttons-area">
           <Button key="submit-button" onClick={() => this.submit()}>
-            Submit
+            Add
           </Button>
         </div>
         {state.submitError && <ErrorPanel {...state.submitError} />}
