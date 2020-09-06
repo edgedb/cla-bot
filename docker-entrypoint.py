@@ -31,6 +31,13 @@ def get_secret(secrets_manager, secret_name: str) -> str:
     return data.get("SecretString")
 
 
+def get_optional_secret(secrets_manager, secret_name: str, default_value: str="") -> str:
+    try:
+        return get_secret(secrets_manager, secret_name)
+    except:
+        return default_value
+
+
 def write_pem_file(pem: str):
     with open("private-key.pem", mode="wt") as key_file:
         key_file.write(pem)
@@ -134,6 +141,7 @@ def main() -> None:
         get_secret(secrets_manager, "SERVER_URL"),
         get_secret(secrets_manager, "SECRET"),
         get_secret(secrets_manager, "ORGANIZATION_NAME"),
+        get_optional_secret(secrets_manager, "ORGANIZATION_DISPLAY_NAME")
     )
 
     for key, value in env_variables.items():

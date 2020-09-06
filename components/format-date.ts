@@ -1,4 +1,5 @@
 // Common code to format dates for the client
+import isNumber from "lodash/isNumber";
 
 // Nota bene: localStorage here works because this function is always
 // executed on the client.
@@ -30,7 +31,24 @@ function getCurrentFormat(): Intl.DateTimeFormat {
   return supportedFormats[preferredDateCulture] || supportedFormats["en-us"];
 }
 
-export default function formatDate(date: Date | string): string {
-  const value = date instanceof Date ? date : new Date(date);
-  return getCurrentFormat().format(value);
+export default function formatDate(
+  input: Date | string | number | null
+): string {
+  if (!input) {
+    return "";
+  }
+  if (isNumber(input)) {
+    input = new Date(input);
+  }
+  const value = input instanceof Date ? input : new Date(input);
+  try {
+    return getCurrentFormat().format(value);
+  } catch (error) {
+    // it doesn't make sense to crash a whole component only because of
+    // a failure in formatting a date
+
+    // tslint:disable-next-line: no-console
+    console.error(error);
+    return "";
+  }
 }

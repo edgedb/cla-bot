@@ -59,6 +59,7 @@ declare -a EXPECTED_SECRETS=(
   "SERVER_URL"
   "SECRET"
   "ORGANIZATION_NAME"
+  "ORGANIZATION_DISPLAY_NAME"
 )
 
 if [ "$DELETE" == "1" ]; then
@@ -112,7 +113,7 @@ HAS_ERRORS=0
 for EXPECTED_SECRET in "${EXPECTED_SECRETS[@]}"
 do
   if [ "$EXPECTED_SECRET" == "GITHUB_RSA_PRIVATE_KEY" ]; then
-    # Special case: the private RSA key is red from a given file for
+    # Special case: the private RSA key is read from a given file
     FILE_PATH="${!EXPECTED_SECRET}"
 
     # Make sure that the file exists:

@@ -88,7 +88,6 @@ export default class AgreementPage extends Component<
       <Container className="contributor-agreement-area">
         <Head>
           <title>{title}</title>
-          <link rel="icon" href="/favicon.png" type="image/x-icon" />
         </Head>
 
         <main>

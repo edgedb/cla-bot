@@ -1,7 +1,7 @@
-import ErrorPanel, {ErrorProps} from "./error";
+import ErrorPanel, {ErrorProps} from "../error";
 import {Component, ReactElement} from "react";
 import {Button} from "@material-ui/core";
-import Loader from "./loader";
+import Loader from "../loader";
 
 interface FormViewProps {
   submit: () => Promise<void>;
@@ -96,7 +96,7 @@ export default class FormView extends Component<FormViewProps, FormViewState> {
     if (this.props.editing) {
       elements.push(
         <Button key="submit-button" onClick={() => this.submit()}>
-          Submit
+          Confirm
         </Button>
       );
       elements.push(

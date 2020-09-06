@@ -6,7 +6,7 @@ import {AgreementText} from "./contracts";
 import {Component, ReactElement} from "react";
 import {ErrorProps} from "../../common/error";
 import {get, put} from "../../fetch";
-import FormView from "../../common/form-view";
+import FormView from "../../common/forms/form-view";
 import formatDate from "../../format-date";
 import {changeHandler} from "../../forms";
 import {TextField} from "@material-ui/core";
@@ -279,7 +279,7 @@ export class VersionText extends Component<
             editing={editing}
             readonly={!this.props.draft}
           >
-            <dl className="inline">
+            <dl>
               {state.lastUpdateTime !== undefined && (
                 <React.Fragment>
                   <dt>Last updated at</dt>

@@ -2,7 +2,7 @@ import {patch} from "../../fetch";
 import {Component, ReactElement} from "react";
 import {VersionsTable} from "./versions-table";
 import {TextField} from "@material-ui/core";
-import FormView from "../../common/form-view";
+import FormView from "../../common/forms/form-view";
 import {AgreementDetails, AgreementVersion} from "./contracts";
 import {changeHandler} from "../../forms";
 import formatDate from "../../format-date";
@@ -99,7 +99,7 @@ export class AgreementView extends Component<
           editing={editing}
           className="flex"
         >
-          <dl className="inline">
+          <dl>
             <dt>Id</dt>
             <dd>{details.id}</dd>
             <dt>Created at</dt>

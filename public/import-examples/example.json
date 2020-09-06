@@ -1,0 +1,14 @@
+[
+  {
+    "email": "example@foo.net",
+    "username": "ExampleFoo"
+  },
+  {
+    "email": "hello@world.org",
+    "username": "HelloWorld"
+  },
+  {
+    "email": "contributor-one@foo.com",
+    "username": "ContributorOne"
+  }
+]

@@ -115,11 +115,10 @@ export default class NewRepositoryForm extends Component<
       if (this.props.repositories.length) {
         title = "All repositories configured";
         message =
-          "All your organization repositories are bound to an Agreement.";
+          "All your organization repositories are bound to an agreement.";
       } else {
         // rare, but it might happen (organization without repositories)
-        message =
-          "There are no configured repositories for your organization.";
+        message = "There are no repositories in the organization.";
       }
     } else if (!hasAgreements) {
       message =
@@ -273,7 +272,7 @@ export default class NewRepositoryForm extends Component<
           loading={state.loading}
         >
           <h1>Bind repository to agreement</h1>
-          <dl className="inline">
+          <dl>
             <dt>
               <InputLabel id="agreement-select-label">Agreement</InputLabel>
             </dt>
@@ -335,7 +334,7 @@ export default class NewRepositoryForm extends Component<
           </dl>
           <div className="buttons-area">
             <Button key="submit-button" onClick={() => this.submit()}>
-              Submit
+              Add
             </Button>
           </div>
         </Panel>
