@@ -7,6 +7,7 @@
 export interface ContributorLicenseAgreement {
   id: string;
   email: string;
+  username: string;
   versionId: string;
   signedAt: string;
 }

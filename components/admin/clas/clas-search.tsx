@@ -118,6 +118,8 @@ export class ClaSearch extends Component<{}, ClaSearchState> {
                   <dd>{item.id}</dd>
                   <dt>Email</dt>
                   <dd>{item.email}</dd>
+                  <dt>Username</dt>
+                  <dd>{item.username}</dd>
                   <dt>Signed at</dt>
                   <dd>{formatDate(item.signedAt)}</dd>
                   <dt>Agreement version</dt>

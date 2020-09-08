@@ -28,12 +28,14 @@ export interface ClaCheckState extends ClaCheckInput {
 export class ContributorLicenseAgreement {
   id: string | null;
   email: string;
+  username: string;
   versionId: string;
   signedAt: Date;
 
   constructor(
     id: string | null,
     email: string,
+    username: string,
     versionId: string,
     signedAt: Date
   ) {
@@ -41,6 +43,7 @@ export class ContributorLicenseAgreement {
     this.email = email;
     this.versionId = versionId;
     this.signedAt = signedAt;
+    this.username = username;
   }
 }
 

@@ -1,15 +1,11 @@
-import {
-  ContributorLicenseAgreement,
-  ClaRepository,
-  ClasImportInput,
-  ClasImportOutput,
-} from "../../domain/cla";
+import {ContributorLicenseAgreement, ClaRepository} from "../../domain/cla";
 import {EdgeDBRepository} from "./base";
 import {injectable} from "inversify";
 
 interface ClaItem {
   id: string;
   email: string;
+  username: string;
   versionId: string;
   creation_time: Date;
 }
@@ -24,6 +20,7 @@ export class EdgeDBClaRepository extends EdgeDBRepository
       return await connection.query(
         `SELECT ContributorLicenseAgreement {
           email,
+          username,
           creation_time,
           versionId := .agreement_version.id
         }
@@ -37,6 +34,7 @@ export class EdgeDBClaRepository extends EdgeDBRepository
       return new ContributorLicenseAgreement(
         item.id,
         item.email,
+        item.username,
         item.versionId,
         item.creation_time
       );
@@ -51,12 +49,14 @@ export class EdgeDBClaRepository extends EdgeDBRepository
         `
         INSERT ContributorLicenseAgreement {
           email := <str>$email,
+          username := <str>$username,
           agreement_version := (SELECT AgreementVersion FILTER .id = <uuid>$version),
           creation_time := <datetime>$creation_time
         }
         `,
         {
           email: data.email,
+          username: data.username,
           version: data.versionId,
           creation_time: data.signedAt,
         }

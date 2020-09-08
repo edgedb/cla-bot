@@ -183,3 +183,7 @@ dd {
     padding-top: 6px;
   }
 }
+
+.readonly input[disabled] {
+  color: #000;
+}
