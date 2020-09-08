@@ -70,6 +70,7 @@ export class ClasHandler {
           new ContributorLicenseAgreement(
             uuid(),
             entry.email.trim().toLowerCase(),
+            entry.username.trim(),
             currentVersion.id,
             new Date()
           )

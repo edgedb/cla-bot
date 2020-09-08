@@ -45,12 +45,14 @@ class SignClaHandler {
 
   @async_retry()
   async createCla(
+    username: string,
     emailInfo: EmailInfo,
     agreementVersionId: string
   ): Promise<ContributorLicenseAgreement> {
     const cla = new ContributorLicenseAgreement(
       uuid(),
       emailInfo.email.toString(),
+      username,
       agreementVersionId,
       new Date()
     );
@@ -86,8 +88,10 @@ class SignClaHandler {
     );
 
     // if a commet was created, update its text;
-    const commentInfo = await this._commentsRepository
-      .getCommentInfoByPullRequestId(data.pullRequest.id);
+    const repository = this._commentsRepository;
+    const commentInfo = await repository.getCommentInfoByPullRequestId(
+      data.pullRequest.id
+    );
 
     if (commentInfo == null) {
       return;
@@ -105,8 +109,8 @@ class SignClaHandler {
     data: ClaCheckInput,
     committers: string[]
   ): Promise<void> {
-    const allSigned = await this._claCheckHandler
-      .allCommittersHaveSignedTheCla(committers);
+    const handler = this._claCheckHandler;
+    const allSigned = await handler.allCommittersHaveSignedTheCla(committers);
 
     if (allSigned) {
       await this.completeClaCheck(data);
@@ -137,6 +141,7 @@ class SignClaHandler {
   }
 
   private async handleAllMatchingEmails(
+    username: string,
     matchingEmails: EmailInfo[],
     agreementVersionId: string
   ): Promise<void> {
@@ -151,7 +156,7 @@ class SignClaHandler {
       );
 
       if (existingCla == null) {
-        await this.createCla(matchingEmail, agreementVersionId);
+        await this.createCla(username, matchingEmail, agreementVersionId);
       }
     }
   }
@@ -176,6 +181,9 @@ class SignClaHandler {
     //
     const data = this.parseState(rawState);
     const committers = this.getAllCommitters(data);
+    const user = await this._usersService.getUserInfoFromAccessToken(
+      accessToken
+    );
     const userEmails = await this._usersService.getUserEmailAddresses(
       accessToken
     );
@@ -196,6 +204,7 @@ class SignClaHandler {
     }
 
     await this.handleAllMatchingEmails(
+      user.login,
       matchingEmails,
       this.readAgreementVersionId(data)
     );

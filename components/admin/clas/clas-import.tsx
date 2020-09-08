@@ -400,7 +400,7 @@ export class ClasImport extends Component<{}, ClasImportState> {
         </dl>
         {fileProblem && <AlertPanel {...fileProblem} />}
         {entries.length > 0 && (
-          <div>
+          <div className="readonly">
             <table>
               <thead>
                 <tr>
