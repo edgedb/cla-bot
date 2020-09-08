@@ -65,6 +65,16 @@ export class ClasHandler {
     const results: ClasImportEntryResult[] = [];
     for (const entry of data.entries) {
       try {
+        // validate email
+        if (!validateEmail(entry.email)) {
+          results.push({
+            success: false,
+            entry: simplifyEntry(entry),
+            error: "Invalid email",
+          });
+          continue;
+        }
+
         // TODO: store username, too, when supported
         await this._clasRepository.saveCla(
           new ContributorLicenseAgreement(
