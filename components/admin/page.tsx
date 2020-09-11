@@ -1,12 +1,13 @@
 import React from "react";
 import {Component, ReactElement} from "react";
-import {get, ApplicationError} from "../fetch";
-import ErrorPanel, {ErrorProps} from "../common/error";
+import {get} from "../fetch";
+import ErrorPanel from "../common/error";
 import Loader from "../common/loader";
+import {ApplicationError} from "../errors";
 
 interface AdminPageState {
   authenticated: boolean;
-  error?: ErrorProps;
+  error?: ApplicationError;
 }
 
 /**
@@ -57,7 +58,7 @@ export default class AdminPage extends Component<unknown, AdminPageState> {
           this.redirectToLogin();
         } else {
           this.setState({
-            error: {},
+            error,
           });
         }
       }
@@ -69,7 +70,7 @@ export default class AdminPage extends Component<unknown, AdminPageState> {
 
     if (!authenticated) {
       if (error !== undefined) {
-        return <ErrorPanel {...error} />;
+        return <ErrorPanel error={error} />;
       }
       return <Loader className="overlay" />;
     }

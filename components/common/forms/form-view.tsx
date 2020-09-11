@@ -1,7 +1,8 @@
-import ErrorPanel, {ErrorProps} from "../error";
+import ErrorPanel from "../error";
 import {Component, ReactElement} from "react";
 import {Button} from "@material-ui/core";
 import Loader from "../loader";
+import {ApplicationError} from "../../errors";
 
 interface FormViewProps {
   submit: () => Promise<void>;
@@ -13,7 +14,7 @@ interface FormViewProps {
 }
 
 interface FormViewState {
-  error?: ErrorProps;
+  error?: ApplicationError;
   loading: boolean;
   submitting: boolean;
 }
@@ -49,21 +50,16 @@ export default class FormView extends Component<FormViewProps, FormViewState> {
             submitting: false,
           });
         },
-        () => {
+        (error: ApplicationError) => {
           this.setState({
-            error: {
-              dismiss: () => this.setState({error: undefined}),
-            },
+            error,
             submitting: false,
           });
         }
       )
-      .catch((error) => {
+      .catch((error: ApplicationError) => {
         this.setState({
-          error: {
-            message: `${error}`,
-            dismiss: () => this.setState({error: undefined}),
-          },
+          error,
           submitting: false,
         });
       });
@@ -125,20 +121,18 @@ export default class FormView extends Component<FormViewProps, FormViewState> {
   }
 
   render(): ReactElement {
-    const state = this.state;
-    const props = this.props;
+    const {error, submitting} = this.state;
+    const {children, className, readonly} = this.props;
 
     return (
       <div
         onKeyDown={this.handleKeyDown.bind(this)}
-        className={
-          "edit-view" + (props.className ? ` ${props.className}` : "")
-        }
+        className={"edit-view" + (className ? ` ${className}` : "")}
       >
-        {state.submitting && <Loader className="overlay" />}
-        {props.children}
-        {state.error && <ErrorPanel {...state.error} />}
-        {!props.readonly && (
+        {submitting && <Loader className="overlay" />}
+        {children}
+        {error && <ErrorPanel error={error} />}
+        {!readonly && (
           <div className="buttons-area">{this.renderButtons()}</div>
         )}
       </div>

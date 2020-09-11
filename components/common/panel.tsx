@@ -4,12 +4,13 @@
  */
 import {Component, ReactElement} from "react";
 import Loader from "./loader";
-import ErrorPanel, {ErrorProps} from "./error";
+import ErrorPanel from "./error";
+import {ApplicationError} from "../errors";
 
 export interface PanelProps {
   id?: string;
   loading: boolean;
-  error?: ErrorProps;
+  error?: ApplicationError;
   load?: () => void;
 }
 
@@ -37,7 +38,7 @@ export default class Panel extends Component<PanelProps> {
     }
 
     if (error) {
-      return <ErrorPanel {...error} />;
+      return <ErrorPanel error={error} />;
     }
 
     return <div id={props.id}>{props.children}</div>;

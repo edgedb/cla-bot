@@ -19,7 +19,11 @@ export class AgreementsHandler {
   @inject(TYPES.AgreementsRepository)
   private _repository: AgreementsRepository;
 
-  async getAgreements(): Promise<AgreementListItem[]> {
+  async getAgreements(filter?: string): Promise<AgreementListItem[]> {
+    if (filter === "complete") {
+      return await this._repository.getCompleteAgreements();
+    }
+
     return await this._repository.getAgreements();
   }
 

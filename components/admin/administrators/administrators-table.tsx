@@ -2,6 +2,7 @@ import {Administrator} from "./contracts";
 import {Component, ReactElement} from "react";
 import HighlightOff from "@material-ui/icons/HighlightOff";
 import {Button} from "@material-ui/core";
+import React from "react";
 
 export interface AdministratorsTableProps {
   items: Administrator[];
@@ -11,6 +12,11 @@ export interface AdministratorsTableProps {
 export class AdministratorsTable extends Component<AdministratorsTableProps> {
   render(): ReactElement {
     const items = this.props.items;
+
+    if (!items.length) {
+      // CLA specific administrators are not required
+      return <React.Fragment></React.Fragment>;
+    }
 
     return (
       <table>

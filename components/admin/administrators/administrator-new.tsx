@@ -1,18 +1,19 @@
 import {Button, TextField} from "@material-ui/core";
 import {Component, ReactElement} from "react";
-import ErrorPanel, {ErrorProps} from "../../common/error";
+import ErrorPanel from "../../common/error";
 import Loader from "../../common/loader";
 import {changeHandler} from "../../forms";
-import {post, ApplicationError} from "../../fetch";
+import {post} from "../../fetch";
 import {validateEmail} from "../../../service/common/emails";
+import {ApplicationError} from "../../errors";
 
 interface NewAdministratorFormProps {
   onNewAdministrator: () => void;
 }
 
 interface NewAdministratorFormState {
-  error?: ErrorProps;
-  submitError?: ErrorProps;
+  error?: ApplicationError;
+  submitError?: ApplicationError;
   loading: boolean;
   submitting: boolean;
   email: string;
@@ -99,23 +100,29 @@ export default class NewAdministratorForm extends Component<
 
         this.setState({
           submitting: false,
-          submitError: {},
+          submitError: error,
         });
       }
     );
   }
 
   render(): ReactElement {
-    const state = this.state;
+    const {
+      email,
+      emailError,
+      emailHelperText,
+      submitting,
+      submitError,
+    } = this.state;
 
     return (
       <div>
-        {state.submitting && <Loader className="overlay" />}
+        {submitting && <Loader className="overlay" />}
         <h1>Add new administrator</h1>
         <TextField
-          value={state.email}
-          error={state.emailError}
-          helperText={state.emailHelperText}
+          value={email}
+          error={emailError}
+          helperText={emailHelperText}
           name="email"
           required
           fullWidth
@@ -129,7 +136,7 @@ export default class NewAdministratorForm extends Component<
             Add
           </Button>
         </div>
-        {state.submitError && <ErrorPanel {...state.submitError} />}
+        {submitError && <ErrorPanel error={submitError} />}
       </div>
     );
   }

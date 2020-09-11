@@ -7,15 +7,14 @@ import Layout from "../layout";
 import NewRepositoryForm from "./repository-new";
 import Panel from "../../common/panel";
 import Loader from "../../common/loader";
-import {Button} from "@material-ui/core";
 import {Component, ReactElement} from "react";
 import {del, get} from "../../fetch";
-import {ErrorProps} from "../../common/error";
 import {RepositoriesTable} from "./repositories-table";
 import {Repository} from "./contracts";
+import {ApplicationError} from "../../errors";
 
 interface RepositoriesState {
-  error?: ErrorProps;
+  error?: ApplicationError;
   loading: boolean;
   waiting: boolean;
   repositories: Repository[];
@@ -50,14 +49,10 @@ export default class Repositories extends Component<{}, RepositoriesState> {
           repositories: items,
         });
       },
-      () => {
+      (error: ApplicationError) => {
         this.setState({
           loading: false,
-          error: {
-            retry: () => {
-              this.load();
-            },
-          },
+          error,
         });
       }
     );
@@ -72,9 +67,9 @@ export default class Repositories extends Component<{}, RepositoriesState> {
     });
   }
 
-  addErrorToDialog(): void {
+  addErrorToDialog(error: ApplicationError): void {
     const dialog = this.state.confirm;
-    dialog.error = {};
+    dialog.error = error;
     this.setState({
       waiting: false,
       confirm: dialog,
@@ -106,8 +101,8 @@ export default class Repositories extends Component<{}, RepositoriesState> {
         ArrayUtils.remove(this.state.repositories, item);
         this.dismissDialog();
       },
-      () => {
-        this.addErrorToDialog();
+      (error: ApplicationError) => {
+        this.addErrorToDialog(error);
       }
     );
   }
@@ -117,29 +112,25 @@ export default class Repositories extends Component<{}, RepositoriesState> {
   }
 
   render(): ReactElement {
-    const state = this.state;
+    const {confirm, error, loading, repositories, waiting} = this.state;
 
     return (
       <Layout title="Repositories">
-        {state.waiting && <Loader className="overlay" />}
-        <Panel
-          error={state.error}
-          load={this.load.bind(this)}
-          loading={state.loading}
-        >
+        {waiting && <Loader className="overlay" />}
+        <Panel error={error} load={this.load.bind(this)} loading={loading}>
           <h1>Configured repositories</h1>
           <RepositoriesTable
-            items={state.repositories}
+            items={repositories}
             onRemove={this.onRemoveClick.bind(this)}
           />
           <div className="new-item-region region">
             <NewRepositoryForm
-              repositories={this.state.repositories}
+              repositories={repositories}
               onNewRepository={this.onNewRepository.bind(this)}
             />
           </div>
         </Panel>
-        <ConfirmDialog {...state.confirm} />
+        <ConfirmDialog {...confirm} />
       </Layout>
     );
   }

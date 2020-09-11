@@ -19,7 +19,6 @@ export default class DashboardView extends Component {
             <li>Configure the text of the first version of the agreement</li>
             <li>Mark the agreement version as "Done"</li>
             <li>Assign the agreement to repositories</li>
-            <li>Configure CLA administrators</li>
             <li>Import CLAs from source files</li>
             <li>Search signed CLAs</li>
           </ol>

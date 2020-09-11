@@ -1,57 +1,54 @@
-import ErrorOutline from "@material-ui/icons/ErrorOutline";
 import HighlightOff from "@material-ui/icons/HighlightOff";
+import React, {Component, ReactElement} from "react";
+import {iconBySeverity} from "./alert";
 import {Button} from "@material-ui/core";
-import {Component, ReactElement} from "react";
+import {reprError} from "./errors-repr";
+import {ApplicationError, ErrorDetails} from "../errors";
 
-export interface ErrorProps {
-  title?: string;
-  message?: string;
-  className?: string;
-  status?: string;
-  retry?: () => void;
+interface ErrorProps {
+  error: ApplicationError;
   dismiss?: () => void;
 }
 
+function reprDetails(data: ErrorDetails | string): string {
+  if (typeof data === "string") {
+    return data;
+  }
+
+  return JSON.stringify(data, undefined, 2);
+}
+
 export default class ErrorPanel extends Component<ErrorProps> {
-  constructor(props: ErrorProps) {
-    super(props);
-  }
-
-  dismiss(): void {
-    if (this.props.dismiss) {
-      this.props.dismiss();
-    }
-  }
-
   render(): ReactElement {
-    const props = this.props;
-    const title = props.title || "Technical error";
-    const message =
-      props.message ||
-      "An unexpected error has occurred. " +
-        "Please contact the service administrators if the problem persists.";
+    const {error, dismiss} = this.props;
 
-    const retry = props.retry;
-    const className = props.className ? props.className : "alert-panel";
-    const status = props.status || "error";
+    let details = "";
+    const {title, message, severity} = reprError(error);
+
+    if (error instanceof ApplicationError && error.data) {
+      details = reprDetails(error.data);
+    }
+
+    const retry = error.retry;
 
     return (
-      <div className={className + " alert-" + status}>
-        <div className={"alert"}>
-          <div className="icon-wrapper">
-            <ErrorOutline />
-          </div>
+      <div className={"alert-panel alert-" + severity}>
+        <div className="alert">
+          <div className="icon-wrapper">{iconBySeverity(severity)}</div>
           <h2>{title}</h2>
-          {props.dismiss !== undefined && (
+          {dismiss !== undefined ? (
             <Button
               title="Dismiss"
-              onClick={() => this.dismiss()}
+              onClick={() => dismiss()}
               className="dismiss-btn"
             >
               <HighlightOff />
             </Button>
+          ) : (
+            <React.Fragment></React.Fragment>
           )}
           <p>{message}</p>
+          {details && <pre>{details}</pre>}
           {retry !== undefined ? (
             <Button
               className="btn btn-default"

@@ -1,8 +1,8 @@
 import React, {Component, ReactElement} from "react";
-import ErrorPanel, {ErrorProps} from "../error";
+import ErrorPanel from "../error";
 import Loader from "../loader";
 import NamedSelect, {NamedItem} from "./select-named";
-import {ApplicationError} from "../../fetch";
+import {ApplicationError} from "../../errors";
 
 export interface DynamicSelectProps<T> {
   load: () => Promise<T[]>;
@@ -15,7 +15,7 @@ export interface DynamicSelectProps<T> {
 
 interface DynamicSelectState<T> {
   loading: boolean;
-  error?: ErrorProps;
+  error?: ApplicationError;
   items: T[];
   selectedItemId: string;
 }
@@ -87,14 +87,12 @@ export default class DynamicSelect<T extends NamedItem> extends Component<
         });
       },
       (error: ApplicationError) => {
-        // TODO: handle ApplicationError in error view
+        error.retry = () => {
+          this.load();
+        };
         this.setState({
           loading: false,
-          error: {
-            retry: () => {
-              this.load();
-            },
-          },
+          error,
         });
       }
     );
@@ -109,7 +107,7 @@ export default class DynamicSelect<T extends NamedItem> extends Component<
     const {error, loading, items, selectedItemId} = this.state;
 
     if (error) {
-      return <ErrorPanel {...error} />;
+      return <ErrorPanel error={error} />;
     }
 
     if (loading) {

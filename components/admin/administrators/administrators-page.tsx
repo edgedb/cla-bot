@@ -5,16 +5,16 @@ import ConfirmDialog, {
 import Layout from "../layout";
 import Panel from "../../common/panel";
 import {Component, ReactElement} from "react";
-import {ErrorProps} from "../../common/error";
 import {get, del} from "../../fetch";
 import {AdministratorsTable} from "./administrators-table";
 import {Administrator} from "./contracts";
 import ArrayUtils from "../../array";
 import Loader from "../../common/loader";
 import NewAdministratorForm from "./administrator-new";
+import {ApplicationError} from "../../errors";
 
 interface AdministratorsPageState {
-  error?: ErrorProps;
+  error?: ApplicationError;
   loading: boolean;
   waiting: boolean;
   administrators: Administrator[];
@@ -54,14 +54,13 @@ export default class AdministratorsPage extends Component<
           administrators,
         });
       },
-      () => {
+      (error: ApplicationError) => {
+        error.retry = () => {
+          this.load();
+        };
         this.setState({
           loading: false,
-          error: {
-            retry: () => {
-              this.load();
-            },
-          },
+          error,
         });
       }
     );
@@ -76,9 +75,9 @@ export default class AdministratorsPage extends Component<
     });
   }
 
-  addErrorToDialog(): void {
+  addErrorToDialog(error: ApplicationError): void {
     const dialog = this.state.confirm;
-    dialog.error = {};
+    dialog.error = error;
     this.setState({
       waiting: false,
       confirm: dialog,
@@ -108,8 +107,8 @@ export default class AdministratorsPage extends Component<
         ArrayUtils.remove(this.state.administrators, item);
         this.dismissDialog();
       },
-      () => {
-        this.addErrorToDialog();
+      (error: ApplicationError) => {
+        this.addErrorToDialog(error);
       }
     );
   }
@@ -119,19 +118,15 @@ export default class AdministratorsPage extends Component<
   }
 
   render(): ReactElement {
-    const state = this.state;
+    const {administrators, confirm, error, loading, waiting} = this.state;
 
     return (
       <Layout title="Administrators">
-        {state.waiting && <Loader className="overlay" />}
-        <Panel
-          error={state.error}
-          load={this.load.bind(this)}
-          loading={state.loading}
-        >
+        {waiting && <Loader className="overlay" />}
+        <Panel error={error} load={this.load.bind(this)} loading={loading}>
           <h1>Administrators</h1>
           <AdministratorsTable
-            items={state.administrators}
+            items={administrators}
             onRemove={this.onRemoveClick.bind(this)}
           />
           <p>
@@ -146,7 +141,7 @@ export default class AdministratorsPage extends Component<
             />
           </div>
         </Panel>
-        <ConfirmDialog {...state.confirm} />
+        <ConfirmDialog {...confirm} />
       </Layout>
     );
   }

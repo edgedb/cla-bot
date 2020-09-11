@@ -2,12 +2,13 @@ import Head from "next/head";
 import {Button, Container} from "@material-ui/core";
 import {Component, ReactElement} from "react";
 import ClaView from "../components/common/cla-view";
-import ErrorPanel, {ErrorProps} from "../components/common/error";
+import ErrorPanel from "../components/common/error";
 import Loader from "../components/common/loader";
 import {get} from "../components/fetch";
+import {ApplicationError} from "../components/errors";
 
 interface AgreementPageState {
-  error?: ErrorProps;
+  error?: ApplicationError;
   loading: boolean;
   data?: ContributorLicenseAgreement;
 }
@@ -55,14 +56,13 @@ export default class AgreementPage extends Component<
           data,
         });
       },
-      () => {
+      (error: ApplicationError) => {
+        error.retry = () => {
+          this.load();
+        };
         this.setState({
           loading: false,
-          error: {
-            retry: () => {
-              this.load();
-            },
-          },
+          error,
         });
       }
     );
@@ -75,8 +75,16 @@ export default class AgreementPage extends Component<
       return <Loader />;
     }
 
-    if (error || !data) {
-      return <ErrorPanel {...error} />;
+    if (error) {
+      return <ErrorPanel error={error} />;
+    }
+
+    if (!data) {
+      return (
+        <ErrorPanel
+          error={new ApplicationError("Agreement not found.", 400)}
+        />
+      );
     }
 
     const {title, state, text} = data;

@@ -1,3 +1,5 @@
+// This module contains exceptions thrown by the server side.
+
 export interface ErrorDetails {
   statusCode: number;
   error: string;

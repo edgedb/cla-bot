@@ -1,25 +1,7 @@
 import {fetch} from "cross-fetch";
+import {NotFoundError, ApplicationError} from "./errors";
 
 const JSON_ContentType = "application/json; charset=utf-8";
-
-export class ApplicationError extends Error {
-  status: number;
-
-  constructor(message: string, statusCode: number) {
-    super(message);
-    this.status = statusCode;
-  }
-
-  allowRetry(): boolean {
-    return this.status === 500;
-  }
-}
-
-export class NotFoundError extends ApplicationError {
-  constructor(message: string = "Object not found") {
-    super(message, 404);
-  }
-}
 
 async function tryParseBodyAsJSON(response: Response): Promise<any> {
   const contentType = response.headers.get("content-type");
@@ -56,8 +38,6 @@ async function appFetch<T>(
 
   const response = await fetch(input, init);
 
-  // TODO: complete logic to handle data from server even when it includes
-  // error details, to provide useful information to the user
   const data = await tryParseBodyAsJSON(response);
 
   if (response.status === 404) {
@@ -67,7 +47,8 @@ async function appFetch<T>(
   if (response.status >= 400) {
     throw new ApplicationError(
       "Response status does not indicate success",
-      response.status
+      response.status,
+      data
     );
   }
 

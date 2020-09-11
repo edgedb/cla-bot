@@ -1,12 +1,12 @@
 import * as files from "../../common/files";
 import AlertPanel, {AlertProps, AlertSeverity} from "../../common/alert";
-import ErrorPanel, {ErrorProps} from "../../common/error";
+import ErrorPanel from "../../common/error";
 import FileInfo from "../../common/forms/file-info";
 import FileInput from "../../common/forms/file-input";
 import Loader from "../../common/loader";
 import React from "react";
 import uniqueId from "lodash/uniqueId";
-import {ApplicationError, get, post} from "../../fetch";
+import {get, post} from "../../fetch";
 import {Component, ReactElement} from "react";
 import {ParseError, UnsupportedFileType} from "../../common/errors";
 import {parseSync as parseCSV} from "../../common/csv";
@@ -20,6 +20,7 @@ import ErrorOutline from "@material-ui/icons/ErrorOutline";
 import NotInterestedIcon from "@material-ui/icons/NotInterested";
 import Publish from "@material-ui/icons/Publish";
 import {ImportOutput, ImportEntryResult} from "./contracts";
+import {ApplicationError} from "../../errors";
 
 enum ImportEntryStatus {
   valid = "valid",
@@ -61,8 +62,8 @@ const Examples: FileExample[] = [
 interface ClasImportState {
   loading: boolean;
   waiting: boolean;
-  error?: ErrorProps;
-  submitError?: ErrorProps;
+  error?: ApplicationError;
+  submitError?: ApplicationError;
   output?: ImportOutput;
   selectedFile: File | null;
   fileProblem?: AlertProps;
@@ -298,9 +299,7 @@ export class ClasImport extends Component<{}, ClasImportState> {
       (error: ApplicationError) => {
         this.setState({
           waiting: false,
-          submitError: {
-            message: error.message,
-          },
+          submitError: error,
         });
       }
     );
@@ -330,7 +329,7 @@ export class ClasImport extends Component<{}, ClasImportState> {
   }
 
   getAgreements(): Promise<AgreementListItem[]> {
-    return get<AgreementListItem[]>("/api/agreements");
+    return get<AgreementListItem[]>("/api/agreements?filter=complete");
   }
 
   onAgreementSelect(item: AgreementListItem | null): void {
@@ -342,14 +341,14 @@ export class ClasImport extends Component<{}, ClasImportState> {
   onAgreementsLoaded(items: AgreementListItem[]): void {
     if (!items.length) {
       // cannot import because there are no agreements configured in the system
+      const error = new ApplicationError(
+        "Before importing CLAs, it is necessary to configure " +
+          "at least one agreement with a current version.",
+        400
+      );
+      error.title = "Cannot import CLAs";
       this.setState({
-        error: {
-          title: "Cannot import CLAs",
-          message:
-            "Before importing CLAs, it is necessary to configure " +
-            "at least one agreement.",
-          status: "warning",
-        },
+        error,
       });
     }
   }
@@ -441,8 +440,8 @@ export class ClasImport extends Component<{}, ClasImportState> {
             )}
           </div>
         )}
-        {error && <ErrorPanel {...error} />}
-        {submitError && <ErrorPanel {...submitError} />}
+        {error && <ErrorPanel error={error} />}
+        {submitError && <ErrorPanel error={submitError} />}
       </div>
     );
   }

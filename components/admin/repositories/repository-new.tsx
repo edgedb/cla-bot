@@ -1,13 +1,14 @@
 import {Select, InputLabel, Button, FormHelperText} from "@material-ui/core";
 import {Component, ReactElement} from "react";
-import ErrorPanel, {ErrorProps} from "../../common/error";
+import ErrorPanel from "../../common/error";
 import Loader from "../../common/loader";
 import {changeHandler} from "../../forms";
 import Panel from "../../common/panel";
-import {get, post, ApplicationError} from "../../fetch";
+import {get, post} from "../../fetch";
 import {AgreementListItem} from "../agreements/contracts";
 import {Repository, ExternalRepository} from "./contracts";
 import ArrayUtils from "../../array";
+import {ApplicationError, ConflictError} from "../../errors";
 
 interface NewRepositoryFormProps {
   onNewRepository: () => void;
@@ -15,8 +16,8 @@ interface NewRepositoryFormProps {
 }
 
 interface NewRepositoryFormState {
-  error?: ErrorProps;
-  submitError?: ErrorProps;
+  error?: ApplicationError;
+  submitError?: ApplicationError;
   loading: boolean;
   submitting: boolean;
   agreements: AgreementListItem[];
@@ -100,7 +101,7 @@ export default class NewRepositoryForm extends Component<
   private validateAvailableItems(
     agreements: AgreementListItem[],
     repositories: ExternalRepository[]
-  ): ErrorProps | undefined {
+  ): ApplicationError | undefined {
     const hasAgreements = agreements.length > 0;
     const hasRepositories = repositories.length > 0;
 
@@ -109,7 +110,7 @@ export default class NewRepositoryForm extends Component<
     }
 
     let title = "Cannot create a configuration";
-    let message;
+    let message = "";
 
     if (!hasRepositories) {
       if (this.props.repositories.length) {
@@ -126,11 +127,9 @@ export default class NewRepositoryForm extends Component<
         "Start by configuring an agreement.";
     }
 
-    return {
-      title,
-      message,
-      status: "info",
-    };
+    const error = new ApplicationError(message, 202);
+    error.title = title;
+    return error;
   }
 
   load(): void {
@@ -158,14 +157,13 @@ export default class NewRepositoryForm extends Component<
           ),
         });
       },
-      () => {
+      (error: ApplicationError) => {
+        error.retry = () => {
+          this.load();
+        };
         this.setState({
           loading: false,
-          error: {
-            retry: () => {
-              this.load();
-            },
-          },
+          error,
         });
       }
     );
@@ -237,40 +235,41 @@ export default class NewRepositoryForm extends Component<
         if (error.status === 409) {
           this.setState({
             submitting: false,
-            submitError: {
-              title: "Repository already configured",
-              message: "There is already a configuration for this repository.",
-              status: "info",
-            },
+            submitError: new ConflictError(
+              "There is already a configuration for this repository."
+            ),
           });
           return;
         }
 
         this.setState({
           submitting: false,
-          submitError: {},
+          submitError: error,
         });
       }
     );
   }
 
   render(): ReactElement {
-    const state = this.state;
     const {
+      error,
       agreements,
       repositories,
+      loading,
       selectedAgreementId,
       selectedRepositoryFullName,
-    } = state;
+      selectedRepositoryFullNameError,
+      selectedRepositoryFullNameHelperText,
+      selectedAgreementIdError,
+      selectedAgreementIdHelperText,
+      submitting,
+      submitError,
+    } = this.state;
 
     return (
       <div>
-        {state.submitting && <Loader className="overlay" />}
-        <Panel
-          error={state.error}
-          load={() => this.load()}
-          loading={state.loading}
-        >
+        {submitting && <Loader className="overlay" />}
+        <Panel error={error} load={() => this.load()} loading={loading}>
           <h1>Bind repository to agreement</h1>
           <dl>
             <dt>
@@ -279,7 +278,7 @@ export default class NewRepositoryForm extends Component<
             <dd className="select-parent">
               <Select
                 native
-                error={state.selectedAgreementIdError}
+                error={selectedAgreementIdError}
                 id="agreement-select"
                 labelId="agreement-select-label"
                 value={selectedAgreementId}
@@ -294,9 +293,9 @@ export default class NewRepositoryForm extends Component<
                   );
                 })}
               </Select>
-              {state.selectedAgreementIdHelperText && (
+              {selectedAgreementIdHelperText && (
                 <FormHelperText>
-                  {state.selectedAgreementIdHelperText}
+                  {selectedAgreementIdHelperText}
                 </FormHelperText>
               )}
             </dd>
@@ -306,7 +305,7 @@ export default class NewRepositoryForm extends Component<
             <dd className="select-parent">
               <Select
                 native
-                error={state.selectedRepositoryFullNameError}
+                error={selectedRepositoryFullNameError}
                 id="repository-select"
                 labelId="repository-select-label"
                 value={selectedRepositoryFullName}
@@ -325,9 +324,9 @@ export default class NewRepositoryForm extends Component<
                   );
                 })}
               </Select>
-              {state.selectedRepositoryFullNameHelperText && (
+              {selectedRepositoryFullNameHelperText && (
                 <FormHelperText>
-                  {state.selectedRepositoryFullNameHelperText}
+                  {selectedRepositoryFullNameHelperText}
                 </FormHelperText>
               )}
             </dd>
@@ -338,7 +337,7 @@ export default class NewRepositoryForm extends Component<
             </Button>
           </div>
         </Panel>
-        {state.submitError && <ErrorPanel {...state.submitError} />}
+        {submitError && <ErrorPanel error={submitError} />}
       </div>
     );
   }
