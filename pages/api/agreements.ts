@@ -19,7 +19,7 @@ export default async (
 
   switch (method) {
     case "GET":
-      const agreements = await agreementsHandler.getAgreements();
+      const agreements = await agreementsHandler.getAgreements("");
       res.status(200).json(agreements);
       return;
 

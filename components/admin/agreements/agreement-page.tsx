@@ -1,18 +1,18 @@
-import {get, ApplicationError} from "../../fetch";
+import {get} from "../../fetch";
 import Layout from "../layout";
 import {AgreementDetails} from "./contracts";
 import {AgreementView} from "./agreement";
-import {ErrorProps} from "../../common/error";
 import {Component, ReactElement} from "react";
 import Panel from "../../common/panel";
 import {AgreementVersion} from "./contracts";
+import {ApplicationError} from "../../errors";
 
 interface AgreementDetailsPageProps {
   id: string;
 }
 
 export interface AgreementDetailsState {
-  error?: ErrorProps;
+  error?: ApplicationError;
   loading: boolean;
   details: AgreementDetails | null;
 }
@@ -67,16 +67,7 @@ export default class AgreementDetailsPage extends Component<
   handleError(error: ApplicationError): void {
     this.setState({
       loading: false,
-      error: {
-        // TODO: how to handle user friendly error titles and messages?
-        // title: error.message,
-        // message: error.message,
-        retry: error.allowRetry()
-          ? () => {
-              this.load();
-            }
-          : undefined,
-      },
+      error,
     });
   }
 

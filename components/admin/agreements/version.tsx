@@ -5,9 +5,10 @@ import ConfirmDialog, {
 import {AgreementVersion} from "./contracts";
 import {Button} from "@material-ui/core";
 import {Component, ReactElement} from "react";
-import {post, ApplicationError} from "../../fetch";
+import {post} from "../../fetch";
 import {VersionText} from "./version-text";
 import Loader from "../../common/loader";
+import {ApplicationError} from "../../errors";
 
 export interface VersionProps {
   details: AgreementVersion;
@@ -47,7 +48,7 @@ export class Version extends Component<VersionProps, VersionState> {
 
   addErrorToDialog(error: ApplicationError): void {
     const dialog = this.state.confirm;
-    dialog.error = {}; // TODO: make a common function to display error
+    dialog.error = error;
     this.setState({
       waiting: false,
       confirm: dialog,

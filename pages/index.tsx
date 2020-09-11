@@ -1,9 +1,10 @@
 import Head from "next/head";
 import {Container} from "@material-ui/core";
 import {Component, ReactElement} from "react";
-import ErrorPanel, {ErrorProps} from "../components/common/error";
+import ErrorPanel from "../components/common/error";
 import {get} from "../components/fetch";
 import Loader from "../components/common/loader";
+import {ApplicationError} from "../components/errors";
 
 interface ApiMetadata {
   organizationName: string;
@@ -11,7 +12,7 @@ interface ApiMetadata {
 }
 
 interface IndexState {
-  error?: ErrorProps;
+  error?: ApplicationError;
   loading: boolean;
   data?: ApiMetadata;
 }
@@ -45,14 +46,13 @@ export default class Index extends Component<unknown, IndexState> {
           data,
         });
       },
-      () => {
+      (error: ApplicationError) => {
+        error.retry = () => {
+          this.load();
+        };
         this.setState({
           loading: false,
-          error: {
-            retry: () => {
-              this.load();
-            },
-          },
+          error,
         });
       }
     );
@@ -65,11 +65,13 @@ export default class Index extends Component<unknown, IndexState> {
       return <Loader />;
     }
 
-    if (error || !data) {
-      return <ErrorPanel {...error} />;
+    if (error) {
+      return <ErrorPanel error={error} />;
     }
 
-    const {organizationDisplayName} = data;
+    const organizationDisplayName = data
+      ? data.organizationDisplayName || data.organizationName
+      : "Organization";
     const title = `Contributor License Agreement (CLA) - ${organizationDisplayName} Open Source`;
 
     return (

@@ -19,7 +19,8 @@ export class AgreementsHandler {
   @inject(TYPES.AgreementsRepository)
   private _repository: AgreementsRepository;
 
-  async getAgreements(): Promise<AgreementListItem[]> {
+  async getAgreements(filter?: string): Promise<AgreementListItem[]> {
+    console.info(filter);
     return await this._repository.getAgreements();
   }
 

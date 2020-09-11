@@ -7,7 +7,8 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
-import ErrorPanel, {ErrorProps} from "./error";
+import ErrorPanel from "./error";
+import {ApplicationError} from "../errors";
 
 export interface ConfirmDialogProps {
   title: string;
@@ -16,7 +17,7 @@ export interface ConfirmDialogProps {
   close: () => void;
   confirm: () => void;
   fragment?: ReactElement;
-  error?: ErrorProps;
+  error?: ApplicationError;
 }
 
 export default class ConfirmDialog extends Component<ConfirmDialogProps> {
@@ -36,7 +37,7 @@ export default class ConfirmDialog extends Component<ConfirmDialogProps> {
             {props.description}
           </DialogContentText>
           {props.fragment !== undefined && props.fragment}
-          {props.error !== undefined && <ErrorPanel {...props.error} />}
+          {props.error !== undefined && <ErrorPanel error={props.error} />}
         </DialogContent>
         <DialogActions>
           <Button onClick={() => props.confirm()}>Confirm</Button>

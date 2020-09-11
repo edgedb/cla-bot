@@ -3,13 +3,14 @@ import {Button, TextField} from "@material-ui/core";
 import {changeHandler} from "../../forms";
 import {Component, ReactElement} from "react";
 import {ContributorLicenseAgreement} from "./contracts";
-import ErrorPanel, {ErrorProps} from "../../common/error";
-import {ApplicationError, get} from "../../fetch";
+import ErrorPanel from "../../common/error";
 import Loader from "../../common/loader";
 import {validateEmail} from "../../../service/common/emails";
+import {ApplicationError} from "../../errors";
+import {get} from "../../fetch";
 
 export interface ClaSearchState {
-  error?: ErrorProps;
+  error?: ApplicationError;
   waiting: boolean;
   item: ContributorLicenseAgreement | null | undefined;
   search: string;
@@ -78,15 +79,14 @@ export class ClaSearch extends Component<{}, ClaSearchState> {
         }
         this.setState({
           waiting: false,
-          error: {},
+          error,
         });
       }
     );
   }
 
   render(): ReactElement {
-    const state = this.state;
-    const {search, waiting, item} = state;
+    const {error, search, waiting, item} = this.state;
 
     return (
       <div>
@@ -136,7 +136,7 @@ export class ClaSearch extends Component<{}, ClaSearchState> {
             )}
           </div>
         )}
-        {state.error && <ErrorPanel {...state.error} />}
+        {error && <ErrorPanel error={error} />}
       </div>
     );
   }

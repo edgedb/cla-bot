@@ -4,13 +4,13 @@ import MarkdownIt from "markdown-it";
 import Panel from "../../common/panel";
 import {AgreementText} from "./contracts";
 import {Component, ReactElement} from "react";
-import {ErrorProps} from "../../common/error";
 import {get, put} from "../../fetch";
 import FormView from "../../common/forms/form-view";
 import formatDate from "../../format-date";
 import {changeHandler} from "../../forms";
 import {TextField} from "@material-ui/core";
 import ClaView from "../../common/cla-view";
+import {ApplicationError} from "../../errors";
 
 export interface VersionTextProps {
   versionId: string;
@@ -26,7 +26,7 @@ export interface VersionTextState {
   bodyError: boolean;
   bodyHelperText: string;
   text_id: string;
-  error?: ErrorProps;
+  error?: ApplicationError;
   loading: boolean;
   mod_title: string;
   mod_body: string;
@@ -98,11 +98,9 @@ export class VersionText extends Component<
           editing: false,
         });
       },
-      () => {
+      (error: ApplicationError) => {
         this.setState({
-          error: {
-            dismiss: () => this.setState({error: undefined}),
-          },
+          error,
           loading: false,
         });
       }

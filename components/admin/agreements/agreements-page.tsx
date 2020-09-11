@@ -1,15 +1,15 @@
 import {get} from "../../fetch";
 import Layout from "../layout";
 import Panel from "../../common/panel";
-import {ErrorProps} from "../../common/error";
 import {Component, ReactElement} from "react";
 import Link from "next/link";
 import {Button} from "@material-ui/core";
 import {AgreementListItem} from "./contracts";
 import {AgreementsTable} from "./agreements-table";
+import {ApplicationError} from "../../errors";
 
 export interface AgreementsPageState {
-  error?: ErrorProps;
+  error?: ApplicationError;
   loading: boolean;
   items: AgreementListItem[] | null;
 }
@@ -43,14 +43,10 @@ export default class AgreementsPage extends Component<
           items: data,
         });
       },
-      (error) => {
+      (error: ApplicationError) => {
         this.setState({
           loading: false,
-          error: {
-            retry: () => {
-              this.load();
-            },
-          },
+          error,
         });
       }
     );

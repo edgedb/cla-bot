@@ -3,13 +3,14 @@ import Layout from "../layout";
 import Link from "next/link";
 import {Button, TextField} from "@material-ui/core";
 import {Component, ReactElement} from "react";
-import ErrorPanel, {ErrorProps} from "../../common/error";
+import ErrorPanel from "../../common/error";
 import Loader from "../../common/loader";
 import {changeHandler} from "../../forms";
-import {post, ApplicationError} from "../../fetch";
+import {post} from "../../fetch";
+import {ApplicationError} from "../../errors";
 
 interface NewAgreementPageState {
-  error?: ErrorProps;
+  error?: ApplicationError;
   loading: boolean;
   name: string;
   nameError: boolean;
@@ -76,7 +77,7 @@ export default class NewAgreementPage extends Component<
           });
         } else {
           this.setState({
-            error: undefined,
+            error,
             submitting: false,
           });
         }
@@ -85,18 +86,18 @@ export default class NewAgreementPage extends Component<
   }
 
   render(): ReactElement {
-    const state = this.state;
+    const {nameError, nameHelperText, error, submitting} = this.state;
 
     return (
       <Layout title="New agreement">
-        {state.submitting && <Loader className="overlay" />}
+        {submitting && <Loader className="overlay" />}
         <h1>Create new agreement</h1>
         <form noValidate>
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
-                error={state.nameError}
-                helperText={state.nameHelperText}
+                error={nameError}
+                helperText={nameHelperText}
                 name="name"
                 required
                 fullWidth
@@ -128,7 +129,7 @@ export default class NewAgreementPage extends Component<
             </Link>
           </div>
         </form>
-        {state.error && <ErrorPanel {...state.error} />}
+        {error && <ErrorPanel error={error} />}
       </Layout>
     );
   }
