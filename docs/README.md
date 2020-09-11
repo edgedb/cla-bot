@@ -138,5 +138,8 @@ development.
 
 ## Next steps
 
-To configure an instance in `edbcloud`, see the instructions at
-[edgedb-cloud.md](./edgedb-cloud.md).
+To configure an instance in `edbcloud`, see the instructions
+_[Running in EdgeDB Cloud](./edgedb-cloud.md)_.
+
+For instructions on how to start using the `cla-bot` with repositories, see
+the _[Getting Started Wiki page](https://github.com/edgedb/cla-bot/wiki/Getting-started)_.
