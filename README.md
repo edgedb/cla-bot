@@ -45,7 +45,6 @@ This project uses onion architecture, with the following namespaces:
 - `service.domain` contains domain objects and interfaces for external services
 - `service.data` contains concrete implementations of external services
 - `service.handlers` contains business logic
-- `docs` folder contains documentation for developers
 
 Business logic is lousy coupled with the data access layer, since it is only
 aware of interfaces, not concrete implementations of DAL logic. Everything
