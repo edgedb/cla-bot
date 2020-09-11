@@ -20,7 +20,10 @@ export class AgreementsHandler {
   private _repository: AgreementsRepository;
 
   async getAgreements(filter?: string): Promise<AgreementListItem[]> {
-    console.info(filter);
+    if (filter === "complete") {
+      return await this._repository.getCompleteAgreements();
+    }
+
     return await this._repository.getAgreements();
   }
 

@@ -329,6 +329,28 @@ export class EdgeDBAgreementsRepository extends EdgeDBRepository
     );
   }
 
+  async getCompleteAgreements(): Promise<AgreementListItem[]> {
+    const items = await this.run(async (connection) => {
+      return await connection.query(
+        `SELECT Agreement {
+          name,
+          description,
+          creation_time
+        } FILTER .versions.current = True;`
+      );
+    });
+
+    return items.map(
+      (entity) =>
+        new AgreementListItem(
+          entity.id,
+          entity.name,
+          entity.description,
+          entity.creation_time
+        )
+    );
+  }
+
   async createAgreement(
     name: string,
     description?: string

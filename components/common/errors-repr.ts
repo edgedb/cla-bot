@@ -36,18 +36,6 @@ export function reprError(error: ApplicationError): ErrorRepresentation {
             "but it has not been completed.",
         severity: AlertSeverity.info,
       };
-    case 419: // custom
-      return {
-        title: error.title || "Warning",
-        message: error.message,
-        severity: AlertSeverity.warning,
-      };
-    case 404:
-      return {
-        title: error.title || "Object not found",
-        message: error.message,
-        severity: AlertSeverity.warning,
-      };
     case 400:
       return {
         title: error.title || "Bad Request",
@@ -68,12 +56,24 @@ export function reprError(error: ApplicationError): ErrorRepresentation {
           "You are not authorized to complete the requested operation.",
         severity: AlertSeverity.warning,
       };
+    case 404:
+      return {
+        title: error.title || "Object not found",
+        message: error.message,
+        severity: AlertSeverity.warning,
+      };
     case 409:
       return {
         title: error.title || "Conflict",
         message:
           error.message ||
           "You are not authorized to complete the requested operation.",
+        severity: AlertSeverity.warning,
+      };
+    case 419: // custom
+      return {
+        title: error.title || "Warning",
+        message: error.message,
         severity: AlertSeverity.warning,
       };
     default:

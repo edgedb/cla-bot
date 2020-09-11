@@ -75,7 +75,6 @@ export class ClasHandler {
           continue;
         }
 
-        // TODO: store username, too, when supported
         await this._clasRepository.saveCla(
           new ContributorLicenseAgreement(
             uuid(),

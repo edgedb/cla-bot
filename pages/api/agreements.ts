@@ -19,7 +19,10 @@ export default async (
 
   switch (method) {
     case "GET":
-      const agreements = await agreementsHandler.getAgreements("");
+      const {filter} = req.query;
+      const agreements = await agreementsHandler.getAgreements(
+        filter ? filter.toString() : undefined
+      );
       res.status(200).json(agreements);
       return;
 

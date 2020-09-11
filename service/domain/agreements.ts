@@ -105,6 +105,8 @@ export class Agreement extends AgreementListItem {
 export interface AgreementsRepository {
   getAgreements(): Promise<AgreementListItem[]>;
 
+  getCompleteAgreements(): Promise<AgreementListItem[]>;
+
   getAgreement(agreementId: string): Promise<Agreement | null>;
 
   getAgreementVersion(versionId: string): Promise<AgreementVersion | null>;

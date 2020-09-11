@@ -341,13 +341,14 @@ export class ClasImport extends Component<{}, ClasImportState> {
   onAgreementsLoaded(items: AgreementListItem[]): void {
     if (!items.length) {
       // cannot import because there are no agreements configured in the system
-      // "Cannot import CLAs"
+      const error = new ApplicationError(
+        "Before importing CLAs, it is necessary to configure " +
+          "at least one agreement with a current version.",
+        400
+      );
+      error.title = "Cannot import CLAs";
       this.setState({
-        error: new ApplicationError(
-          "Before importing CLAs, it is necessary to configure " +
-            "at least one agreement.",
-          400
-        ),
+        error,
       });
     }
   }
