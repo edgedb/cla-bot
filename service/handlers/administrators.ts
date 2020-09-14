@@ -105,7 +105,7 @@ export class AdministratorsHandler {
       accessToken
     );
 
-    // use only the primary email
+    // try first using the primary email
     const emailInfo = userEmails.find((item) => item.primary && item.verified);
 
     if (emailInfo === undefined) {
@@ -114,9 +114,26 @@ export class AdministratorsHandler {
       );
     }
 
-    const admin = await this._repository.getAdministratorByEmail(
+    let admin = await this._repository.getAdministratorByEmail(
       emailInfo.email
     );
+
+    if (admin === null) {
+      // try with other verified emails
+      const verifiedEmailsInfo = userEmails.filter(
+        (item) => !item.primary && item.verified
+      );
+
+      for (const verifiedEmailInfo of verifiedEmailsInfo) {
+        admin = await this._repository.getAdministratorByEmail(
+          verifiedEmailInfo.email
+        );
+
+        if (admin !== null) {
+          break;
+        }
+      }
+    }
 
     if (admin === null) {
       // The user who signed-in is not an administrator, return Unauthorized
