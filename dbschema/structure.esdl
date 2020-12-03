@@ -86,6 +86,8 @@ module default {
             constraint exclusive;
         };
 
+        property username -> str;
+
         required property creation_time -> datetime {
             default := datetime_current();
         }
