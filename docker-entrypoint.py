@@ -2,7 +2,7 @@
 # This file runs on Debian Buster and needs to be Python 3.7 compatible.
 
 from __future__ import annotations
-from typing import Dict, Union, Any
+from typing import Dict, Union, Any, Optional
 
 import os
 import shutil
@@ -14,12 +14,15 @@ import boto3
 
 def get_secrets_manager(region_name: str):
     session = boto3.session.Session()
-    return session.client(service_name="secretsmanager", region_name=region_name)
+    return session.client(
+        service_name="secretsmanager",
+        region_name=region_name,
+    )
 
 
 def get_secret(secrets_manager, secret_name: str) -> str:
-    # a prefix is used to enable multiple instances of the CLA-Bot inside the same
-    # collection of secrets
+    # a prefix is used to enable multiple instances of the CLA-Bot
+    # inside the same collection of secrets.
     if os.environ.get("CUSTOMER") and os.environ.get("INSTANCE"):
         prefix = (
             f'edbcloud/app/{os.environ["CUSTOMER"]}'
@@ -31,10 +34,14 @@ def get_secret(secrets_manager, secret_name: str) -> str:
     return data.get("SecretString")
 
 
-def get_optional_secret(secrets_manager, secret_name: str, default_value: str="") -> str:
+def get_optional_secret(
+    secrets_manager,
+    secret_name: str,
+    default_value: str = "",
+) -> str:
     try:
         return get_secret(secrets_manager, secret_name)
-    except:
+    except Exception:
         return default_value
 
 
@@ -52,9 +59,11 @@ def get_env_variables(
     server_url: str,
     application_secret: str,
     organization_name: str,
+    organization_display_name: Optional[str],
 ) -> Dict[str, str]:
     """
-    Returns a dictionary of all environmental variables handled by the web service.
+    Returns a dictionary of all environmental variables
+    handled by the web service.
     """
     return {
         "EDGEDB_HOST": edgedb_host or "127.0.0.1",
@@ -67,6 +76,7 @@ def get_env_variables(
         "SERVER_URL": server_url,
         "SECRET": application_secret,
         "ORGANIZATION_NAME": organization_name,
+        "ORGANIZATION_DISPLAY_NAME": organization_display_name or "edgedb",
     }
 
 
@@ -121,8 +131,8 @@ def edgedb_output(
 
 
 def main() -> None:
-    # Collect secrets and configure them as environmental variables read by the Next.js
-    # application
+    # Collect secrets and configure them as environmental variables
+    # read by the Next.js application
     region = os.environ["REGION"]
 
     secrets_manager = get_secrets_manager(region)
