@@ -52,21 +52,19 @@ class ClaCheckHandler {
     // We create a JWT token, to ensure that the user cannot modify the
     // parameter
     const token = this._tokensHandler.createToken(data);
-    return (
-      `${this._settings.url}/contributor-license-agreement?state=${token}`
-    );
+    return `${this._settings.url}/contributor-license-agreement?state=${token}`;
   }
 
   getSignedComment(signedUrl: string): string {
     return (
-      `All committers signed the Contributor License Agreement. <br/> ` +
+      `All commit authors signed the Contributor License Agreement. <br/> ` +
       `[![CLA signed](${this._settings.url}/cla-signed.svg)](${signedUrl})`
     );
   }
 
   getNotSignedComment(challengeUrl: string): string {
     return (
-      `Committers are required to sign the Contributor License Agreement. <br/> ` +
+      `Commit authors are required to sign the Contributor License Agreement. <br/> ` +
       `[![CLA not signed](${this._settings.url}/cla-not-signed.svg)](${challengeUrl})`
     );
   }
@@ -112,19 +110,17 @@ class ClaCheckHandler {
     );
   }
 
-  async allCommittersHaveSignedTheCla(
-    allCommitters: string[]
-  ): Promise<boolean> {
+  async allAuthorsHaveSignedTheCla(allAuthors: string[]): Promise<boolean> {
     // This code performs fine in realistic scenarios: most PRs will
-    // have a single committer email, or only a few.
+    // have a single author email, or only a few.
     // However, someone might trick our service by faking a big number of
     // unique users and a big number of commits.
     // In such unhappy case, it makes sense to handle
     // committers sequentially one by one, to not starve our resources for a
     // single request.
 
-    for (let i = 0; i < allCommitters.length; i++) {
-      const email = allCommitters[i];
+    for (let i = 0; i < allAuthors.length; i++) {
+      const email = allAuthors[i];
 
       const cla = await this._claRepository.getClaByEmailAddress(email);
 
@@ -160,32 +156,30 @@ class ClaCheckHandler {
       return;
     }
 
-    const allCommitters = await this._statusCheckService
-      .getAllCommittersByPullRequestId(
-        data.repository.fullName,
-        data.pullRequest.number
-      );
+    const allAuthors = await this._statusCheckService.getAllAuthorsByPullRequestId(
+      data.repository.fullName,
+      data.pullRequest.number
+    );
 
-    if (!allCommitters.length) {
+    if (!allAuthors.length) {
       throw new Error(
-        "Failed to extract the committers emails for the pull request."
+        "Failed to extract the author emails for the pull request."
       );
     }
 
-    // Store committers in the input state, so we don't need to fetch
-    // again the same information when validating each committer
+    // Store authors in the input state, so we don't need to fetch
+    // again the same information when validating each author
     // (when each of them authorizes our app);
-    data.committers = allCommitters.map((email) => email.toLowerCase());
+    data.authors = allAuthors.map((email) => email.toLowerCase());
 
     let status: StatusCheckInput;
 
     const challengeUrl = this.getTargetUrlWithChallenge(data);
-    const allCommittersHaveSignedTheCla = await this
-      .allCommittersHaveSignedTheCla(
-        allCommitters
-      );
+    const allAuthorsHaveSignedTheCla = await this.allAuthorsHaveSignedTheCla(
+      allAuthors
+    );
 
-    if (allCommittersHaveSignedTheCla) {
+    if (allAuthorsHaveSignedTheCla) {
       status = new StatusCheckInput(
         CheckState.success,
         this.getSuccessStatusTargetUrl(

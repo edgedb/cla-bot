@@ -41,12 +41,12 @@ export class GitHubStatusChecksAPI implements StatusChecksService {
   }
 
   @async_retry()
-  async getAllCommittersByPullRequestId(
+  async getAllAuthorsByPullRequestId(
     targetRepoFullName: string,
     pullRequestNumber: number
   ): Promise<string[]> {
     let pageNumber = 0;
-    const committersEmails: string[] = [];
+    const authorsEmails = new Set<string>();
 
     // GitHub returns commits in pages of 30 items;
     // we have two ways to know when we should stop fetching commits:
@@ -62,11 +62,7 @@ export class GitHubStatusChecksAPI implements StatusChecksService {
       const data: GitHubCommitItem[] = await response.json();
 
       data.forEach((item) => {
-        const committerEmail = item.commit.committer.email;
-
-        if (committersEmails.indexOf(committerEmail) === -1) {
-          committersEmails.push(item.commit.committer.email);
-        }
+        authorsEmails.add(item.commit.author.email);
       });
 
       if (!data.length || !hasMoreItems(response)) {
@@ -76,7 +72,7 @@ export class GitHubStatusChecksAPI implements StatusChecksService {
       pageNumber += 1;
     }
 
-    return committersEmails;
+    return Array.from(authorsEmails);
   }
 
   @async_retry()
@@ -86,8 +82,9 @@ export class GitHubStatusChecksAPI implements StatusChecksService {
     pullRequestHeadSha: string,
     data: StatusCheckInput
   ): Promise<void> {
-    const accessToken = await this._access_token_handler
-      .getAccessTokenForAccount(targetAccountId);
+    const accessToken = await this._access_token_handler.getAccessTokenForAccount(
+      targetAccountId
+    );
 
     const response = await fetch(
       `https://api.github.com/repos/${targetRepoFullName}/statuses/${pullRequestHeadSha}`,
