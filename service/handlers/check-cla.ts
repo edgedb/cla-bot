@@ -52,7 +52,9 @@ class ClaCheckHandler {
     // We create a JWT token, to ensure that the user cannot modify the
     // parameter
     const token = this._tokensHandler.createToken(data);
-    return `${this._settings.url}/contributor-license-agreement?state=${token}`;
+    return (
+      `${this._settings.url}/contributor-license-agreement?state=${token}`
+    );
   }
 
   getSignedComment(signedUrl: string): string {
@@ -156,10 +158,11 @@ class ClaCheckHandler {
       return;
     }
 
-    const allAuthors = await this._statusCheckService.getAllAuthorsByPullRequestId(
-      data.repository.fullName,
-      data.pullRequest.number
-    );
+    const allAuthors = await this._statusCheckService
+      .getAllAuthorsByPullRequestId(
+        data.repository.fullName,
+        data.pullRequest.number
+      );
 
     if (!allAuthors.length) {
       throw new Error(

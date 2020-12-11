@@ -82,9 +82,10 @@ export class GitHubStatusChecksAPI implements StatusChecksService {
     pullRequestHeadSha: string,
     data: StatusCheckInput
   ): Promise<void> {
-    const accessToken = await this._access_token_handler.getAccessTokenForAccount(
-      targetAccountId
-    );
+    const accessToken = await this._access_token_handler
+      .getAccessTokenForAccount(
+        targetAccountId
+      );
 
     const response = await fetch(
       `https://api.github.com/repos/${targetRepoFullName}/statuses/${pullRequestHeadSha}`,
