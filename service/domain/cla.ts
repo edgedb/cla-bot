@@ -15,7 +15,7 @@ export interface ClaCheckPullRequest {
 
 export interface ClaCheckInput {
   gitHubUserId: number;
-  committers: string[] | null;
+  authors: string[] | null;
   agreementVersionId: string | null;
   repository: ClaCheckRepository;
   pullRequest: ClaCheckPullRequest;

@@ -23,7 +23,7 @@ export class StatusCheckInput {
 }
 
 export interface StatusChecksService {
-  getAllCommittersByPullRequestId(
+  getAllAuthorsByPullRequestId(
     targetRepoFullName: string,
     pullRequestNumber: number
   ): Promise<string[]>;

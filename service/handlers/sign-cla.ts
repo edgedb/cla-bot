@@ -61,12 +61,12 @@ class SignClaHandler {
     return cla;
   }
 
-  private getAllCommitters(data: ClaCheckInput): string[] {
-    if (data.committers) {
-      return data.committers;
+  private getAllAuthors(data: ClaCheckInput): string[] {
+    if (data.authors) {
+      return data.authors;
     }
 
-    throw new Error("Missing committers information in state.");
+    throw new Error("Missing authors information in state.");
   }
 
   async completeClaCheck(data: ClaCheckInput): Promise<void> {
@@ -107,10 +107,10 @@ class SignClaHandler {
 
   async checkIfAllSigned(
     data: ClaCheckInput,
-    committers: string[]
+    authors: string[]
   ): Promise<void> {
     const handler = this._claCheckHandler;
-    const allSigned = await handler.allCommittersHaveSignedTheCla(committers);
+    const allSigned = await handler.allAuthorsHaveSignedTheCla(authors);
 
     if (allSigned) {
       await this.completeClaCheck(data);
@@ -118,7 +118,7 @@ class SignClaHandler {
   }
 
   private getAllMatchingEmails(
-    committers: string[],
+    authors: string[],
     userEmails: EmailInfo[]
   ): EmailInfo[] {
     return userEmails.filter((emailInfo) => {
@@ -127,7 +127,7 @@ class SignClaHandler {
         return false;
       }
 
-      return committers.indexOf(emailInfo.email.toLowerCase()) > -1;
+      return authors.indexOf(emailInfo.email.toLowerCase()) > -1;
     });
   }
 
@@ -180,7 +180,7 @@ class SignClaHandler {
     // using several email addresses, and being owner of all of them.
     //
     const data = this.parseState(rawState);
-    const committers = this.getAllCommitters(data);
+    const authors = this.getAllAuthors(data);
     const user = await this._usersService.getUserInfoFromAccessToken(
       accessToken
     );
@@ -188,7 +188,7 @@ class SignClaHandler {
       accessToken
     );
 
-    const matchingEmails = this.getAllMatchingEmails(committers, userEmails);
+    const matchingEmails = this.getAllMatchingEmails(authors, userEmails);
 
     if (!matchingEmails.length) {
       // The user who signed in is not among those who contributed to the PR
@@ -199,7 +199,7 @@ class SignClaHandler {
       throw new SafeError(
         `Thank you for authorizing our application, but the CLA must be signed ` +
           `by the users who contributed to the PR. ` +
-          `Committers emails are: ${committers}.`
+          `Authors emails are: ${authors}.`
       );
     }
 
@@ -209,11 +209,11 @@ class SignClaHandler {
       this.readAgreementVersionId(data)
     );
 
-    if (committers.length === 1) {
-      // single committer: the CLA is signed
+    if (authors.length === 1) {
+      // single author: the CLA is signed
       await this.completeClaCheck(data);
     } else {
-      await this.checkIfAllSigned(data, committers);
+      await this.checkIfAllSigned(data, authors);
     }
 
     return {
