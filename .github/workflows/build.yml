@@ -15,11 +15,6 @@ jobs:
       - name: Install dependencies
         run: |
           yarn install
-      - name: Temporary fix for edgedb package
-        run: |
-          FILE="node_modules/edgedb/dist/src/pool.d.ts" && \
-          sed -i -E 's, } from "./ifaces";,\, onConnectionClose } from "./ifaces";,' $FILE && \
-          sed -i -E 's,private \[holderAttr\];$,private [holderAttr];\r    [onConnectionClose](): void;\r,' $FILE
       - name: Run tslint tests
         run: |
           yarn tslint --project .
