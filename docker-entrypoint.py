@@ -168,6 +168,8 @@ def main() -> None:
     if 'cla' not in databases:
         edgedb('create-database', 'cla', settings=env_variables, check=True)
 
+    os.environ["EDGEDB_DATABASE"] = "cla"
+
     # Apply migrations
     edgedb('-d', 'cla', 'migrate', settings=env_variables)
 

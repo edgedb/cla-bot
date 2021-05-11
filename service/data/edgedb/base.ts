@@ -6,8 +6,7 @@ import {ConflictError, SafeError} from "../../common/web";
 @injectable()
 export class EdgeDBRepository {
   async run<T>(action: (connection: Connection) => Promise<T>): Promise<T> {
-    const pool = await getPool();
-    const connection = await pool.acquire();
+    const connection = await getPool();
     try {
       return await action(connection);
     } catch (error) {
@@ -29,8 +28,6 @@ export class EdgeDBRepository {
       }
 
       throw error;
-    } finally {
-      await pool.release(connection);
     }
   }
 }

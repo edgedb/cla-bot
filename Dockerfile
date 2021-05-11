@@ -1,21 +1,15 @@
-FROM node:13.3.0-buster-slim AS builder
+FROM node:14.16-buster-slim AS builder
 WORKDIR /app
-RUN npm install -g yarn
 
 COPY . .
 
 RUN yarn install
 
-# Temporary fix for edgedb package:
-RUN FILE="node_modules/edgedb/dist/src/pool.d.ts" && \
-  sed -i -E 's, } from "./ifaces";,\, onConnectionClose } from "./ifaces";,' $FILE && \
-  sed -i -E 's,private \[holderAttr\];$,private [holderAttr];\r    [onConnectionClose](): void;\r,' $FILE
-
 RUN yarn next build
 
 FROM edgedb/edgedb-cli:linux-x86_64-latest AS edgedbcli
 
-FROM node:13.3.0-buster-slim AS final
+FROM node:14.16-buster-slim AS final
 WORKDIR /app
 COPY --from=builder /app .
 COPY --from=edgedbcli /usr/bin/edgedb /usr/bin/edgedb

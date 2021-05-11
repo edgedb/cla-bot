@@ -13,8 +13,7 @@ A full setup requires also:
 
 - a configured OAuth application in GitHub
 - a configured GitHub application in GitHub
-- an instance of EdgeDB with a database configured running
-  `migrations/structure.edgeql`
+- an EdgeDB instance configured with schema from `dbschema/`
 - `.env` file populated with proper application settings
 - a web hook for pull requests
 
