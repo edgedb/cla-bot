@@ -1,14 +1,17 @@
 import {getPool} from "./connect";
 import {injectable} from "inversify";
-import {ConstraintViolationError, Connection} from "edgedb";
+import {ConstraintViolationError} from "edgedb";
 import {ConflictError, SafeError} from "../../common/web";
+import { Executor } from "edgedb/dist/src/ifaces";
 
 @injectable()
 export class EdgeDBRepository {
-  async run<T>(action: (connection: Connection) => Promise<T>): Promise<T> {
+  async run<T>(action: (connection: Executor) => Promise<T>): Promise<T> {
     const connection = await getPool();
     try {
-      return await action(connection);
+      return connection.retryingTransaction(async tx => {
+        return await action(tx);
+      })
     } catch (error) {
       // handles common errors in a centralized manner, rethrowing exceptions
       // that handled by the front-end and used to return information
