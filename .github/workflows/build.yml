@@ -17,10 +17,10 @@ jobs:
           yarn install
       - name: Run tslint tests
         run: |
-          yarn tslint --project .
+          yarn lint
       - name: Run tests
         run: |
-          npm t
+          yarn test
       - name: Create production build
         run: |
           yarn next build

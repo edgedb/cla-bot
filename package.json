@@ -57,10 +57,11 @@
     "prettier": "^2.3.0",
     "ts-node": "^9.1.1",
     "tslint": "^6.1.0",
-    "typescript": "^4.2.4"
+    "typescript": "^4.4.4"
   },
   "scripts": {
     "format": "prettier --config .prettierrc --write './**/*.ts' './**/*.tsx'",
+    "lint": "tslint --project .",
     "test": "cross-env TS_NODE_COMPILER_OPTIONS='{ \"module\": \"commonjs\" }' mocha -r ts-node/register tests/**/*.test.ts",
     "coverage": "cross-env TS_NODE_COMPILER_OPTIONS='{ \"module\": \"commonjs\" }' nyc -r text -e .ts -x \"tests/*.test.ts\" npm run test"
   }

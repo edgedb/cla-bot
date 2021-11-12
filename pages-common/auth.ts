@@ -41,7 +41,7 @@ function readJWTBearer(req: NextApiRequest): Promise<object> {
     } catch (error) {
       // tslint:disable-next-line: no-console
       console.log(`JWT validation failure: ${error}`);
-      return reject(getMessageForError(error));
+      return reject(getMessageForError(error as Error));
     }
 
     resolve(identity);
@@ -67,7 +67,7 @@ export function auth(
   return new Promise((resolve, reject) => {
     readJWTBearer(req).then(
       (user) => {
-        ((req as unknown) as AuthContext).user = user;
+        (req as unknown as AuthContext).user = user;
         resolve(user);
       },
       (error) => {

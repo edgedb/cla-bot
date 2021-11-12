@@ -32,7 +32,7 @@ export function async_retry(
     // delay between retries.
     const originalMethod = descriptor.value;
 
-    descriptor.value = async function(...args: any[]): Promise<any> {
+    descriptor.value = async function (...args: any[]): Promise<any> {
       let attempt = 0;
 
       while (true) {
@@ -46,7 +46,7 @@ export function async_retry(
           attempt += 1;
 
           if (attempt > times) {
-            throw new RetryError(error, propertyKey);
+            throw new RetryError(error as Error, propertyKey);
           }
 
           if (delay > 0) await timeout(delay);
