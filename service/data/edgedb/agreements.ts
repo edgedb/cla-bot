@@ -18,8 +18,8 @@ interface TextEntity {
   title: string;
   text: string;
   culture: string;
-  update_time: string;
-  creation_time: string;
+  update_time: Date;
+  creation_time: Date;
 }
 
 interface VersionEntity {
@@ -55,11 +55,19 @@ function mapVersionEntity(entity: VersionEntity): AgreementVersion {
 }
 
 @injectable()
-export class EdgeDBAgreementsRepository extends EdgeDBRepository
-  implements AgreementsRepository {
+export class EdgeDBAgreementsRepository
+  extends EdgeDBRepository
+  implements AgreementsRepository
+{
   async getAgreement(agreementId: string): Promise<Agreement | null> {
-    const items = await this.run(async (connection) => {
-      return await connection.query(
+    const agreement = await this.run(async (connection) => {
+      return await connection.querySingle<{
+        id: string;
+        name: string;
+        description: string;
+        creation_time: Date;
+        versions: VersionEntity[];
+      }>(
         `SELECT Agreement {
           name,
           description,
@@ -76,25 +84,22 @@ export class EdgeDBAgreementsRepository extends EdgeDBRepository
       );
     });
 
-    if (!items.length) return null;
-
-    const agreement = items[0];
-    const versions = agreement.versions as VersionEntity[];
+    if (!agreement) return null;
 
     return new Agreement(
       agreement.id,
       agreement.name,
       agreement.description,
       agreement.creation_time,
-      versions.map(mapVersionEntity)
+      agreement.versions.map(mapVersionEntity)
     );
   }
 
   async getAgreementVersion(
     versionId: string
   ): Promise<AgreementVersion | null> {
-    const items = await this.run(async (connection) => {
-      return await connection.query(
+    const item = await this.run(async (connection) => {
+      return await connection.querySingle<VersionEntity>(
         `SELECT AgreementVersion {
           current,
           draft,
@@ -114,9 +119,9 @@ export class EdgeDBAgreementsRepository extends EdgeDBRepository
       );
     });
 
-    if (!items.length) return null;
+    if (!item) return null;
 
-    return mapVersionEntity(items[0] as VersionEntity);
+    return mapVersionEntity(item);
   }
 
   async updateAgreement(
@@ -125,7 +130,7 @@ export class EdgeDBAgreementsRepository extends EdgeDBRepository
     description: string
   ): Promise<void> {
     await this.run(async (connection) => {
-      await connection.queryOne(
+      await connection.queryRequiredSingle(
         `
         UPDATE Agreement
         FILTER .id = <uuid>$id
@@ -151,7 +156,7 @@ export class EdgeDBAgreementsRepository extends EdgeDBRepository
     body: string
   ): Promise<void> {
     await this.run(async (connection) => {
-      await connection.queryOne(
+      await connection.queryRequiredSingle(
         `
         UPDATE AgreementText
         FILTER .id = <uuid>$id
@@ -173,7 +178,7 @@ export class EdgeDBAgreementsRepository extends EdgeDBRepository
 
   async updateAgreementVersion(id: string, draft: boolean): Promise<void> {
     await this.run(async (connection) => {
-      await connection.queryOne(
+      await connection.queryRequiredSingle(
         `
         UPDATE AgreementVersion
         FILTER .id = <uuid>$id
@@ -192,13 +197,18 @@ export class EdgeDBAgreementsRepository extends EdgeDBRepository
   async getCurrentAgreementVersionForRepository(
     repositoryFullName: string
   ): Promise<RepositoryAgreementInfo | null> {
-    const items = await this.run(async (connection) => {
-      return await connection.query(
+    const item = await this.run(async (connection) => {
+      return await connection.querySingle<{
+        id: string;
+        agreement: {currentVersion: {id: string} | null};
+      }>(
         `SELECT Repository {
           agreement: {
-            versions: {
-              id
-            } FILTER .current = True and .texts.culture = <str>$culture LIMIT 1
+            currentVersion := assert_single(
+              .versions {
+                id
+              } FILTER .current = True and .texts.culture = <str>$culture
+            )
           }
         } FILTER .full_name = <str>$full_name;`,
         {
@@ -208,10 +218,10 @@ export class EdgeDBAgreementsRepository extends EdgeDBRepository
       );
     });
 
-    if (!items.length) return null;
+    if (!item) return null;
 
-    const currentVersion = items[0].agreement?.versions[0];
-    if (currentVersion === undefined) {
+    const currentVersion = item.agreement.currentVersion;
+    if (!currentVersion) {
       return null;
     }
     return new RepositoryAgreementInfo(currentVersion.id);
@@ -221,19 +231,37 @@ export class EdgeDBAgreementsRepository extends EdgeDBRepository
     repositoryFullName: string,
     cultureCode: string
   ): Promise<AgreementText | null> {
-    const items = await this.run(async (connection) => {
-      return await connection.query(
+    const item = await this.run(async (connection) => {
+      return await connection.querySingle<{
+        agreement: {
+          currentVersion: {
+            id: string;
+            text: {
+              id: string;
+              text: string;
+              title: string;
+              culture: string;
+              update_time: Date;
+              creation_time: Date;
+            };
+          };
+        };
+      }>(
         `SELECT Repository {
           agreement: {
-            versions: {
-              texts: {
-                text,
-                title,
-                culture,
-                update_time,
-                creation_time
-              } FILTER .culture = <str>$culture LIMIT 1
-            } FILTER .current = True LIMIT 1
+            currentVersion := assert_single(
+              .versions {
+                text := assert_single (
+                  .texts {
+                    text,
+                    title,
+                    culture,
+                    update_time,
+                    creation_time
+                  } FILTER .culture = <str>$culture
+                )
+              } FILTER .current = True
+            )
           }
         } FILTER .full_name = <str>$full_name;`,
         {
@@ -243,10 +271,10 @@ export class EdgeDBAgreementsRepository extends EdgeDBRepository
       );
     });
 
-    if (!items.length) return null;
+    if (!item) return null;
 
-    const currentVersion = items[0].agreement?.versions[0];
-    const versionText = currentVersion.texts[0] as TextEntity;
+    const currentVersion = item.agreement.currentVersion;
+    const versionText = currentVersion.text;
     const text = mapTextEntity(versionText);
     text.versionId = currentVersion.id;
     return text;
@@ -256,14 +284,19 @@ export class EdgeDBAgreementsRepository extends EdgeDBRepository
     versionId: string,
     cultureCode: string
   ): Promise<AgreementText | null> {
-    const items = await this.run(async (connection) => {
-      return await connection.query(
+    const version = await this.run(async (connection) => {
+      return await connection.querySingle<{
+        id: string;
+        text: {text: string; title: string; culture: string};
+      }>(
         `SELECT AgreementVersion {
-          texts: {
-            text,
-            title,
-            culture
-          } FILTER .culture = <str>$culture LIMIT 1
+          text := assert_single(
+            .texts {
+              text,
+              title,
+              culture
+            } FILTER .culture = <str>$culture
+          )
         } FILTER .id = <uuid>$version_id;`,
         {
           culture: cultureCode,
@@ -272,44 +305,20 @@ export class EdgeDBAgreementsRepository extends EdgeDBRepository
       );
     });
 
-    if (!items.length) return null;
+    if (!version) return null;
 
-    const version = items[0];
-    const versionText = version.texts[0] as TextEntity;
+    const versionText = version.text as TextEntity;
     return mapTextEntity(versionText);
-  }
-
-  async getLicenseForRepository(
-    fullRepositoryName: string,
-    cultureCode: string
-  ): Promise<string | null> {
-    const items = await this.run(async (connection) => {
-      return await connection.query(
-        `SELECT Repository {
-          agreement: {
-            versions: {
-              texts: {
-                text
-              } FILTER .culture = <str>$culture
-            } FILTER .current = True
-          }
-        } FILTER .full_name = <str>$full_name;`,
-        {
-          culture: cultureCode,
-          full_name: fullRepositoryName,
-        }
-      );
-    });
-
-    if (!items.length) return null;
-
-    const item = items[0];
-    return item.license?.versions[0]?.texts[0]?.text || null;
   }
 
   async getAgreements(): Promise<AgreementListItem[]> {
     const items = await this.run(async (connection) => {
-      return await connection.query(
+      return await connection.query<{
+        id: string;
+        name: string;
+        description: string;
+        creation_time: Date;
+      }>(
         `SELECT Agreement {
           name,
           description,
@@ -331,7 +340,12 @@ export class EdgeDBAgreementsRepository extends EdgeDBRepository
 
   async getCompleteAgreements(): Promise<AgreementListItem[]> {
     const items = await this.run(async (connection) => {
-      return await connection.query(
+      return await connection.query<{
+        id: string;
+        name: string;
+        description: string;
+        creation_time: Date;
+      }>(
         `SELECT Agreement {
           name,
           description,
@@ -360,7 +374,7 @@ export class EdgeDBAgreementsRepository extends EdgeDBRepository
 
     return await this.run(async (connection) => {
       const creationTime = new Date();
-      const result = await connection.query(
+      const item = await connection.queryRequiredSingle<{id: string}>(
         `
         INSERT Agreement {
           name := <str>$name,
@@ -390,7 +404,6 @@ export class EdgeDBAgreementsRepository extends EdgeDBRepository
           initial_culture: "en",
         }
       );
-      const item = result[0];
       return new AgreementListItem(item.id, name, description, creationTime);
     });
   }
@@ -432,7 +445,7 @@ export class EdgeDBAgreementsRepository extends EdgeDBRepository
     const {title, text, culture} = texts[0];
 
     return await this.run(async (connection) => {
-      const items = await connection.query(
+      const item = await connection.querySingle(
         `
         UPDATE Agreement
         FILTER
@@ -461,11 +474,11 @@ export class EdgeDBAgreementsRepository extends EdgeDBRepository
         }
       );
 
-      if (!items.length) throw new ServerError("Expected a result.");
+      if (!item) throw new ServerError("Expected a result.");
 
       // TODO: how to get the new item id?
       // I would like to return it
-      return mapVersionEntity(items[0] as VersionEntity);
+      return mapVersionEntity(item as VersionEntity);
     });
   }
 }

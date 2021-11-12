@@ -1,17 +1,7 @@
-import {createPool, Pool} from "edgedb";
-import {getEnvSettingOrDefault} from "../../common/settings";
+import {Client, createClient} from "edgedb";
 
-let pool: Pool | undefined;
+const client = createClient();
 
-export async function getPool(): Promise<Pool> {
-  if (pool === undefined) {
-    pool = await createPool({
-      connectOptions: {
-        database: getEnvSettingOrDefault("EDGEDB_DATABASE", "edgedb"),
-      },
-      minSize: 1,
-    });
-  }
-
-  return pool;
+export async function getClient(): Promise<Client> {
+  return client.ensureConnected();
 }

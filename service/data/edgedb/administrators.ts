@@ -6,11 +6,13 @@ import {
 } from "../../domain/administrators";
 
 @injectable()
-export class EdgeDBAdministratorsRepository extends EdgeDBRepository
-  implements AdministratorsRepository {
+export class EdgeDBAdministratorsRepository
+  extends EdgeDBRepository
+  implements AdministratorsRepository
+{
   async getAdministrators(): Promise<Administrator[]> {
     const items = await this.run(async (connection) => {
-      return await connection.query(
+      return await connection.query<{id: string; email: string}>(
         `SELECT Administrator {
           id,
           email
@@ -22,25 +24,23 @@ export class EdgeDBAdministratorsRepository extends EdgeDBRepository
   }
 
   async getAdministratorByEmail(email: string): Promise<Administrator | null> {
-    const items = await this.run(async (connection) => {
-      return await connection.query(
+    const item = await this.run(async (connection) => {
+      return await connection.querySingle<{id: string; email: string}>(
         `SELECT Administrator {
           id,
           email
-        } FILTER .email = <str>$email LIMIT 1;`,
+        } FILTER .email = <str>$email;`,
         {
           email,
         }
       );
     });
 
-    if (!items.length) {
+    if (!item) {
       return null;
     }
 
-    const singleItem = items[0];
-
-    return new Administrator(singleItem.id, singleItem.email);
+    return new Administrator(item.id, item.email);
   }
 
   async addAdministrator(email: string): Promise<void> {
@@ -60,7 +60,7 @@ export class EdgeDBAdministratorsRepository extends EdgeDBRepository
 
   async removeAdministrator(id: string): Promise<void> {
     await this.run(async (connection) => {
-      await connection.queryOne(
+      await connection.queryRequiredSingle(
         `
         DELETE Administrator FILTER .id = <uuid>$id
         `,

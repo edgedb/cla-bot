@@ -11,13 +11,15 @@ interface ClaItem {
 }
 
 @injectable()
-export class EdgeDBClaRepository extends EdgeDBRepository
-  implements ClaRepository {
+export class EdgeDBClaRepository
+  extends EdgeDBRepository
+  implements ClaRepository
+{
   async getClaByEmailAddress(
     email: string
   ): Promise<ContributorLicenseAgreement | null> {
-    const signed_cla: ClaItem[] = await this.run(async (connection) => {
-      return await connection.query(
+    const signed_cla = await this.run(async (connection) => {
+      return await connection.querySingle<ClaItem>(
         `SELECT ContributorLicenseAgreement {
           email,
           username,
@@ -29,14 +31,13 @@ export class EdgeDBClaRepository extends EdgeDBRepository
       );
     });
 
-    if (signed_cla.length) {
-      const item = signed_cla[0];
+    if (signed_cla) {
       return new ContributorLicenseAgreement(
-        item.id,
-        item.email,
-        item.username,
-        item.versionId,
-        item.creation_time
+        signed_cla.id,
+        signed_cla.email,
+        signed_cla.username,
+        signed_cla.versionId,
+        signed_cla.creation_time
       );
     }
 
@@ -45,7 +46,7 @@ export class EdgeDBClaRepository extends EdgeDBRepository
 
   async saveCla(data: ContributorLicenseAgreement): Promise<void> {
     await this.run(async (connection) => {
-      const result = await connection.query(
+      const result = await connection.queryRequiredSingle<{id: string}>(
         `
         INSERT ContributorLicenseAgreement {
           email := <str>$email,
@@ -61,7 +62,7 @@ export class EdgeDBClaRepository extends EdgeDBRepository
           creation_time: data.signedAt,
         }
       );
-      data.id = result[0].id;
+      data.id = result.id;
     });
   }
 }
