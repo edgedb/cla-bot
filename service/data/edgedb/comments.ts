@@ -3,23 +3,28 @@ import {EdgeDBRepository} from "./base";
 import {injectable} from "inversify";
 
 @injectable()
-export class EdgeDBCommentsRepository extends EdgeDBRepository
-  implements CommentsRepository {
+export class EdgeDBCommentsRepository
+  extends EdgeDBRepository
+  implements CommentsRepository
+{
   async getCommentInfoByPullRequestId(
     pullRequestId: number
   ): Promise<CommentInfo | null> {
-    const items = await this.run(async (connection) => {
-      return await connection.query(
+    const item = await this.run(async (connection) => {
+      return await connection.querySingle<{
+        id: string;
+        comment_id: string;
+        creation_time: Date;
+      }>(
         `SELECT CommentInfo {
           comment_id,
           creation_time
-        } FILTER .pull_request_id = <int64>$0 limit 1;`,
+        } FILTER .pull_request_id = <int64>$0`,
         [pullRequestId]
       );
     });
 
-    if (items.length) {
-      const item = items[0];
+    if (item) {
       return {
         id: item.id,
         commentId: item.comment_id,

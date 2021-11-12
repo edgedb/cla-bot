@@ -3,11 +3,18 @@ import {injectable} from "inversify";
 import {RepositoriesRepository, Repository} from "../../domain/repositories";
 
 @injectable()
-export class EdgeDBRepositoriesRepository extends EdgeDBRepository
-  implements RepositoriesRepository {
+export class EdgeDBRepositoriesRepository
+  extends EdgeDBRepository
+  implements RepositoriesRepository
+{
   async getConfiguredRepositories(): Promise<Repository[]> {
     const items = await this.run(async (connection) => {
-      return await connection.query(
+      return await connection.query<{
+        id: string;
+        full_name: string;
+        agreementId: string;
+        agreementName: string;
+      }>(
         `SELECT Repository {
           full_name,
           agreementId := .agreement.id,
@@ -49,7 +56,7 @@ export class EdgeDBRepositoriesRepository extends EdgeDBRepository
 
   async deleteRepositoryConfiguration(id: string): Promise<void> {
     await this.run(async (connection) => {
-      await connection.queryOne(
+      await connection.queryRequiredSingle(
         `
         DELETE Repository FILTER .id = <uuid>$id
         `,
