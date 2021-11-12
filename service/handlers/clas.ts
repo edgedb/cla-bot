@@ -99,7 +99,7 @@ export class ClasHandler {
           results.push({
             success: false,
             entry: simplifyEntry(entry),
-            error: error.toString(),
+            error: (error as Error).toString(),
           });
         }
       }

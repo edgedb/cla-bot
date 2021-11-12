@@ -64,7 +64,11 @@ export class TokensHandler {
     try {
       return this.verifyToken(rawToken);
     } catch (error) {
-      throw new SafeError("Token validation error.", error);
+      throw new SafeError(
+        "Token validation error.",
+        undefined,
+        error as Error
+      );
     }
   }
 }
