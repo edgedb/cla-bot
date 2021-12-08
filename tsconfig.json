@@ -28,7 +28,8 @@
       "./node_modules/@types"
     ],
     "allowJs": false,
-    "skipLibCheck": false
+    "skipLibCheck": false,
+    "incremental": true
   },
   "exclude": [
     "node_modules"
