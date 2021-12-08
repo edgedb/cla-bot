@@ -1575,10 +1575,10 @@ ecdsa-sig-formatter@1.0.11:
   dependencies:
     safe-buffer "^5.0.1"
 
-edgedb@^0.16.0:
-  version "0.16.0"
-  resolved "https://registry.yarnpkg.com/edgedb/-/edgedb-0.16.0.tgz#c3cafb9979dfc8fce69b39e9756804fe2d6627b4"
-  integrity sha512-mYYOf6qQwK2IL9gYUqG7e4SY4XQOwMQ0uvonZd74Tei7ebeugcAhkeb2zN+wg+QTEmQwHqZOIvPEOoRGlCCGRg==
+edgedb@^0.17.0:
+  version "0.17.0"
+  resolved "https://registry.yarnpkg.com/edgedb/-/edgedb-0.17.0.tgz#885e257009834ee52f8d8c6deba1de75f646e41f"
+  integrity sha512-ApCEKsBD0RU85tPVlawMju1tkCA5JV9lX2AC0wu04WNuymmXHrqIKToZj9TAIKBjp41GtAYnMFQVZ2KgjV7UbQ==
 
 electron-to-chromium@^1.3.723, electron-to-chromium@^1.3.896:
   version "1.4.12"
