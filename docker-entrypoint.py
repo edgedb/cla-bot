@@ -8,6 +8,7 @@ import os
 import shutil
 import subprocess
 import sys
+import tempfile
 
 import boto3
 
@@ -53,6 +54,7 @@ def write_pem_file(pem: str):
 def get_env_variables(
     edgedb_host: str,
     edgedb_password: str,
+    edgedb_tls_ca: str,
     github_application_id: str,
     oauth_application_id: str,
     oauth_application_secret: str,
@@ -69,6 +71,7 @@ def get_env_variables(
         "EDGEDB_HOST": edgedb_host or "127.0.0.1",
         "EDGEDB_USER": "edgedb",
         "EDGEDB_PASSWORD": edgedb_password,
+        "EDGEDB_TLS_CA": edgedb_tls_ca,
         "GITHUB_RSA_PRIVATE_KEY": "private-key.pem",
         "GITHUB_APPLICATION_ID": github_application_id,
         "GITHUB_OAUTH_APPLICATION_ID": oauth_application_id,
@@ -91,13 +94,23 @@ def edgedb(
     if not edgedb_cli:
         raise RuntimeError('missing edgedb-cli executable')
 
+    cli_args = [
+        '--user', settings['EDGEDB_USER'],
+        '--host', settings['EDGEDB_HOST'],
+        '--password-from-stdin',
+    ]
+
+    ca_file = settings.get('EDGEDB_TLS_CA_FILE')
+    if ca_file:
+        cli_args.extend([
+            '--tls-ca-file', ca_file
+        ])
+
     try:
         return subprocess.run(
             [
                 edgedb_cli,
-                '--user', settings['EDGEDB_USER'],
-                '--host', settings['EDGEDB_HOST'],
-                '--password-from-stdin',
+                *cli_args,
                 *args,
             ],
             input=settings['EDGEDB_PASSWORD'],
@@ -145,6 +158,7 @@ def main() -> None:
     env_variables = get_env_variables(
         get_secret(secrets_manager, "EDGEDB_HOST"),
         get_secret(secrets_manager, "EDGEDB_PASSWORD"),
+        get_secret(secrets_manager, "EDGEDB_TLS_CA"),
         get_secret(secrets_manager, "GITHUB_APPLICATION_ID"),
         get_secret(secrets_manager, "GITHUB_OAUTH_APPLICATION_ID"),
         get_secret(secrets_manager, "GITHUB_OAUTH_APPLICATION_SECRET"),
@@ -157,29 +171,39 @@ def main() -> None:
     for key, value in env_variables.items():
         os.environ[key] = value
 
-    # Create the "cla" database if not exists
-    # TODO: replace this with `create-database --if-not-exists`
-    # once supported.
-    databases = set(edgedb_output(
-        'list-databases',
-        settings=env_variables,
-    ).split('\n'))
+    ca = env_variables["EDGEDB_TLS_CA"]
+    with tempfile.NamedTemporaryFile("wt") as ca_file:
+        ca_file.write(ca)
+        ca_file.flush()
+        env_variables["EDGEDB_TLS_CA_FILE"] = ca_file.name
+        os.environ["EDGEDB_TLS_CA_FILE"] = ca_file.name
 
-    if 'cla' not in databases:
-        edgedb('create-database', 'cla', settings=env_variables, check=True)
+        # Create the "cla" database if not exists
+        # TODO: replace this with `create-database --if-not-exists`
+        # once supported.
+        databases = set(edgedb_output(
+            'list', 'databases',
+            settings=env_variables,
+        ).split('\n'))
 
-    os.environ["EDGEDB_DATABASE"] = "cla"
+        if 'cla' not in databases:
+            edgedb(
+                'create-database', 'cla',
+                settings=env_variables,
+                check=True)
 
-    # Apply migrations
-    edgedb('-d', 'cla', 'migrate', settings=env_variables)
+        os.environ["EDGEDB_DATABASE"] = "cla"
 
-    # start the next application
-    yarn_executable = shutil.which("yarn")
+        # Apply migrations
+        edgedb('-d', 'cla', 'migrate', settings=env_variables)
 
-    if not yarn_executable:
-        raise RuntimeError("Missing yarn executable")
+        # start the next application
+        yarn_executable = shutil.which("yarn")
 
-    os.execv(yarn_executable, ("yarn", "next", "start", "-p", "80"))
+        if not yarn_executable:
+            raise RuntimeError("Missing yarn executable")
+
+        os.execv(yarn_executable, ("yarn", "next", "start", "-p", "80"))
 
 
 if __name__ == "__main__":

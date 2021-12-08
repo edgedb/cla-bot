@@ -4,6 +4,7 @@
 /.vscode
 /yarn-error.log
 /.env
+/.env.docker
 /.dmypy.json
 /.mypy_cache
 

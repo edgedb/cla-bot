@@ -2,7 +2,6 @@ import {getClient} from "./connect";
 import {injectable} from "inversify";
 import {ConstraintViolationError, Client} from "edgedb";
 import {ConflictError, SafeError} from "../../common/web";
-import { Executor } from "edgedb/dist/src/ifaces";
 
 @injectable()
 export class EdgeDBRepository {
