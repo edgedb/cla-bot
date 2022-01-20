@@ -10,7 +10,7 @@ describe("Async retry decorator", () => {
         this.k = 0;
       }
 
-      @async_retry(5, 1)
+      @async_retry(5, (attempt) => 1)
       async crashing(): Promise<number> {
         this.k += 1;
 

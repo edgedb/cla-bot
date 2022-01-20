@@ -1,4 +1,4 @@
-function timeout(ms: number): Promise<void> {
+function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
@@ -14,9 +14,15 @@ export class RetryError extends Error {
   }
 }
 
+export type BackoffFunction = (n: number) => number;
+
+function defaultBackoff(attempt: number): number {
+  return 2 ** attempt * 100 + Math.random() * 100;
+}
+
 export function async_retry(
   times: number = 3,
-  delay: number = 100
+  backoff: BackoffFunction = defaultBackoff
 ): (
   target: object,
   propertyKey: string,
@@ -49,7 +55,7 @@ export function async_retry(
             throw new RetryError(error as Error, propertyKey);
           }
 
-          if (delay > 0) await timeout(delay);
+          await sleep(backoff(attempt));
         }
       }
     };
