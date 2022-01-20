@@ -41,14 +41,13 @@ class SignClaHandler {
     emailInfo: EmailInfo,
     agreementVersionId: string
   ): Promise<ContributorLicenseAgreement> {
-    const cla = new ContributorLicenseAgreement(
-      uuid(),
-      emailInfo.email.toString(),
+    const cla = {
+      id: uuid(),
+      email: emailInfo.email.toString(),
       username,
-      agreementVersionId,
-      new Date()
-    );
-
+      versionId: agreementVersionId,
+      signedAt: new Date(),
+    }
     await this._claRepository.saveCla(cla);
     return cla;
   }

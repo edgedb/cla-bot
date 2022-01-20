@@ -75,15 +75,14 @@ export class ClasHandler {
           continue;
         }
 
-        await this._clasRepository.saveCla(
-          new ContributorLicenseAgreement(
-            uuid(),
-            entry.email.trim().toLowerCase(),
-            entry.username.trim(),
-            currentVersion.id,
-            new Date()
-          )
-        );
+        await this._clasRepository.saveCla({
+          id: uuid(),
+          email: entry.email.trim().toLowerCase(),
+          username: entry.username.trim(),
+          versionId: currentVersion.id,
+          signedAt: new Date()
+        });
+
         results.push({
           success: true,
           entry: simplifyEntry(entry),

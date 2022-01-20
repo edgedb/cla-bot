@@ -1,4 +1,3 @@
-import fetch from "cross-fetch";
 import {accessHandler, GitHubAccessHandler} from "./clientcredentials";
 import {async_retry} from "../../common/resiliency";
 import {
