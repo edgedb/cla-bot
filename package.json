@@ -15,10 +15,9 @@
     "buffer": "^6.0.3",
     "client-oauth2": "^4.3.3",
     "cross-env": "^7.0.3",
-    "cross-fetch": "^3.1.4",
     "csv-parse": "^4.15.4",
     "dotenv": "^9.0.2",
-    "edgedb": "^0.17.0",
+    "edgedb": "^1.2.1",
     "immer": "^9.0.2",
     "inversify": "^5.1.1",
     "jsonwebtoken": "^8.5.1",
@@ -37,6 +36,7 @@
     "zod": "^1.11.17"
   },
   "devDependencies": {
+    "@edgedb/generate": "^0.1.0",
     "@types/body-parser": "^1.19.2",
     "@types/chai": "^4.2.11",
     "@types/http-errors": "^1.8.2",

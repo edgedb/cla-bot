@@ -221,7 +221,7 @@ class ClaCheckHandler {
       );
 
 
-    let emailsWithoutCla = [];
+    let emailsWithoutCla: string[] = [];
     let challengeUrl = "";
     if (allAuthors.length) {
       // Store authors in the input state, so we don't need to fetch

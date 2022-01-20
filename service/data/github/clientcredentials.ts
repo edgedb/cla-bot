@@ -1,4 +1,3 @@
-import fetch from "cross-fetch";
 import fs from "fs";
 import jwt from "jsonwebtoken";
 import {async_retry} from "../../common/resiliency";

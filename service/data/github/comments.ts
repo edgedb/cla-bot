@@ -1,4 +1,3 @@
-import fetch from "cross-fetch";
 import {async_retry} from "../../common/resiliency";
 import {CommentsService} from "../../domain/comments";
 import {expectSuccessfulResponse} from "../../common/web";

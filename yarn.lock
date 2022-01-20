@@ -1455,13 +1455,6 @@ cross-env@^7.0.3:
   dependencies:
     cross-spawn "^7.0.1"
 
-cross-fetch@^3.1.4:
-  version "3.1.4"
-  resolved "https://registry.yarnpkg.com/cross-fetch/-/cross-fetch-3.1.4.tgz#9723f3a3a247bf8b89039f3a380a9244e8fa2f39"
-  integrity sha512-1eAtFWdIubi6T4XPy6ei9iUFoKpUkIF971QLN8lIvvvwueI65+Nw5haMNKUwfJxabqlIIDODJKGrQ66gxC0PbQ==
-  dependencies:
-    node-fetch "2.6.1"
-
 cross-spawn@^7.0.0, cross-spawn@^7.0.1, cross-spawn@^7.0.3:
   version "7.0.3"
   resolved "https://registry.yarnpkg.com/cross-spawn/-/cross-spawn-7.0.3.tgz#f73a85b9d5d41d045551c177e2882d4ac85728a6"
@@ -1599,10 +1592,10 @@ ecdsa-sig-formatter@1.0.11:
   dependencies:
     safe-buffer "^5.0.1"
 
-edgedb@^0.17.0:
-  version "0.17.0"
-  resolved "https://registry.yarnpkg.com/edgedb/-/edgedb-0.17.0.tgz#885e257009834ee52f8d8c6deba1de75f646e41f"
-  integrity sha512-ApCEKsBD0RU85tPVlawMju1tkCA5JV9lX2AC0wu04WNuymmXHrqIKToZj9TAIKBjp41GtAYnMFQVZ2KgjV7UbQ==
+edgedb@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/edgedb/-/edgedb-1.2.1.tgz#3bed17da3ae7d51c862d91489fcb97b425be1531"
+  integrity sha512-v2QPNfn1BpotGH2WZKwchI4rnHLMqBup2Crq6Nxn2r2K5iMPa+mbW0nM67V8rDZTPz54VuITuV+z2amTvRxEdQ==
 
 ee-first@1.1.1:
   version "1.1.1"
@@ -2834,11 +2827,6 @@ next@^12.3.4:
     "@next/swc-win32-arm64-msvc" "12.3.4"
     "@next/swc-win32-ia32-msvc" "12.3.4"
     "@next/swc-win32-x64-msvc" "12.3.4"
-
-node-fetch@2.6.1:
-  version "2.6.1"
-  resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.1.tgz#045bd323631f76ed2e2b55573394416b639a0052"
-  integrity sha512-V4aYg89jEoVRxRb2fJdAg8FHvI7cEyYdVAh94HH0UIK8oJxUfkjlDQN9RbMx+bEjP7+ggMiFRprSti032Oipxw==
 
 node-gyp@^8.4.1:
   version "8.4.1"
