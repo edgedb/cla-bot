@@ -21,7 +21,7 @@ function defaultBackoff(attempt: number): number {
 }
 
 export function async_retry(
-  times: number = 3,
+  times: number = 6,
   backoff: BackoffFunction = defaultBackoff
 ): (
   target: object,
