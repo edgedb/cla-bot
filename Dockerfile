@@ -3,7 +3,8 @@ WORKDIR /app
 
 COPY . .
 
-RUN yarn install
+# Big packages cause false network connectivity alarms: https://github.com/yarnpkg/yarn/issues/4890
+RUN yarn install --network-timeout 1000000
 
 RUN yarn next build
 
