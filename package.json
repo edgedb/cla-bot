@@ -10,6 +10,7 @@
     "@material-ui/icons": "^4.11.2",
     "@reduxjs/toolkit": "^1.5.1",
     "assert-never": "^1.2.1",
+    "body-parser": "^1.19.1",
     "buffer": "^6.0.3",
     "client-oauth2": "^4.3.3",
     "cross-env": "^7.0.3",
@@ -35,7 +36,9 @@
     "zod": "^1.11.17"
   },
   "devDependencies": {
+    "@types/body-parser": "^1.19.2",
     "@types/chai": "^4.2.11",
+    "@types/http-errors": "^1.8.2",
     "@types/js-yaml": "^4.0.1",
     "@types/jsonwebtoken": "^8.3.9",
     "@types/lodash": "^4.14.161",

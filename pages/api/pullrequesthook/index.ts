@@ -1,15 +1,108 @@
-import {ClaCheckHandler} from "../../service/handlers/check-cla";
-import {ClaCheckInput} from "../../service/domain/cla";
-import {container} from "../../service/di";
+import * as crypto from "crypto";
+
+import {ClaCheckHandler} from "../../../service/handlers/check-cla";
+import {ClaCheckInput} from "../../../service/domain/cla";
+import {TYPES} from "../../../constants/types";
 import {NextApiRequest, NextApiResponse} from "next";
-import {TYPES} from "../../constants/types";
+import {container} from "../../../service/di";
+import * as bodyParser from "body-parser";
+import * as httpErrors from "http-errors";
+import {NextHandleFunction} from "connect";
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+): Promise<void> {
+  try {
+    await runMiddleware(
+      req,
+      res,
+      bodyParser.json({type: "application/json", verify})
+    );
+  } catch (e) {
+    if (httpErrors.isHttpError(e)) {
+      return res.status(e.statusCode).json({error: e.message});
+    } else {
+      throw e;
+    }
+  }
+
+  try {
+    await _handler(req, res);
+  } catch (e) {
+    return res.status(400).json({error: "Webhook error"});
+  }
+}
+
+function runMiddleware(
+  req: NextApiRequest,
+  res: NextApiResponse,
+  middleware: NextHandleFunction
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    middleware(req, res, (result) =>
+      result instanceof Error ? reject(result) : resolve(result)
+    );
+  });
+}
+
+function verify(
+  req: NextApiRequest,
+  res: NextApiResponse,
+  buf: Buffer,
+  enc: string
+): void {
+  const secret = process.env.GITHUB_WEBHOOK_SECRET;
+  if (secret === undefined || secret === "") {
+    return;
+  }
+
+  let expectedSignature = req.headers["x-hub-signature-256"];
+  if (!expectedSignature) {
+    throw new Error("Missing required webhook signature.");
+  }
+  if (typeof expectedSignature !== "string") {
+    throw new Error("Multiple webhook signature specified.");
+  }
+  if (!expectedSignature.startsWith("sha256=")) {
+    throw new Error("Webhook signature must start with sha256=");
+  }
+  expectedSignature = expectedSignature.substring("sha256=".length);
+
+  const expectedBuf = Buffer.from(expectedSignature, "hex");
+  if (expectedBuf.length === 0) {
+    throw new Error("Webhook signature must contain only hexadecimal characters");
+  }
+  const signature = crypto
+    .createHmac("sha256", secret)
+    .update(buf)
+    .digest("hex");
+
+  const computedBuf = Buffer.from(signature, "hex");
+
+  if (
+    expectedBuf.length !== computedBuf.length ||
+    !crypto.timingSafeEqual(expectedBuf, computedBuf)
+  ) {
+    throw new Error("Webhook signature did not match.");
+  }
+}
 
 // Handler for GitHub pull requests.
 // It verifies that the user who is creating a PR signed the CLA,
 // and posts a status check to the PR.
-const handler = container.get<ClaCheckHandler>(TYPES.ClaCheckHandler);
+const claHandler = container.get<ClaCheckHandler>(TYPES.ClaCheckHandler);
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
+async function _handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+): Promise<void> {
   const {method} = req;
 
   if (method !== "POST") {
@@ -76,6 +169,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         `);
       }
 
+      if (Buffer.from(pullRequestHeadSha, "hex").length === 0) {
+        return res.status(400).end(`Invalid pull request HEAD SHA`);
+      }
+
       const input: ClaCheckInput = {
         gitHubUserId,
         agreementVersionId: null,
@@ -95,10 +192,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         },
       };
 
-      await handler.checkCla(input);
+      await claHandler.checkCla(input);
       res.status(200).end("OK");
       break;
     default:
       return res.status(400).end(`The event ${event} is not handled.`);
   }
-};
+}

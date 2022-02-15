@@ -60,6 +60,7 @@ def get_env_variables(
     oauth_application_secret: str,
     server_url: str,
     application_secret: str,
+    webhook_secret: str,
     organization_name: str,
     organization_display_name: Optional[str],
 ) -> Dict[str, str]:
@@ -78,6 +79,7 @@ def get_env_variables(
         "GITHUB_OAUTH_APPLICATION_SECRET": oauth_application_secret,
         "SERVER_URL": server_url,
         "SECRET": application_secret,
+        "GITHUB_WEBHOOK_SECRET": webhook_secret or "",
         "ORGANIZATION_NAME": organization_name,
         "ORGANIZATION_DISPLAY_NAME": organization_display_name or "edgedb",
     }
@@ -164,6 +166,7 @@ def main() -> None:
         get_secret(secrets_manager, "GITHUB_OAUTH_APPLICATION_SECRET"),
         get_secret(secrets_manager, "SERVER_URL"),
         get_secret(secrets_manager, "SECRET"),
+        get_secret(secrets_manager, "GITHUB_WEBHOOK_SECRET"),
         get_secret(secrets_manager, "ORGANIZATION_NAME"),
         get_optional_secret(secrets_manager, "ORGANIZATION_DISPLAY_NAME")
     )
