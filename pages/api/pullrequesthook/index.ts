@@ -8,6 +8,7 @@ import {container} from "../../../service/di";
 import * as bodyParser from "body-parser";
 import * as httpErrors from "http-errors";
 import {NextHandleFunction} from "connect";
+import {createAPIHandler} from "../../../pages-common/apiHandler";
 
 export const config = {
   api: {
@@ -15,30 +16,37 @@ export const config = {
   },
 };
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-): Promise<void> {
-  try {
-    await runMiddleware(
-      req,
-      res,
-      bodyParser.json({type: "application/json", verify})
-    );
-  } catch (e) {
-    if (httpErrors.isHttpError(e)) {
-      return res.status(e.statusCode).json({error: e.message});
-    } else {
-      throw e;
-    }
-  }
+// Handler for GitHub pull requests.
+// It verifies that the user who is creating a PR signed the CLA,
+// and posts a status check to the PR.
+const claHandler = container.get<ClaCheckHandler>(TYPES.ClaCheckHandler);
 
-  try {
-    await _handler(req, res);
-  } catch (e) {
-    return res.status(400).json({error: "Webhook error"});
-  }
-}
+export default createAPIHandler({
+  POST: {
+    noAuth: true,
+    handler: async (req, res) => {
+      try {
+        await runMiddleware(
+          req,
+          res,
+          bodyParser.json({type: "application/json", verify})
+        );
+      } catch (e) {
+        if (httpErrors.isHttpError(e)) {
+          return res.status(e.statusCode).json({error: e.message});
+        } else {
+          throw e;
+        }
+      }
+
+      try {
+        await _handler(req, res);
+      } catch (e) {
+        return res.status(400).json({error: "Webhook error"});
+      }
+    },
+  },
+});
 
 function runMiddleware(
   req: NextApiRequest,
@@ -77,7 +85,9 @@ function verify(
 
   const expectedBuf = Buffer.from(expectedSignature, "hex");
   if (expectedBuf.length === 0) {
-    throw new Error("Webhook signature must contain only hexadecimal characters");
+    throw new Error(
+      "Webhook signature must contain only hexadecimal characters"
+    );
   }
   const signature = crypto
     .createHmac("sha256", secret)
@@ -94,21 +104,10 @@ function verify(
   }
 }
 
-// Handler for GitHub pull requests.
-// It verifies that the user who is creating a PR signed the CLA,
-// and posts a status check to the PR.
-const claHandler = container.get<ClaCheckHandler>(TYPES.ClaCheckHandler);
-
 async function _handler(
   req: NextApiRequest,
   res: NextApiResponse
 ): Promise<void> {
-  const {method} = req;
-
-  if (method !== "POST") {
-    return res.status(404).end("Not found");
-  }
-
   // Next.js enforces lowercase header names
   const event = req.headers["x-github-event"];
 
@@ -119,17 +118,15 @@ async function _handler(
   switch (event) {
     case "ping":
       // sent when configuring a webhook
-      res.status(200).end("Hi there!");
-      break;
+      return res.status(200).end("Hi there!");
     case "pull_request":
       const {body} = req;
 
       const action = body.action;
       if (["opened", "reopened", "synchronize"].indexOf(action) === -1) {
-        res
+        return res
           .status(200)
           .end(`Doing nothing: the pull_request action is ${action}`);
-        break;
       }
 
       const gitHubUserId = body?.pull_request?.user?.id;
@@ -193,8 +190,8 @@ async function _handler(
       };
 
       await claHandler.checkCla(input);
-      res.status(200).end("OK");
-      break;
+      return res.status(200).end("OK");
+
     default:
       return res.status(400).end(`The event ${event} is not handled.`);
   }

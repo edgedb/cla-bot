@@ -3,6 +3,7 @@ import {container} from "../../../service/di";
 import {AgreementsHandler} from "../../../service/handlers/agreements";
 import {TYPES} from "../../../constants/types";
 import {ServerError} from "../../../service/common/app";
+import {createAPIHandler} from "../../../pages-common/apiHandler";
 
 interface SignedAgreement {
   title: string;
@@ -10,32 +11,39 @@ interface SignedAgreement {
 }
 
 // Returns the text of an already signed agreement
-export default async (
-  req: NextApiRequest,
-  res: NextApiResponse<SignedAgreement>
-) => {
-  const versionId = req.query.version;
 
-  if (typeof versionId !== "string") {
-    return res.status(400).end("Missing version parameter");
-  }
+export default createAPIHandler({
+  GET: {
+    noAuth: true,
+    handler: async (
+      req: NextApiRequest,
+      res: NextApiResponse<SignedAgreement>
+    ) => {
+      const versionId = req.query.version;
 
-  const licensesHandler = container.get<AgreementsHandler>(
-    TYPES.AgreementsHandler
-  );
+      if (typeof versionId !== "string") {
+        return res.status(400).end("Missing version parameter");
+      }
 
-  const agreementText = await licensesHandler.getAgreementText(
-    versionId,
-    "en"
-  );
+      const licensesHandler = container.get<AgreementsHandler>(
+        TYPES.AgreementsHandler
+      );
 
-  if (agreementText.versionId === null) {
-    // We need the agreement version id here, for the reason described below
-    throw new ServerError("Missing version id in agreement text context.");
-  }
+      const agreementText = await licensesHandler.getAgreementText(
+        versionId,
+        "en"
+      );
 
-  res.status(200).json({
-    text: agreementText.text,
-    title: agreementText.title,
-  });
-};
+      if (agreementText.versionId === null) {
+        // We need the agreement version id here,
+        // for the reason described below
+        throw new ServerError("Missing version id in agreement text context.");
+      }
+
+      res.status(200).json({
+        text: agreementText.text,
+        title: agreementText.title,
+      });
+    },
+  },
+});

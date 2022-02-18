@@ -1,15 +1,17 @@
-import {auth} from "../../../../../pages-common/auth";
 import {container} from "../../../../../service/di";
 import {AgreementsHandler} from "../../../../../service/handlers/agreements";
 import {NextApiRequest, NextApiResponse} from "next";
 import {TYPES} from "../../../../../constants/types";
-import {handleExceptions} from "../../../";
+import {createAPIHandler} from "../../../../../pages-common/apiHandler";
 
 const agreementsHandler = container.get<AgreementsHandler>(
   TYPES.AgreementsHandler
 );
 
-export default async (req: NextApiRequest, res: NextApiResponse<any>) => {
+function parseQueryParams(
+  req: NextApiRequest,
+  res: NextApiResponse
+): {id: string; culture: string} | void {
   const {
     query: {id, culture},
   } = req;
@@ -24,43 +26,49 @@ export default async (req: NextApiRequest, res: NextApiResponse<any>) => {
     return res.status(400).end("Invalid culture code");
   }
 
-  switch (req.method) {
-    case "GET":
-      await handleExceptions(res, async () => {
-        const data = await agreementsHandler
-          .getAgreementTextByVersionIdAndCulture(
-            id,
-            culture
-          );
+  return {id, culture};
+}
 
-        if (!data) {
-          return res.status(404).end("Agreement text not found.");
-        }
+export default createAPIHandler({
+  GET: {
+    noAuth: true,
+    handler: async (req: NextApiRequest, res: NextApiResponse) => {
+      const params = parseQueryParams(req, res);
 
-        return res.status(200).json(data);
-      });
+      if (!params) {
+        return;
+      }
 
-      break;
-    case "PUT":
-      await auth(req, res);
-
-      // inserts or updates the text of an existing agreement version
-      // by id and culture: id is a version id
-      await handleExceptions(res, async () => {
-        const body = req.body;
-
-        await agreementsHandler.updateAgreementTextByVersionIdAndCulture(
-          id,
-          culture,
-          body.title,
-          body.text
+      const data =
+        await agreementsHandler.getAgreementTextByVersionIdAndCulture(
+          params.id,
+          params.culture
         );
-        return res.status(204).end();
-      });
 
-      break;
-    default:
-      res.status(405).end(`${req.method} not allowed`);
-      break;
-  }
-};
+      if (!data) {
+        return res.status(404).end("Agreement text not found.");
+      }
+
+      return res.status(200).json(data);
+    },
+  },
+  PUT: async (req: NextApiRequest, res: NextApiResponse) => {
+    const params = parseQueryParams(req, res);
+
+    if (!params) {
+      return;
+    }
+
+    const body = req.body;
+
+    // inserts or updates the text of an existing agreement version
+    // by id and culture: id is a version id
+    await agreementsHandler.updateAgreementTextByVersionIdAndCulture(
+      params.id,
+      params.culture,
+      body.title,
+      body.text
+    );
+    return res.status(204).end();
+  },
+});

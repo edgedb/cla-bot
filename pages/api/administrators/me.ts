@@ -1,10 +1,10 @@
-import {auth} from "../../../pages-common/auth";
-import {handleExceptions} from "..";
+import {AuthContext} from "../../../pages-common/auth";
 import {NextApiRequest, NextApiResponse} from "next";
+import {createAPIHandler} from "../../../pages-common/apiHandler";
 
-export default async (req: NextApiRequest, res: NextApiResponse) => {
-  await handleExceptions(res, async () => {
-    const user = await auth(req, res);
+export default createAPIHandler({
+  GET: async (req: NextApiRequest, res: NextApiResponse) => {
+    const user = (req as unknown as AuthContext).user;
     res.status(200).json(user);
-  });
-};
+  },
+});

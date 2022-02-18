@@ -18,7 +18,7 @@ function getMessageForError(error: Error): string {
   return "Unauthorized";
 }
 
-function readJWTBearer(req: NextApiRequest): Promise<object> {
+export function readJWTBearer(req: NextApiRequest): Promise<object> {
   return new Promise((resolve, reject) => {
     const authorization = req.headers.authorization;
 
@@ -45,35 +45,5 @@ function readJWTBearer(req: NextApiRequest): Promise<object> {
     }
 
     resolve(identity);
-  });
-}
-
-// NB: the function below is coded like in the official documentation
-// middlewares example (2020.06.04).
-// This is convenient because some admin api routes can still be public:
-// for example those that return the list of agreements (GET),
-// even though cherry-picking endpoints that require authentication is
-// not the best developer's UX.
-
-/**
- * Requires an authenticated user for an API request. Inspects request headers
- * to look for a valid JWT Bearer token. Stops request handling and returns
- * 401 for unauthorized users.
- */
-export function auth(
-  req: NextApiRequest,
-  res: NextApiResponse
-): Promise<object> {
-  return new Promise((resolve, reject) => {
-    readJWTBearer(req).then(
-      (user) => {
-        (req as unknown as AuthContext).user = user;
-        resolve(user);
-      },
-      (error) => {
-        res.status(401).end(error);
-        reject(error);
-      }
-    );
   });
 }
