@@ -20,13 +20,13 @@ export class EdgeDBClaRepository
   ): Promise<ContributorLicenseAgreement | null> {
     const signed_cla = await this.run(async (connection) => {
       return await connection.querySingle<ClaItem>(
-        `SELECT ContributorLicenseAgreement {
+        `SELECT assert_single((SELECT ContributorLicenseAgreement {
           email,
           username,
           creation_time,
           versionId := .agreement_version.id
         }
-        FILTER .email = <str>$0;`,
+        FILTER .normalized_email = str_lower(<str>$0)));`,
         [email]
       );
     });

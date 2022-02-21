@@ -85,6 +85,11 @@ module default {
         required property email -> str {
             constraint exclusive;
         };
+        index on (.email);
+
+        property normalized_email := str_lower(.email);
+        constraint exclusive on (.normalized_email);
+        index on (.normalized_email);
 
         property username -> str;
 
@@ -93,8 +98,6 @@ module default {
         }
 
         required link agreement_version -> AgreementVersion;
-
-        index on (.email);
 
         index on (.agreement_version);
     }
