@@ -4,26 +4,28 @@ import {AgreementsHandler} from "../../../../service/handlers/agreements";
 import {NextApiRequest, NextApiResponse} from "next";
 import {TYPES} from "../../../../constants/types";
 import {ErrorDetails} from "../../../../service/common/web";
+import {createAPIHandler} from "../../../../pages-common/apiHandler";
 
 const agreementsHandler = container.get<AgreementsHandler>(
   TYPES.AgreementsHandler
 );
 
-export default async (
-  req: NextApiRequest,
-  res: NextApiResponse<AgreementVersion | ErrorDetails | void>
-) => {
-  const {
-    query: {id},
-  } = req;
+export default createAPIHandler({
+  GET: {
+    noAuth: true,
+    handler: async (
+      req: NextApiRequest,
+      res: NextApiResponse<AgreementVersion | ErrorDetails | void>
+    ) => {
+      const {
+        query: {id},
+      } = req;
 
-  if (typeof id !== "string") {
-    // should never happen by definition
-    return res.status(400).end("Invalid object id");
-  }
+      if (typeof id !== "string") {
+        // should never happen by definition
+        return res.status(400).end("Invalid object id");
+      }
 
-  switch (req.method) {
-    case "GET":
       const data = await agreementsHandler.getAgreementVersion(id);
 
       if (!data) {
@@ -31,8 +33,6 @@ export default async (
       }
 
       res.status(200).json(data);
-      return;
-  }
-
-  res.status(405).end(`${req.method} not allowed`);
-};
+    },
+  },
+});

@@ -1,11 +1,10 @@
 import githubAuth from "./configuration";
 import {NextApiRequest, NextApiResponse} from "next";
-import {SafeError} from "../../../../../service/common/web";
 import {readOAuthError} from "../../../../../pages-common/oauth";
 import {AdministratorsHandler} from "../../../../../service/handlers/administrators";
 import {container} from "../../../../../service/di";
 import {TYPES} from "../../../../../constants/types";
-import {handleExceptions} from "../../../";
+import {handleExceptions} from "../../../../../pages-common/handleExceptions";
 
 const administratorsHandler = container.get<AdministratorsHandler>(
   TYPES.AdministratorsHandler
