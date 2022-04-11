@@ -18,18 +18,41 @@ export class EdgeDBClaRepository
   async getClaByEmailAddress(
     email: string
   ): Promise<ContributorLicenseAgreement | null> {
-    const signed_cla = await this.run(async (connection) => {
-      return await connection.querySingle<ClaItem>(
-        `SELECT assert_single((SELECT ContributorLicenseAgreement {
-          email,
-          username,
-          creation_time,
-          versionId := .agreement_version.id
-        }
-        FILTER .normalized_email = str_lower(<str>$0)));`,
-        [email]
-      );
-    });
+    const ghPseudoEmail = /^([0-9]+)\+([^@]+)@users\.noreply\.github\.com$/;
+    const ghEmailMatches = email.match(ghPseudoEmail);
+    let signed_cla = null;
+    if (ghEmailMatches)
+    {
+      signed_cla = await this.run(async (connection) => {
+        return await connection.querySingle<ClaItem>(
+          `SELECT ContributorLicenseAgreement {
+            email,
+            username,
+            creation_time,
+            versionId := .agreement_version.id
+          }
+          FILTER .username = <str>$0
+          ORDER BY .email
+          LIMIT 1;`,
+          [ghEmailMatches[2]]
+        );
+      });
+    }
+    else
+    {
+      signed_cla = await this.run(async (connection) => {
+        return await connection.querySingle<ClaItem>(
+          `SELECT assert_single((SELECT ContributorLicenseAgreement {
+            email,
+            username,
+            creation_time,
+            versionId := .agreement_version.id
+          }
+          FILTER .normalized_email = str_lower(<str>$0)));`,
+          [email]
+        );
+      });
+    }
 
     if (signed_cla) {
       return new ContributorLicenseAgreement(
