@@ -161,7 +161,8 @@ class ClaCheckHandler {
     const allAuthors = await this._statusCheckService
       .getAllAuthorsByPullRequestId(
         data.repository.fullName,
-        data.pullRequest.number
+        data.pullRequest.number,
+        this._settings.preApprovedAccounts
       );
 
     if (!allAuthors.length) {

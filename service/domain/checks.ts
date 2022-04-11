@@ -25,7 +25,8 @@ export class StatusCheckInput {
 export interface StatusChecksService {
   getAllAuthorsByPullRequestId(
     targetRepoFullName: string,
-    pullRequestNumber: number
+    pullRequestNumber: number,
+    preApprovedAccounts: string[]
   ): Promise<string[]>;
 
   createStatus(

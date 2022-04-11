@@ -24,12 +24,18 @@ interface GitHubCommitInfo {
   url: string;
 }
 
+interface GitHubLoginInfo {
+  login: string;
+}
+
 interface GitHubCommitItem {
   sha: string;
   node_id: string;
   commit: GitHubCommitInfo;
   url: string;
   html_url: string;
+  author: GitHubLoginInfo;
+  committer: GitHubLoginInfo;
 }
 
 @injectable()
@@ -43,7 +49,8 @@ export class GitHubStatusChecksAPI implements StatusChecksService {
   @async_retry()
   async getAllAuthorsByPullRequestId(
     targetRepoFullName: string,
-    pullRequestNumber: number
+    pullRequestNumber: number,
+    preApprovedAccounts: string[]
   ): Promise<string[]> {
     let pageNumber = 0;
     const authorsEmails = new Set<string>();
@@ -62,7 +69,10 @@ export class GitHubStatusChecksAPI implements StatusChecksService {
       const data: GitHubCommitItem[] = await response.json();
 
       data.forEach((item) => {
-        authorsEmails.add(item.commit.author.email);
+        if (!(item.author && preApprovedAccounts.includes(item.author.login)))
+        {
+          authorsEmails.add(item.commit.author.email);
+        }
       });
 
       if (!data.length || !hasMoreItems(response)) {
