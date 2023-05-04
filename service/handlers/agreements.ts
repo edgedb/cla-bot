@@ -1,7 +1,7 @@
 import {
   Agreement,
   AgreementListItem,
-  AgreementsRepository,
+  type AgreementsRepository,
   AgreementText,
   AgreementVersion,
 } from "../domain/agreements";

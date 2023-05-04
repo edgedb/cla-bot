@@ -1,14 +1,14 @@
 import {inject, injectable} from "inversify";
 import {TYPES} from "../../constants/types";
-import {
+import type {
   Administrator,
   AdministratorsRepository,
 } from "../domain/administrators";
 import {BadRequestError, UnauthorizedError} from "../common/web";
 import {validateEmail} from "../common/emails";
-import {UsersService} from "../domain/users";
+import type {UsersService} from "../domain/users";
 import {TokensHandler} from "./tokens";
-import {OrganizationsService} from "../domain/organizations";
+import type {OrganizationsService} from "../domain/organizations";
 import {ServiceSettings} from "../settings";
 
 @injectable()
