@@ -1,16 +1,15 @@
 import {async_retry} from "../common/resiliency";
-import {StatusChecksService} from "../../service/domain/checks";
+import {type StatusChecksService} from "../../service/domain/checks";
 import {
   ContributorLicenseAgreement,
   ClaCheckInput,
-  ClaRepository,
+  type ClaRepository,
 } from "../../service/domain/cla";
 import {ClaCheckHandler} from "./check-cla";
 import {
-  CommentsRepository,
-  CommentsService,
+  type CommentsRepository,
 } from "../../service/domain/comments";
-import {EmailInfo, UsersService} from "../../service/domain/users";
+import {type EmailInfo, type UsersService} from "../../service/domain/users";
 import {inject, injectable} from "inversify";
 import {SafeError} from "../common/web";
 import {TokensHandler} from "./tokens";

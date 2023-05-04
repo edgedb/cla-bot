@@ -2,15 +2,15 @@ import {async_retry} from "../common/resiliency";
 import {
   CheckState,
   StatusCheckInput,
-  StatusChecksService,
+  type StatusChecksService,
 } from "../../service/domain/checks";
-import {ClaCheckInput, ClaRepository} from "../../service/domain/cla";
-import {
+import type {ClaCheckInput, ClaRepository} from "../../service/domain/cla";
+import type {
   CommentsRepository,
   CommentsService,
 } from "../../service/domain/comments";
 import {inject, injectable} from "inversify";
-import {AgreementsRepository} from "../domain/agreements";
+import {type AgreementsRepository} from "../domain/agreements";
 import {ServiceSettings} from "../settings";
 import {TokensHandler} from "../handlers/tokens";
 import {TYPES} from "../../constants/types";

@@ -2,14 +2,14 @@ import {inject, injectable} from "inversify";
 import {BadRequestError, ConflictError} from "../common/web";
 import {TYPES} from "../../constants/types";
 import {
-  ClaRepository,
+  type ClaRepository,
   ContributorLicenseAgreement,
   ClasImportInput,
   ClasImportOutput,
   ClasImportEntryResult,
 } from "../domain/cla";
 import {validateEmail} from "../common/emails";
-import {AgreementsRepository} from "../domain/agreements";
+import {type AgreementsRepository} from "../domain/agreements";
 import {v4 as uuid} from "uuid";
 import {ImportEntry} from "../../components/admin/clas/contracts";
 
