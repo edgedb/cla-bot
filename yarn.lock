@@ -451,6 +451,13 @@
   dependencies:
     "@jridgewell/trace-mapping" "0.3.9"
 
+"@edgedb/generate@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@edgedb/generate/-/generate-0.1.0.tgz#dc6696a089de8662ba4d63ad07b80768f35a2bba"
+  integrity sha512-pV/40NUXuuxeTmW76a6Pa/ZjQvvI3wiFTpynbPe961OGWwyl4Y3oeUBLHA49huZiBbYgowsYEm4HZL0TDM8eEA==
+  dependencies:
+    chokidar "^3.5.3"
+
 "@emotion/hash@^0.8.0":
   version "0.8.0"
   resolved "https://registry.yarnpkg.com/@emotion/hash/-/hash-0.8.0.tgz#bbbff68978fefdbe68ccb533bc8cbe1d1afb5413"
@@ -1307,7 +1314,7 @@ chokidar@3.5.1:
   optionalDependencies:
     fsevents "~2.3.1"
 
-"chokidar@>=3.0.0 <4.0.0":
+"chokidar@>=3.0.0 <4.0.0", chokidar@^3.5.3:
   version "3.5.3"
   resolved "https://registry.yarnpkg.com/chokidar/-/chokidar-3.5.3.tgz#1cf37c8707b932bd1af1ae22c0432e2acd1903bd"
   integrity sha512-Dr3sfKRP6oTcjf2JmUmFJfeVMvXBdegxB0iVQ5eb2V10uFJUCAS8OByZdVAyVb8xXNz3GjjTgj9kLWsZTqE6kw==
