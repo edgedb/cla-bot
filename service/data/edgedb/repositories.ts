@@ -42,7 +42,7 @@ export class EdgeDBRepositoriesRepository
     await this.run(async (connection) =>
       e
         .delete(e.Repository, (repo) => ({
-          filter_single: {id}
+          filter_single: {id},
         }))
         .run(connection)
     );

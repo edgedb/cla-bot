@@ -157,8 +157,7 @@ async function _handler(
         !targetRepositoryFullName ||
         !targetRepositoryName
       ) {
-        res.status(400)
-          .end(`Expected a pull request webhook payload with:
+        res.status(400).end(`Expected a pull request webhook payload with:
           pull_request.number;
           pull_request.user.id;
           pull_request.url;

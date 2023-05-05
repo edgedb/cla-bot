@@ -107,13 +107,8 @@ export default class NewAdministratorForm extends Component<
   }
 
   render(): ReactElement {
-    const {
-      email,
-      emailError,
-      emailHelperText,
-      submitting,
-      submitError,
-    } = this.state;
+    const {email, emailError, emailHelperText, submitting, submitError} =
+      this.state;
 
     return (
       <div>
