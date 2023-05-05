@@ -6,9 +6,7 @@ import {
   type ClaRepository,
 } from "../../service/domain/cla";
 import {ClaCheckHandler} from "./check-cla";
-import {
-  type CommentsRepository,
-} from "../../service/domain/comments";
+import {type CommentsRepository} from "../../service/domain/comments";
 import {type EmailInfo, type UsersService} from "../../service/domain/users";
 import {inject, injectable} from "inversify";
 import {SafeError} from "../common/web";
@@ -47,14 +45,14 @@ class SignClaHandler {
       username,
       versionId: agreementVersionId,
       signedAt: new Date(),
-    }
+    };
     await this._claRepository.saveCla(cla);
     return cla;
   }
 
   private getAllAuthors(data: ClaCheckInput): string[] {
     if (data.authors) {
-      return data.authors.map(email => email.toLowerCase());
+      return data.authors.map((email) => email.toLowerCase());
     }
 
     throw new Error("Missing authors information in state.");

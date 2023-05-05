@@ -115,9 +115,8 @@ export class GitHubAccessHandler {
 
   getCachedAccessToken(targetAccountId: number): AccessToken | null {
     if (targetAccountId in this._accountAccessTokensCache) {
-      const cachedAccessToken = this._accountAccessTokensCache[
-        targetAccountId
-      ];
+      const cachedAccessToken =
+        this._accountAccessTokensCache[targetAccountId];
 
       // applies a margin of 60 seconds while checking for expiration
       if (new Date().getTime() + 60000 < cachedAccessToken.expiresAt) {
@@ -226,9 +225,8 @@ export class GitHubAccessHandler {
     );
 
     // tslint:disable-next-line: max-line-length
-    const installationAccessTokenResult = await this.getAccessTokenForInstallation(
-      installationId
-    );
+    const installationAccessTokenResult =
+      await this.getAccessTokenForInstallation(installationId);
 
     this.setCachedAccessToken(targetAccountId, {
       value: installationAccessTokenResult.token,

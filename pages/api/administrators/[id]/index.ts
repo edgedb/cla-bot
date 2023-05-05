@@ -16,7 +16,7 @@ export default createAPIHandler({
     if (typeof id !== "string") {
       // should never happen by definition
       res.status(400).end("Invalid object id");
-      return
+      return;
     }
 
     await administratorsHandler.removeAdministrator(id);

@@ -52,9 +52,8 @@ class ClaCheckHandler {
     // We create a JWT token, to ensure that the user cannot modify the
     // parameter
     const token = this._tokensHandler.createToken(data);
-    return (
-      `${this._settings.url}/contributor-license-agreement?state=${token}`
-    );
+    /* tslint:disable-next-line */
+    return `${this._settings.url}/contributor-license-agreement?state=${token}`;
   }
 
   getSignedComment(signedUrl: string): string {
@@ -83,8 +82,8 @@ class ClaCheckHandler {
     challengeUrl: string
   ): Promise<void> {
     // was a CLA comment for this PR already written?
-    const commentInfo = await this._commentsRepository
-      .getCommentInfoByPullRequestId(
+    const commentInfo =
+      await this._commentsRepository.getCommentInfoByPullRequestId(
         data.pullRequest.id
       );
 
@@ -190,8 +189,8 @@ class ClaCheckHandler {
       return data.agreementVersionId;
     }
 
-    const currentAgreementForRepository = await this._agreementsRepository
-      .getCurrentAgreementVersionForRepository(
+    const currentAgreementForRepository =
+      await this._agreementsRepository.getCurrentAgreementVersionForRepository(
         data.repository.fullName
       );
 
@@ -213,13 +212,12 @@ class ClaCheckHandler {
       return;
     }
 
-    const allAuthors = await this._statusCheckService
-      .getAllAuthorsByPullRequestId(
+    const allAuthors =
+      await this._statusCheckService.getAllAuthorsByPullRequestId(
         data.repository.fullName,
         data.pullRequest.number,
         this._settings.preApprovedAccounts
       );
-
 
     let emailsWithoutCla: string[] = [];
     let challengeUrl = "";
@@ -253,4 +251,4 @@ class ClaCheckHandler {
   }
 }
 
-export { ClaCheckHandler };
+export {ClaCheckHandler};

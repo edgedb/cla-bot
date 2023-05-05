@@ -354,14 +354,8 @@ export class ClasImport extends Component<{}, ClasImportState> {
   }
 
   render(): ReactElement {
-    const {
-      error,
-      submitError,
-      waiting,
-      selectedFile,
-      fileProblem,
-      entries,
-    } = this.state;
+    const {error, submitError, waiting, selectedFile, fileProblem, entries} =
+      this.state;
 
     return (
       <div>

@@ -80,7 +80,7 @@ export class ClasHandler {
           email: entry.email.trim().toLowerCase(),
           username: entry.username.trim(),
           versionId: currentVersion.id,
-          signedAt: new Date()
+          signedAt: new Date(),
         });
 
         results.push({
