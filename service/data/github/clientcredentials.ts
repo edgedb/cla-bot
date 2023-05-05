@@ -57,11 +57,11 @@ export class GitHubAccessHandler {
   }
 
   private getPrivateKeyPath(): string {
-    const privateRsaKeyPath = process.env.GITHUB_RSA_PRIVATE_KEY;
+    const privateRsaKeyPath = process.env.GITHUB_RSA_PRIVATE_KEY_FILE;
 
     if (!privateRsaKeyPath) {
       throw new Error(
-        "Missing GITHUB_RSA_PRIVATE_KEY environmental variable: " +
+        "Missing GITHUB_RSA_PRIVATE_KEY_FILE environmental variable: " +
           "it must contain the path to a private RSA key used to generate JWTs"
       );
     }
