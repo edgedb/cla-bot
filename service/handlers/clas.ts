@@ -8,7 +8,6 @@ import {
   ClasImportOutput,
   ClasImportEntryResult,
 } from "../domain/cla";
-import {validateEmail} from "../common/emails";
 import {type AgreementsRepository} from "../domain/agreements";
 import {v4 as uuid} from "uuid";
 import {ImportEntry} from "../../components/admin/clas/contracts";
@@ -32,12 +31,6 @@ export class ClasHandler {
   async getClaByEmail(
     email: string
   ): Promise<ContributorLicenseAgreement | null> {
-    if (!validateEmail(email)) {
-      throw new BadRequestError(
-        "The given value is not a valid email address"
-      );
-    }
-
     return await this._clasRepository.getClaByEmailAddress(email);
   }
 
@@ -65,16 +58,6 @@ export class ClasHandler {
     const results: ClasImportEntryResult[] = [];
     for (const entry of data.entries) {
       try {
-        // validate email
-        if (!validateEmail(entry.email)) {
-          results.push({
-            success: false,
-            entry: simplifyEntry(entry),
-            error: "Invalid email",
-          });
-          continue;
-        }
-
         await this._clasRepository.saveCla({
           id: uuid(),
           email: entry.email.trim().toLowerCase(),
